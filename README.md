@@ -28,6 +28,8 @@ To build the world: paint terrain in `data/maps/world.png` (see docs/ART_PIPELIN
 
 `scenes/test_room.tscn` is a small hand-made room for tuning movement (open it and press F6).
 
+Combat test arenas (main menu): tight and loose, to compare combat styles. R restarts, Esc returns to the menu.
+
 Tests: in Git Bash, run `tests/run_tests.sh` (`--soak` for a 10 game-minute bot run, `--render` for frame times in a window).
 
 ## Docs

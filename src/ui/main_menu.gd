@@ -1,5 +1,5 @@
 extends Control
-## Title screen: new game, continue from slot 0, quit.
+## Title screen: new game, continue from slot 0, the two combat test arenas, quit.
 
 const GAME := "res://game.tscn"
 
@@ -8,6 +8,8 @@ func _ready() -> void:
 	%NewButton.pressed.connect(_on_new_pressed)
 	%ContinueButton.pressed.connect(_on_continue_pressed)
 	%QuitButton.pressed.connect(get_tree().quit)
+	%ArenaTightButton.pressed.connect(get_tree().change_scene_to_file.bind("res://scenes/arenas/arena_tight.tscn"))
+	%ArenaLooseButton.pressed.connect(get_tree().change_scene_to_file.bind("res://scenes/arenas/arena_loose.tscn"))
 	%ContinueButton.disabled = not SaveSystem.has_save(0)
 	if %ContinueButton.disabled:
 		%NewButton.grab_focus()

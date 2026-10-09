@@ -73,7 +73,8 @@ Naming: `snake_case` for files and folders, `PascalCase` for `class_name`.
 | `EventBus` | Global signals only. `player_died`, `deed_recorded`, `chunk_loaded`, `faction_standing_changed`. No logic. |
 | `WorldState` | Holds the current `WorldData`. Single source of truth for the sim. |
 | `SaveSystem` | Serializes `WorldData` to `user://` and back. Owns versioning and migration. |
-| `GameClock` | Current year, in-life time, triggers time skips. |
+| `GameClock` | Current year, in-life time, triggers time skips. (Not created yet.) |
+| `Sfx` | Placeholder sound effects generated in code; `Sfx.play(&"hit", position)`. |
 
 Keep autoloads small. If one passes 300 lines, split it.
 

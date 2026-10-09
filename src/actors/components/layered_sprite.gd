@@ -38,10 +38,12 @@ func _ready() -> void:
 
 ## Plays an animation, unless it is already the current one. A one-shot
 ## animation (die, attack...) that has finished stays on its last frame for as
-## long as it keeps being asked for. Falls back to "idle".
+## long as it keeps being asked for. Falls back to "idle", then to the first animation.
 func play(animation: StringName) -> void:
 	if not _body.sprite_frames.has_animation(animation):
 		animation = &"idle"
+		if not _body.sprite_frames.has_animation(animation):
+			animation = _body.sprite_frames.get_animation_names()[0]  # E.g. a flyer only has "move".
 	if _body.animation == animation:
 		if _body.is_playing() or not _body.sprite_frames.get_animation_loop(animation):
 			return

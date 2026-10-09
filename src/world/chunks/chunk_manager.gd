@@ -60,6 +60,19 @@ func _process(_delta: float) -> void:
 	_build_some(cells_per_frame)
 
 
+## Atlas coords of the tile for a (non-empty) ChunkData cell.
+static func atlas_coords(cell: int) -> Vector2i:
+	return Vector2i((cell - 1) % 4, (cell - 1) / 4)
+
+
+## Fills a TileMapLayer with a whole chunk at once (arenas, tools), with its
+## top-left cell at `origin`.
+static func fill_layer(layer: TileMapLayer, data: ChunkData, origin := Vector2i.ZERO) -> void:
+	for i in data.cells.size():
+		if data.cells[i] != ChunkData.EMPTY:
+			layer.set_cell(origin + Vector2i(i % ChunkData.SIZE, i / ChunkData.SIZE), 0, atlas_coords(data.cells[i]))
+
+
 func is_loaded(coord: Vector2i) -> bool:
 	return _layers.has(coord)
 
@@ -136,10 +149,8 @@ func _build_some(budget: int) -> void:
 		var total := cells.size()
 		var end := total if budget < 0 else mini(total, job.next + budget)
 		for i in range(job.next, end):
-			var cell := cells[i]
-			if cell != ChunkData.EMPTY:
-				var open := cell - 1
-				layer.set_cell(Vector2i(i % ChunkData.SIZE, i / ChunkData.SIZE), 0, Vector2i(open % 4, open / 4))
+			if cells[i] != ChunkData.EMPTY:
+				layer.set_cell(Vector2i(i % ChunkData.SIZE, i / ChunkData.SIZE), 0, atlas_coords(cells[i]))
 		if budget > 0:
 			budget -= end - job.next
 		job.next = end
