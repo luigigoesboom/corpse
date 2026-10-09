@@ -33,6 +33,15 @@ Format: ID, date, decision, why, what it rules out.
 **D-007 Godot 4.x with GDScript** (2026-10)
 - Why: already chosen by the developer. GDScript is fast to iterate in. C# or GDExtension only if profiling shows a real need.
 
+**D-008 Chunk streaming prototype pulled forward to week 2** (2026-10-09)
+- Why: wanted a big world to test movement in. A basic version of week 5 (chunks load/unload around the player) was built alongside week 2. Weeks 3 and 4 still come next in order; week 5's "done when" is re-checked when it comes up.
+- Details: 16 x 8 chunks, hard-coded until the painted map (week 4) sets the bounds. Load radius 1 (3 x 3 chunks) instead of the 2 in ARCHITECTURE.md, because one 64-tile chunk is already 2048 px, far wider than the screen. Only rock cells that touch open space get collision.
+- Rules out: nothing. Generation is still on the main thread (week 6 moves it to a worker).
+
+**D-009 Wall cling over ledge grab** (2026-10-09)
+- Why: simpler, and climbing up flesh walls fits the setting. Push into a wall in the air to slide slowly, jump to kick off.
+- Rules out: ledge grab, for now.
+
 ---
 
 ## Open questions

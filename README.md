@@ -8,7 +8,7 @@ Somewhere at the center is the heart.
 
 ## Status
 
-Pre-production. Nothing playable yet. See [docs/ROADMAP.md](docs/ROADMAP.md) for where things stand.
+Early prototype. A placeholder character runs, jumps and wall-clings through a generated cave world that streams in chunks. See [docs/ROADMAP.md](docs/ROADMAP.md) for where things stand.
 
 ## Tech
 
@@ -22,7 +22,9 @@ Pre-production. Nothing playable yet. See [docs/ROADMAP.md](docs/ROADMAP.md) for
 2. Open Godot, choose Import, and select `project.godot` in this folder.
 3. Press F5.
 
-(`project.godot` gets created in week 1 of the roadmap.)
+Controls: A/D or arrows to run, Space/W/Up to jump (hold for higher), push into a wall in the air to cling. Gamepad works too. F3 toggles the debug overlay.
+
+`scenes/test_room.tscn` is a small hand-made room for tuning movement (open it and press F6).
 
 ## Docs
 

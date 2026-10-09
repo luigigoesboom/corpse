@@ -1,0 +1,44 @@
+class_name DebugOverlay
+extends CanvasLayer
+## F3 overlay: FPS, position, velocity, chunk coord, chunk loading.
+##
+## A CanvasLayer draws on top of the game, ignoring the camera, which is
+## what you want for UI and debug text.
+
+@export var player: Player
+## Optional. Scenes without chunk streaming (the test room) leave it empty.
+@export var chunks: ChunkManager
+
+var _label := Label.new()
+
+
+func _ready() -> void:
+	layer = 100
+	_label.position = Vector2(8, 8)
+	_label.add_theme_constant_override("outline_size", 6)
+	_label.add_theme_color_override("font_outline_color", Color.BLACK)
+	add_child(_label)
+	visible = false
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("debug_overlay"):
+		visible = not visible
+		if chunks:
+			chunks.debug_draw = visible
+
+
+func _process(_delta: float) -> void:
+	if not visible or not player:
+		return
+	var pos := player.global_position
+	var lines := PackedStringArray([
+		"FPS %d" % Engine.get_frames_per_second(),
+		"pos %.0f, %.0f   tile %d, %d" % [pos.x, pos.y, floori(pos.x / ChunkData.TILE_PX), floori(pos.y / ChunkData.TILE_PX)],
+		"vel %.0f, %.0f" % [player.velocity.x, player.velocity.y],
+		"chunk %s" % ChunkData.world_to_chunk(pos),
+		"floor %s  wall %s  cling %s" % [player.is_on_floor(), player.is_on_wall(), player.is_clinging()],
+	])
+	if chunks:
+		lines.append("chunks loaded %d  building %d" % [chunks.loaded_count(), chunks.pending_count()])
+	_label.text = "\n".join(lines)

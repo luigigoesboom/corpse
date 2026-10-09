@@ -46,4 +46,4 @@ A god fell from the sky and died. Its body is a continent. Parasite civilization
 
 ## Current status
 
-Week 0 done: concept and docs. Next: ROADMAP week 1 (create the Godot project in this repo, folder layout, empty autoloads, player capsule that runs and jumps on a test TileMapLayer, camera follow).
+Weeks 1 and 2 built: player with tuned movement and wall cling, F3 overlay, test room (`scenes/test_room.tscn`). A chunk streaming prototype (D-008) runs in `game.tscn`: `ChunkGenerator` (src/world/gen) makes plain `ChunkData`, `ChunkManager` (src/world/chunks) builds one TileMapLayer per chunk. Week 2 still needs an outside playtester. Next: ROADMAP week 3 (WorldData, versioned save/load).
