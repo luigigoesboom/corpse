@@ -12,7 +12,8 @@ extends Node
 @export var shake_on_enemy := 3.0
 @export var shake_on_player := 7.0
 
-var _hitstop_until := 0
+## Counts hitstops; only the newest one may end the freeze.
+var _hitstop_id := 0
 
 
 func _ready() -> void:
@@ -35,8 +36,10 @@ func _on_hit_landed(target: Node, _amount: int) -> void:
 func _hitstop(seconds: float) -> void:
 	# Engine.time_scale slows everything that uses delta. The timer below
 	# ignores time scale (last argument), so it ends on real time.
+	_hitstop_id += 1
+	var id := _hitstop_id
 	Engine.time_scale = 0.02
-	_hitstop_until = maxi(_hitstop_until, Time.get_ticks_msec() + int(seconds * 1000.0))
 	await get_tree().create_timer(seconds, true, false, true).timeout
-	if Time.get_ticks_msec() >= _hitstop_until:
+	# A newer hit may have started its own freeze meanwhile; its timer ends it.
+	if id == _hitstop_id:
 		Engine.time_scale = 1.0

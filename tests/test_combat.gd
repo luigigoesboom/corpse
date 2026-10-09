@@ -18,6 +18,15 @@ func run() -> void:
 		await wait_frames(22)
 	check(dummy.get_node("Health").current == dummy_hp - 3, "three swings hit the dummy three times")
 
+	# Hitstop on: hammer the dummy, then the game must be back to full speed.
+	game.get_node("CombatFeel").hitstop_enabled = true
+	for i in 6:
+		await press("attack")
+		await create_timer(0.12, true, false, true).timeout  # Real time, like a player.
+	await create_timer(0.3, true, false, true).timeout
+	check(is_equal_approx(Engine.time_scale, 1.0), "after a flurry of hits the game runs at full speed again (time scale %.2f)" % Engine.time_scale)
+	game.get_node("CombatFeel").hitstop_enabled = false
+
 	# The chamber leech notices and bites.
 	var leech = entity("LeechChamber")
 	await goto(Vector2(leech.global_position.x - 150, 3178), 5)
