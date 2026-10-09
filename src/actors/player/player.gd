@@ -67,8 +67,6 @@ var _attack_cooldown_timer := 0.0
 var _hurt_timer := 0.0
 var _dead := false
 var _facing := 1.0
-## Squash and stretch, applied on top of facing. Springs back to (1, 1).
-var _squash := Vector2.ONE
 var _was_on_floor := true
 
 @onready var health: Health = $Health
@@ -79,6 +77,7 @@ var _was_on_floor := true
 @onready var _mutations: MutationHost = $Mutations
 @onready var _camera: Camera2D = $Camera2D
 @onready var _dust: CPUParticles2D = $Dust
+@onready var sprite: LayeredSprite = $Visual/Sprite
 
 
 func _ready() -> void:
@@ -110,17 +109,17 @@ func _physics_process(delta: float) -> void:
 	if not is_zero_approx(velocity.x) and not _clinging and has_control:
 		_facing = signf(velocity.x)
 	if is_on_floor() and not _was_on_floor and fall_speed > 300.0:
-		_squash = Vector2(1.3, 0.75)  # Landing: squash.
 		_dust.restart()
 	_was_on_floor = is_on_floor()
 
 	if has_control:
 		_handle_attack()
 		_handle_items()
-	_update_visual(delta)
+	_visual.scale.x = _facing
 
 
 func _process(delta: float) -> void:
+	sprite.play(_pick_animation())
 	# Flicker while invulnerable after a hit.
 	_visual.visible = _dead or not health.is_invulnerable() or int(Time.get_ticks_msec() / 60) % 2 == 0
 	# Look ahead: the camera leans the way you face, and down when falling fast.
@@ -128,9 +127,22 @@ func _process(delta: float) -> void:
 	_camera.offset = _camera.offset.lerp(look, minf(1.0, delta * 2.5))
 
 
-func _update_visual(delta: float) -> void:
-	_squash = _squash.lerp(Vector2.ONE, minf(1.0, delta * 12.0))
-	_visual.scale = Vector2(_facing * _squash.x, _squash.y)
+## Which animation fits what the host is doing right now. Order matters:
+## the first match wins.
+func _pick_animation() -> StringName:
+	if _dead:
+		return &"die"
+	if _hurt_timer > 0.0:
+		return &"hurt"
+	if _attack_cooldown_timer > attack_cooldown - 0.18:
+		return &"attack"
+	if _clinging:
+		return &"cling"
+	if not is_on_floor():
+		return &"jump" if velocity.y < 0.0 else &"fall"
+	if absf(velocity.x) > 20.0:
+		return &"run"
+	return &"idle"
 
 
 func is_dead() -> bool:
@@ -154,7 +166,6 @@ func respawn(at: Vector2) -> void:
 	global_position = at
 	velocity = Vector2.ZERO
 	health.heal_full()
-	_visual.rotation = 0.0
 
 
 func _handle_attack() -> void:
@@ -181,7 +192,6 @@ func _on_hurt(amount: int, from: Vector2, knockback: float) -> void:
 
 func _on_died() -> void:
 	_dead = true
-	_visual.rotation = PI / 2.0  # Placeholder "fallen over".
 	EventBus.player_died.emit()
 
 
@@ -263,14 +273,12 @@ func _apply_jump() -> void:
 	if _jump_buffer_timer > 0.0:
 		if _coyote_timer > 0.0:
 			velocity.y = _jump_velocity
-			_squash = Vector2(0.75, 1.3)  # Takeoff: stretch.
 			_dust.restart()
 			_consume_jump()
 		elif _wall_coyote_timer > 0.0:
 			velocity = Vector2(_wall_normal_x * wall_jump_push, _jump_velocity * wall_jump_height_ratio)
 			_wall_lock_timer = wall_jump_lock_time
 			_facing = signf(_wall_normal_x)
-			_squash = Vector2(0.8, 1.2)
 			_consume_jump()
 
 	if Input.is_action_just_released("jump") and velocity.y < 0.0:

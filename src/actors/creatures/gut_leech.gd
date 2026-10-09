@@ -30,9 +30,11 @@ var _dir := 1.0
 var _gravity := 1400.0
 var _rng := RandomNumberGenerator.new()
 var _player: Player
+var _hurt_time := 0.0
 
 @onready var _health: Health = $Health
 @onready var _visual: Node2D = $Visual
+@onready var _sprite: LayeredSprite = $Visual/Sprite
 @onready var _bite: Hitbox = $Visual/BiteHitbox
 @onready var _contact: Hitbox = $ContactHitbox
 @onready var _ledge_check: RayCast2D = $Visual/LedgeCheck
@@ -53,6 +55,7 @@ func _physics_process(delta: float) -> void:
 	if (_player == null or _player.is_dead()) and state in [State.NOTICE, State.CHASE, State.ATTACK, State.FLEE]:
 		_enter(State.WANDER)
 	_state_time += delta
+	_hurt_time -= delta
 	if not is_on_floor():
 		velocity.y += _gravity * delta
 
@@ -75,9 +78,7 @@ func _physics_process(delta: float) -> void:
 		State.NOTICE:
 			velocity.x = 0.0
 			_face(_player.global_position.x - global_position.x)
-			_visual.scale.y = 1.25  # Rears up.
 			if _state_time > 0.4:
-				_visual.scale.y = 1.0
 				_enter(State.CHASE)
 		State.CHASE:
 			var dx := _player.global_position.x - global_position.x
@@ -105,10 +106,8 @@ func _update_attack() -> void:
 	# 0.35 s wind-up, 0.25 s lunge with the bite on, 0.4 s recovery.
 	if _state_time < 0.35:
 		velocity.x = 0.0
-		_visual.scale.x = _dir * 0.8  # Squashes back before lunging.
 	elif _state_time < 0.6:
 		if not _bite.active:
-			_visual.scale.x = _dir
 			_bite.activate()
 			velocity.x = _dir * lunge_speed
 	elif _state_time < 1.0:
@@ -116,6 +115,24 @@ func _update_attack() -> void:
 		velocity.x = move_toward(velocity.x, 0.0, 40.0)
 	else:
 		_enter(State.CHASE)
+
+
+func _process(_delta: float) -> void:
+	_sprite.play(_pick_animation())
+
+
+func _pick_animation() -> StringName:
+	if state == State.DEAD:
+		return &"die"
+	if _hurt_time > 0.0:
+		return &"hurt"
+	if state == State.ATTACK:
+		if _state_time < 0.35:
+			return &"windup"
+		return &"attack" if _state_time < 0.6 else &"idle"
+	if state in [State.IDLE, State.NOTICE] or absf(velocity.x) < 5.0:
+		return &"idle"
+	return &"move"
 
 
 func _enter(new_state: State) -> void:
@@ -150,8 +167,7 @@ func _sees_player() -> bool:
 func _on_hurt(amount: int, from: Vector2, knockback: float) -> void:
 	DamageNumber.spawn(get_parent(), global_position, amount)
 	velocity = Vector2(signf(global_position.x - from.x) * knockback, -knockback * 0.4)
-	_visual.modulate = Color(3, 3, 3)
-	create_tween().tween_property(_visual, "modulate", Color.WHITE, 0.15)
+	_hurt_time = 0.2
 	if _health.current <= flee_health and not _health.is_dead():
 		_enter(State.FLEE)
 	elif state in [State.IDLE, State.WANDER]:
@@ -162,5 +178,6 @@ func _on_died() -> void:
 	_enter(State.DEAD)
 	_contact.deactivate()
 	var tween := create_tween()
+	tween.tween_interval(0.45)  # Let the death frames play.
 	tween.tween_property(self, "modulate:a", 0.0, 0.4)
 	tween.tween_callback(EventBus.entity_killed.emit.bind(self))

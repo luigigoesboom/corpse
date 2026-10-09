@@ -10,6 +10,7 @@ display_name = "Acid Gland"
 description = "A bulging sac under the jaw, full of the god's bile. Spit it."
 slot = "mouth"
 ability = ExtResource("2_ability")
+part_frames_dir = "res://assets/art/mutations/acid_gland"
 control_hint = "K"
 part_color = Color(0.75, 0.85, 0.2, 1)
 part_polygon = PackedVector2Array(0, -3, 6, -4, 9, 0, 6, 4, 0, 3)

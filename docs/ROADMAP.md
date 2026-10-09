@@ -59,8 +59,8 @@
 |---|---|---|
 | 13 | Components. Health, Hitbox, Hurtbox as reusable nodes. Player basic melee attack. Damage numbers or flash for debug. | Player can hit a training dummy and the dummy dies. |
 | 14 | Enemy AI. Small state machine: idle, wander, notice, chase, attack, flee. One grey box enemy. | An enemy finds you, fights you, and runs when hurt. |
-| 15 | **Art week: first rig.** Draw one Gut creature in separate parts, rig it with Skeleton2D and AnimationPlayer: idle, move, attack, hurt. Follow ART_PIPELINE.md. | The grey box enemy is replaced with your rigged creature. |
-| 16 | Player rig with sockets. Draw and rig the first host body. Named sockets (Marker2D on bones) where mutations will attach. | Player is drawn and animated, sockets visible in debug. |
+| 15 | **Art week: first creature (D-017).** Draw the Gut Leech as frame strips (idle, move, windup, attack, hurt, die) over the placeholder in assets/art/creatures/gut_leech. Follow ART_PIPELINE.md. | The grey box enemy is replaced with your rigged creature. |
+| 16 | Player host. Draw the colonist host strips and the three mutation overlays to match (assets/art/hosts, assets/art/mutations). | Player is drawn and animated, sockets visible in debug. |
 | 17 | Mutation system v1. MutationData resource (part scene, socket, ability, stats). Three mutations: acid gland (ranged spit), bone spur (dash attack), lung sac (slow fall / float). | Grafting a mutation adds the part to your body and the ability works. |
 | 18 | Enemies use mutations too. Two more creature types built from the same system. | Three creature types, one of them using a mutation you can also get. |
 | 19 | Combat feel. Hitstop, knockback, screen shake, invulnerability frames, placeholder sounds. Build two test arenas: one tight and punishing, one loose and systemic. | Both versions are playable. |

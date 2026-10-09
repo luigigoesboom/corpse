@@ -78,6 +78,12 @@ Format: ID, date, decision, why, what it rules out.
 - What: built together after week 9: main menu, pause menu, 8-pocket inventory, HUD (roadmap week 41 basics); combat components, player attack, training dummy, Gut Leech (weeks 13-14); mutations v1 with three abilities (week 17). All grey-box.
 - Why: developer wanted a playable loop sooner. Weeks 10-12 (set pieces, light, milestone) still to do; weeks 13, 14 and 17 are largely done but get re-checked against their "done when" when reached, and week 15-16 art rigs wait on Q-007.
 
+**D-017 Layered frame animation** (2026-10-09, answers Q-007, replaces the cutout-rig part of D-002)
+- What: frame-by-frame pixel animation from PNG strips (one per animation, square frames) loaded by `SpriteSheets`. `LayeredSprite` plays the body and keeps overlay layers (mutation parts, glow) on the same animation and frame, in front or behind.
+- Why: classic pixel-art look; rotating rig parts would smear pixels. A mutation only needs its own small overlay frames per animation, not a redraw of the host.
+- Costs: more drawing per animation than a rig; overlays must match the host's frame counts; several host body types will need one overlay set each. Squash and stretch removed (fractional scaling distorts pixels).
+- Rules out: Skeleton2D cutout rigs.
+
 ---
 
 ## Open questions
@@ -89,5 +95,4 @@ Format: ID, date, decision, why, what it rules out.
 | Q-003 | Do any mutations carry over between lives without reclaiming the corpse? | Week 25 |
 | Q-004 | Outlines or no outlines in the art style? | Week 15 |
 | Q-005 | Final name of the game. | Before the Steam page, week 45 |
-| Q-007 | Pixel art animation: frame-by-frame sprites, or a pixel-friendly rig (no rotation, parts only move)? Decides how mutations attach. | Week 15 |
 | Q-006 | Breakable terrain at all? Developer doubts it. If not, week 8 becomes "chunk diffs for entity state only" (dead NPCs, taken items, corpses). | Week 8 |

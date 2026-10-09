@@ -1,10 +1,12 @@
 class_name MutationHost
 extends Node
 ## Lives on the player. Grows the host's mutations from WorldData.mutations:
-## a placeholder body part at the slot's socket and an ability node (child of
-## this node). Also handles eating an item that grants a mutation.
+## the part as a sprite layer over the host's frames (or a fallback polygon at
+## the slot's socket) and an ability node (child of this node). Also handles
+## eating an item that grants a mutation.
 
 var _parts: Array[Node] = []
+var _layer_ids: Array[StringName] = []
 
 @onready var _player: Player = get_parent()
 
@@ -26,6 +28,9 @@ func sync() -> void:
 	for part in _parts:
 		part.queue_free()
 	_parts.clear()
+	for id in _layer_ids:
+		_player.sprite.remove_layer(id)
+	_layer_ids.clear()
 	for ability in get_children():
 		remove_child(ability)
 		ability.queue_free()
@@ -35,11 +40,15 @@ func sync() -> void:
 		var def := MutationDb.get_def(WorldState.data.mutations[slot])
 		if def == null:
 			continue
-		var part := Polygon2D.new()
-		part.polygon = def.part_polygon
-		part.color = def.part_color
-		_player.socket(slot).add_child(part)
-		_parts.append(part)
+		if def.part_frames_dir != "":
+			_player.sprite.add_layer(def.id, SpriteSheets.load_dir(def.part_frames_dir), def.part_behind)
+			_layer_ids.append(def.id)
+		else:
+			var part := Polygon2D.new()
+			part.polygon = def.part_polygon
+			part.color = def.part_color
+			_player.socket(slot).add_child(part)
+			_parts.append(part)
 		if def.ability:
 			var ability: MutationAbility = def.ability.new()
 			ability.player = _player

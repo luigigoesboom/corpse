@@ -14,7 +14,13 @@ extends Resource
 ## How to use it, shown on the HUD (e.g. "K").
 @export var control_hint := ""
 
-@export_group("Placeholder look")
-## Until mutation art exists: a polygon drawn at the slot's socket, pointing right.
+## Folder of overlay strips drawn over the host's frames (D-017), one strip
+## per host animation, e.g. res://assets/art/mutations/acid_gland.
+@export_dir var part_frames_dir: String
+## Draw the part behind the body (sacs on the back) instead of in front.
+@export var part_behind := false
+
+@export_group("Fallback look")
+## Used when there is no part_frames_dir: a polygon at the slot's socket, pointing right.
 @export var part_color := Color.WHITE
 @export var part_polygon := PackedVector2Array()

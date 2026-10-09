@@ -1,6 +1,6 @@
 # Art pipeline
 
-> **Pixel art (D-012).** The game is pixel art. Scale (D-014): tiles are 32 x 32 px, the game renders at 1280 x 720, the host is about 48 px tall. Draw at 1x (one canvas pixel = one game pixel), no anti-aliasing, export PNG; Godot already uses Nearest filtering. Sections below written for smooth hand-drawn art (canvas size, cutout rigs) get reworked when Q-007 (animation) is decided.
+> **Pixel art (D-012).** The game is pixel art. Scale (D-014): tiles are 32 x 32 px, the game renders at 1280 x 720, the host is about 48 px tall. Draw at 1x (one canvas pixel = one game pixel), no anti-aliasing, export PNG; Godot already uses Nearest filtering. Animation is layered frames (D-017), see below. "Canvas and export" was written for smooth art: for pixel art, ignore the 2x advice.
 
 You are learning to draw while making this. That is fine. Plan for early art to be replaced, and keep the style simple enough that you can produce a lot of it.
 
@@ -78,53 +78,43 @@ Row 4 holds two extra tiles without collision: (0,4) rock 2 tiles from open spac
 
 Rules so tiles join cleanly: the fill must reach the tile border on every closed side, and rims must sit only on open sides. Inside corners (rock on all 4 sides but open diagonally) are not handled by 16 tiles; if they look bad, we move to the 47-tile "blob" set later.
 
-## Cutout rigs
+## Animation: layered frames (D-017)
 
-Instead of drawing every animation frame, draw each body part once and animate the parts.
+Characters and creatures are frame-by-frame pixel animations. Mutations are drawn as separate overlay sheets over the same frames, so a host can grow parts without the body being redrawn.
 
-**Drawing a creature for rigging:**
-
-1. Sketch the creature whole, in a neutral pose.
-2. Split it into parts on separate layers: body, head, each limb segment, tail, fins, tentacles.
-3. Where parts overlap at joints, draw a little extra under the overlap so no gaps show when it rotates.
-4. Export each part as its own PNG into `assets/art/creatures/<creature_name>/`.
-
-**Rigging in Godot:**
-
-1. Create a scene with a `Skeleton2D`, add `Bone2D` nodes for each joint.
-2. Add a `Sprite2D` (or `Polygon2D` if you want skinning) for each part, parented under its bone.
-3. Animate bone rotations with `AnimationPlayer`. Minimum set: `idle`, `move`, `attack`, `hurt`, `die`.
-4. Swimming, swaying and breathing loops are cheap and look great: a slow sine rotation on a chain of bones.
-
-## Mutation sockets
-
-Mutations attach to the host as extra parts, so every host rig needs named sockets.
-
-- Add a `Marker2D` as a child of a bone and name it after the socket.
-- Standard socket names (use exactly these so any mutation fits any host):
-
-| Socket | Where |
-|---|---|
-| `socket_back` | Upper back, for sacs, spines, wings |
-| `socket_arm` | Forearm, for spurs, claws (one arm slot for now) |
-| `socket_head` | Top of head |
-| `socket_mouth` | Mouth, for glands that spit |
-| `socket_belly` | Torso front |
-| `socket_tail` | Base of tail, if the host has one |
-
-- A mutation part scene has its own small rig whose root lines up with the socket's origin. Draw it pointing right, the socket handles flipping.
-
-## Naming
+**One folder per character, one PNG strip per animation:**
 
 ```
 assets/art/creatures/gut_leech/
-  gut_leech_body.png
-  gut_leech_head.png
-  gut_leech_tail_01.png
-  gut_leech_tail_02.png
+  gut_leech_idle.png      2 frames
+  gut_leech_move.png      4 frames
+  gut_leech_windup.png    ...
+  gut_leech_attack.png
+  gut_leech_hurt.png
+  gut_leech_die.png
+  glow/gut_leech_glow_idle.png ...   optional: drawn unshaded (glowing eyes)
 ```
 
-`<thing>_<part>[_<index>].png`, all lowercase.
+- File name ends in `_<animation>.png`. The game builds the animations from the folder by itself (`SpriteSheets`); no setup in Godot.
+- Strips are horizontal, frames are **square**: height = frame size, width / height = frame count. Hosts and leech-sized creatures use **48 x 48**.
+- The character stands on the bottom of the frame, centered, facing **right** (the game flips it).
+- Animation names the code asks for:
+  - Host: `idle`, `run`, `jump`, `fall`, `cling`, `attack`, `hurt`, `die`.
+  - Gut Leech: `idle`, `move`, `windup`, `attack`, `hurt`, `die`.
+  - Missing ones fall back to `idle`. Speeds are in `SpriteSheets.FPS`; `windup`, `attack`, `hurt`, `die` play once.
+- A `glow/` subfolder (set as the sprite's glow folder) is drawn on top, unshaded: eyes and glands that shine in the dark.
+
+**Mutation overlays.** A mutation is a folder of strips with the **same animation names and frame counts as the host**, drawn on a transparent canvas the same size, with only the part on it, in the right place on every frame:
+
+```
+assets/art/mutations/acid_gland/acid_gland_idle.png   4 frames, matches colonist_idle.png
+assets/art/mutations/acid_gland/acid_gland_run.png    6 frames, matches colonist_run.png
+...
+```
+
+Easiest way: in Krita or Aseprite, open the host strip, add a layer, draw the part on every frame, export that layer alone. Set `part_behind` on the MutationDef for parts that sit behind the body (back sacs). Current host: `assets/art/hosts/colonist/` (placeholder, generated by script; draw over it freely). When there are several host body types, mutations get one folder per host type.
+
+**Sockets.** `Visual/Sockets/socket_<slot>` markers on the player still exist, but only as gameplay points (where acid spit starts). Move them if your drawing puts the mouth elsewhere.
 
 ## Practice plan
 

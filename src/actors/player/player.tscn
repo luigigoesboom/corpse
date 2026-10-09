@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://src/mutations/mutation_host.gd" id="5_mutations"]
 [ext_resource type="Texture2D" path="res://assets/lights/light_banded.tres" id="6_light"]
 [ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="7_unshaded"]
+[ext_resource type="Script" path="res://src/actors/components/layered_sprite.gd" id="8_sprite"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
 radius = 10.0
@@ -37,14 +38,10 @@ shape = SubResource("CapsuleShape2D_body")
 
 [node name="Visual" type="Node2D" parent="."]
 
-[node name="Body" type="Polygon2D" parent="Visual"]
+[node name="Sprite" type="Node2D" parent="Visual"]
 material = ExtResource("7_unshaded")
-color = Color(0.85, 0.75, 0.6, 1)
-polygon = PackedVector2Array(-4, -22, 4, -22, 9, -17, 10, -12, 10, 12, 9, 17, 4, 22, -4, 22, -9, 17, -10, 12, -10, -12, -9, -17)
-
-[node name="Eye" type="Polygon2D" parent="Visual"]
-color = Color(0.15, 0.1, 0.1, 1)
-polygon = PackedVector2Array(3, -14, 7, -14, 7, -10, 3, -10)
+script = ExtResource("8_sprite")
+body_frames_dir = "res://assets/art/hosts/colonist"
 
 [node name="Sockets" type="Node2D" parent="Visual"]
 

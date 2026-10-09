@@ -20,7 +20,9 @@ func run() -> void:
 		bus.eat_requested.emit(i)
 	await physics_frame
 	check(state.data.mutations == {"mouth": &"acid_gland", "arm": &"bone_spur", "back": &"lung_sac"}, "eating the three items fills three body slots")
-	check(player.socket("mouth").get_child_count() == 1 and player.socket("back").get_child_count() == 1, "body parts appear at their sockets")
+	check(player.sprite.has_layer(&"acid_gland") and player.sprite.has_layer(&"bone_spur") and player.sprite.has_layer(&"lung_sac"),
+		"each mutation adds a sprite layer over the body")
+	check(player.sprite.get_child(0).name == "lung_sac", "the lung sac layer is drawn behind the body")
 	check(player.get_node("Mutations").get_child_count() == 3, "each mutation adds its ability")
 
 	# Acid spit hits the chamber leech.
