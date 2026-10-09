@@ -13,6 +13,15 @@ Next:
 
 ---
 
+## Week 12: Milestone 1 (2026-10-09)
+Done:
+- Tests live in `tests/` now: test_movement, test_world, test_saves, test_items_ui, test_combat, test_mutations (60+ checks, ~30 s), run with `tests/run_tests.sh`. Shared helpers and a play bot in test_case.gd.
+- Soak test (`--soak`): bot plays 10 game-minutes headless (fixed 60 fps, ~10 s real time), teleporting every few seconds. Memory 68-72 MB with no growth, node and orphan counts bounded, no script errors, no lost or duplicated entities.
+- Render test (`--render`): 60 s bot in a window. Median 7.3 ms (137 fps), p99 ~20-23 ms. The only frames over 33 ms are in the first second (first-time shader compiles), none while exploring.
+- Fixed: loading a save during the 2 s death pause was overridden by the pending respawn.
+Not done: the developer's own 10 minutes of play (the real "done when"). Cutting chunks on a thread (week 6) would lower p99 further; not needed yet.
+Phase 1 summary: a hand-painted, streamed, persistent Gut test region with saves, items, light and atmosphere, plus early UI, combat and mutations. Next phase per roadmap: combat and creatures (weeks 13-20), much of 13-14 and 17 already done (D-016); next real work is week 15 (first rig, waits on Q-007) and week 18-19.
+
 ## Weeks 10-11: set piece, light and atmosphere (2026-10-09)
 Done:
 - Terrain: banded pixel-art placeholder tiles with a bright membrane on top-facing edges, plus two depth tiles (rock 2 and 3+ tiles from air) so big rock masses fade to dark. Chunk cut ~5 ms.

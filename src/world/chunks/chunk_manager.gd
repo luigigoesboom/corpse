@@ -12,7 +12,8 @@ extends Node2D
 signal chunk_loaded(coord: Vector2i)
 signal chunk_unloaded(coord: Vector2i)
 
-## 16 tiles in a 4 x 4 atlas, one per open-sides mask: tile (mask % 4, mask / 4).
+## Atlas tile for a cell: index = cell - 1, at (index % 4, index / 4). That is
+## the 16 open-sides masks in rows 0-3, then the two depth tiles in row 4.
 ## See docs/ART_PIPELINE.md, "Terrain tiles".
 const TILE_SET := preload("res://assets/art/tiles/gut_tileset.tres")
 

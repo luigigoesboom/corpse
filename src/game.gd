@@ -83,5 +83,7 @@ func _on_player_health_changed(current: int, max_value: int) -> void:
 func _on_player_died() -> void:
 	EventBus.notify.emit("Your host has died")
 	await get_tree().create_timer(2.0).timeout
+	if not _player.is_dead():
+		return  # A save was loaded in the meantime.
 	_player.respawn(_world.get_node("PlayerSpawn").global_position)
 	_player.get_node("Camera2D").reset_smoothing()
