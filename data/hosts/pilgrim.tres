@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="HostDef" format=3]
+
+[ext_resource type="Script" path="res://src/actors/player/host_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"pilgrim"
+display_name = "Pilgrim"
+description = "Came down from the surface to be near the god and got too close. Quick on its feet, soft in the body."
+frames_dir = "res://assets/art/hosts/pilgrim"
+max_health = 4
+run_speed_scale = 1.15
+start_items = Array[StringName]([&"bone_shard"])
+start_mutations = {}

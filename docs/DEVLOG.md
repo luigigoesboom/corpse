@@ -13,6 +13,11 @@ Next:
 
 ---
 
+## Week 24: host choice (2026-10-10)
+Done: HostDef resources in data/hosts (colonist 5 hearts; pilgrim 4 hearts, faster, starts with a Bone Shard; antibody 7 hearts, slower, born with a Bone Spur) with HostDb. SpawnPoint markers in world.tscn (Flesh-Tender camp, upper corridor, cavern floor, chamber heights), each listing which host types can wake there. After "N years later", three options: different places (never the last host's when avoidable), host types, generated names; deterministic per world and death. Player.apply_host() sets health, speed and body frames; the kit only comes with a new life. LifeRecord.origin. Placeholder pilgrim (hooded) and antibody (pale, round) art shares the colonist's poses, so mutation overlays fit all three. Corpses use their host's frames. Save v9.
+Not done: Host standing with factions (phase 4).
+Next: Week 25, milestone 3: play 5 lives in a row and write up how the loop feels.
+
 ## Week 23: time passes (2026-10-10)
 Done: D-020 (nothing carries over except through the body) and D-021 (time passes as rolled aftermath, not simulation). `Aftermath` (src/sim/history): each death rolls a gap tier (days / months / years / decades) whose strength scales the rules: bodies scavenged and mutations rotting (the newest body always keeps one thing), killed creatures replaced, dropped items rotting. Year advances; new hosts are born in the new year. `EventRecord` log in WorldData.events (host_died, corpse_scavenged, corpse_rotted, creatures_returned), the seed of phase 4 history. Death screen has a second step: "Nine years later." plus a hint. removed_entities now stores what was removed (item or creature kind). Save v8. Deterministic per world and death.
 Not done: Factions adding their own aftermath rules (phase 4).

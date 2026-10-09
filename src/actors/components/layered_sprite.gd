@@ -36,6 +36,16 @@ func _ready() -> void:
 	play(&"idle")
 
 
+## Swaps the body's frames (e.g. a new host type); layers and the current
+## animation stay.
+func set_body_frames(dir: String) -> void:
+	body_frames_dir = dir
+	var animation := _body.animation
+	_body.sprite_frames = SpriteSheets.load_dir(dir)
+	_body.animation = &""
+	play(animation)
+
+
 ## Plays an animation, unless it is already the current one. A one-shot
 ## animation (die, attack...) that has finished stays on its last frame for as
 ## long as it keeps being asked for. Falls back to "idle", then to the first animation.

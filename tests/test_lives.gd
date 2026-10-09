@@ -43,7 +43,7 @@ func run() -> void:
 		"the death screen tells the story of the life")
 
 	# Wake in a new host.
-	screen.wake_pressed.emit()  # Skips time passing (tested in test_aftermath).
+	screen.wake_pressed.emit({})  # Skips time passing (tested in test_aftermath).
 	await wait_frames(2)
 	check(data.lives.size() == 2 and data.current_life() != null and data.current_life().host_name == Names.host_name(data.world_seed, 1),
 		"the next host is a new life with its own name")

@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" path="res://scenes/setpieces/flesh_tender_camp.tscn" id="8_camp"]
 [ext_resource type="PackedScene" path="res://src/actors/creatures/bile_spitter.tscn" id="9_spitter"]
 [ext_resource type="PackedScene" path="res://src/actors/creatures/rot_fly.tscn" id="10_fly"]
+[ext_resource type="Script" path="res://src/world/spawn_point.gd" id="11_spawn"]
 
 [node name="World" type="Node2D"]
 
@@ -19,6 +20,32 @@ script = ExtResource("1_preview")
 [node name="PlayerSpawn" type="Marker2D" parent="."]
 position = Vector2(464, 3178)
 gizmo_extents = 32.0
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="FleshTenderCamp" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(464, 3178)
+script = ExtResource("11_spawn")
+place_name = "the Flesh-Tender camp"
+host_types = Array[StringName]([&"colonist", &"pilgrim"])
+
+[node name="UpperCorridor" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(5000, 810)
+script = ExtResource("11_spawn")
+place_name = "the upper corridor"
+host_types = Array[StringName]([&"pilgrim", &"colonist"])
+
+[node name="CavernFloor" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(6400, 3850)
+script = ExtResource("11_spawn")
+place_name = "the cavern floor"
+host_types = Array[StringName]([&"antibody", &"colonist"])
+
+[node name="ChamberHeights" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(3500, 2314)
+script = ExtResource("11_spawn")
+place_name = "the chamber heights"
+host_types = Array[StringName]([&"antibody", &"pilgrim"])
 
 [node name="Entities" type="Node2D" parent="."]
 script = ExtResource("2_entities")

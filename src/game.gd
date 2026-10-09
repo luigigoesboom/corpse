@@ -40,7 +40,7 @@ func _start_new_world() -> void:
 	var seed_value := new_world_seed if new_world_seed != 0 else randi()
 	var data := WorldData.create(seed_value)
 	data.player_position = _world.get_node("PlayerSpawn").global_position
-	data.start_life(&"colonist")
+	data.start_life(&"colonist", "", "the Flesh-Tender camp")
 	WorldState.set_data(data)
 
 
@@ -82,6 +82,7 @@ func _on_world_loaded() -> void:
 		data.start_life(&"colonist")  # Saves from before week 21 have no lives.
 	$UI.close_all()
 	var saved_health := data.player_health  # respawn() heals, which overwrites it.
+	_player.apply_host(HostDb.get_def(data.current_life().host_type))
 	_player.respawn(data.player_position)
 	if saved_health >= 0:
 		_player.health.set_current(saved_health)
@@ -121,21 +122,58 @@ func _pass_time() -> void:
 	var report := Aftermath.run(WorldState.data)
 	_entities.rebuild()
 	_chunks.reset()
-	$UI.death_screen.show_time(report)
+	$UI.death_screen.show_time(report, rebirth_options())
 
 
-## Placeholder rebirth until week 24 (host choice): same host type, at the
-## spawn, with nothing: the old things are on the old body.
-func _start_next_life() -> void:
+## Three ways to wake (week 24): different places, host types and names.
+## Avoids the place the last host woke when there are enough others.
+## Deterministic per world and death.
+func rebirth_options() -> Array:
 	var data := WorldState.data
-	data.start_life(&"colonist")
+	var rng := SeededRng.make([data.world_seed, "rebirth", data.lives.size()])
+	var points: Array = _world.get_node("SpawnPoints").get_children()
+	var last_origin: String = data.lives[-1].origin if not data.lives.is_empty() else ""
+	var elsewhere := points.filter(func(point): return point.place_name != last_origin)
+	if elsewhere.size() >= 3:
+		points = elsewhere
+	for i in range(points.size() - 1, 0, -1):  # Shuffle with the seeded generator.
+		var j := rng.randi_range(0, i)
+		var swap = points[i]
+		points[i] = points[j]
+		points[j] = swap
+	var options := []
+	for i in mini(3, points.size()):
+		var point: SpawnPoint = points[i]
+		var types: Array = point.host_types if not point.host_types.is_empty() else HostDb.all_ids()
+		options.append({
+			"host_type": types[rng.randi() % types.size()],
+			"host_name": Names.host_name(data.world_seed, data.lives.size() * 7 + i + 1),
+			"place": point.place_name,
+			"position": point.global_position,
+		})
+	return options
+
+
+## Starts the next host from a rebirth option (empty = a colonist at the start).
+## It wakes with its host type's kit only: the old things are on the old body.
+func _start_next_life(option: Dictionary = {}) -> void:
+	var data := WorldState.data
+	var host_type: StringName = option.get("host_type", &"colonist")
+	var host := HostDb.get_def(host_type)
+	data.start_life(host_type, option.get("host_name", ""), option.get("place", "the Flesh-Tender camp"))
 	data.player_health = -1
-	_player.respawn(_world.get_node("PlayerSpawn").global_position)
+	for item in host.start_items:
+		data.add_to_inventory(item)
+	for slot in host.start_mutations:
+		data.graft(slot, host.start_mutations[slot])
+	_player.apply_host(host)
+	_player.respawn(option.get("position", _world.get_node("PlayerSpawn").global_position))
 	_player.get_node("Camera2D").reset_smoothing()
 	$UI.close_all()
 	EventBus.inventory_changed.emit()
 	EventBus.mutations_changed.emit()
-	EventBus.notify.emit("You wake as %s. Your old body lies where it fell." % data.current_life().host_name)
+	var life := data.current_life()
+	EventBus.notify.emit("You wake as %s, a %s, at %s." % [life.host_name, host.display_name, life.origin])
 
 
 ## Kills by the player count toward the current life's deeds.

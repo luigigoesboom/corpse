@@ -3,8 +3,9 @@ extends Control
 
 ## "Wake in a new host" on the epitaph: the game runs the aftermath now.
 signal continue_pressed
-## "Wake" on the time screen: start the next life.
-signal wake_pressed
+## A host was chosen on the time screen: start the next life as it.
+## `option` is one of the game's rebirth options (empty = default host).
+signal wake_pressed(option: Dictionary)
 
 ## Display names for creature kinds (CombatRules.kind_of).
 const CREATURE_NAMES := {
@@ -24,23 +25,40 @@ func _ready() -> void:
 
 func _on_button_pressed() -> void:
 	if _showing_time:
-		wake_pressed.emit()
+		wake_pressed.emit({})
 	else:
 		continue_pressed.emit()
 
 
-## Second step: how much time passed, and a hint or two of what changed.
-func show_time(report: Dictionary) -> void:
+## Second step: how much time passed, a hint or two of what changed, and
+## the hosts to wake as (one button each; none = a plain "Wake" button).
+func show_time(report: Dictionary, options: Array = []) -> void:
 	_showing_time = true
 	%Title.text = Aftermath.gap_text(report)
 	var hints: Array = report.hints
 	%Summary.text = "\n".join(hints) if not hints.is_empty() else "The body goes on without you."
-	%ContinueButton.text = "Wake"
-	%ContinueButton.grab_focus()
+	for child in %Options.get_children():
+		child.queue_free()
+	%ContinueButton.visible = options.is_empty()
+	for option in options:
+		var host := HostDb.get_def(option.host_type)
+		var button := Button.new()
+		button.text = "%s, a %s, wakes at %s  (%d hearts)" % [option.host_name, host.display_name, option.place, host.max_health]
+		button.tooltip_text = host.description
+		button.pressed.connect(wake_pressed.emit.bind(option))
+		%Options.add_child(button)
+	if options.is_empty():
+		%ContinueButton.text = "Wake"
+		%ContinueButton.grab_focus()
+	else:
+		%Options.get_child(0).grab_focus.call_deferred()
 
 
 func show_life(life: LifeRecord, life_number: int) -> void:
 	_showing_time = false
+	for child in %Options.get_children():
+		child.queue_free()
+	%ContinueButton.visible = true
 	%ContinueButton.text = "Wake in a new host"
 	%Title.text = "Here lies %s" % life.host_name
 	var lines := PackedStringArray()

@@ -21,7 +21,8 @@ func _ready() -> void:
 func setup(index: int, life: LifeRecord) -> void:
 	life_index = index
 	position = life.corpse_position
-	$Visual/Sprite.body_frames_dir = "res://assets/art/hosts/%s" % life.host_type
+	var host := HostDb.get_def(life.host_type)
+	$Visual/Sprite.body_frames_dir = host.frames_dir if host else "res://assets/art/hosts/colonist"
 
 
 ## Shows what is still on the body. Call after it is in the tree.

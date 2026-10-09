@@ -88,7 +88,11 @@ var _look := Vector2.ZERO
 @onready var sprite: LayeredSprite = $Visual/Sprite
 
 
+var _base_run_speed := 0.0
+
+
 func _ready() -> void:
+	_base_run_speed = run_speed
 	_recalculate_jump()
 	add_to_group("player")
 	health.hurt.connect(_on_hurt)
@@ -190,6 +194,16 @@ func socket(slot: String) -> Node2D:
 
 
 ## Brings the host back (placeholder until death and rebirth, roadmap week 21).
+## Becomes a body of this host type: health, speed, look. Does not hand out
+## the type's starting kit; that only happens when a new life starts.
+func apply_host(def: HostDef) -> void:
+	if def == null:
+		return
+	health.max_health = def.max_health
+	run_speed = _base_run_speed * def.run_speed_scale
+	sprite.set_body_frames(def.frames_dir)
+
+
 ## The dead host gives way to its Corpse. Hides right away: the death screen
 ## pauses the game, so _process() would not get to it.
 func hide_body() -> void:

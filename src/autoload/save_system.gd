@@ -14,7 +14,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 8
+const SAVE_VERSION := 9
 
 
 func slot_path(slot: int) -> String:
@@ -107,4 +107,9 @@ func _migrate(save: Dictionary) -> Dictionary:
 		# of true; old entries stay true, which Aftermath never brings back.
 		save.world["events"] = []
 		save.save_version = 8
+	if save.save_version == 8:
+		# v9 (week 24): where each host woke.
+		for life in save.world.get("lives", []):
+			life["origin"] = life.get("origin", "")
+		save.save_version = 9
 	return save

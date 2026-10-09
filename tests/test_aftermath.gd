@@ -49,7 +49,7 @@ func run() -> void:
 	screen.continue_pressed.emit()
 	await wait_frames(2)
 	check(screen.visible and screen.get_node("%Title").text.ends_with("later."), "after the epitaph: how much time passed")
-	screen.wake_pressed.emit()
+	screen.wake_pressed.emit({})
 	await wait_frames(2)
 	check(state.data.current_life() != null and state.data.current_life().start_year == state.data.year and state.data.year >= year_at_death,
 		"the new host is born in the new year")

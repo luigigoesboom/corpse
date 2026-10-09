@@ -58,10 +58,12 @@ func current_life() -> LifeRecord:
 	return lives[-1]
 
 
-func start_life(host_type: StringName) -> LifeRecord:
+## Starts the next host. The name defaults to the world's next host name.
+func start_life(host_type: StringName, host_name := "", origin := "") -> LifeRecord:
 	var life := LifeRecord.new()
 	life.host_type = host_type
-	life.host_name = Names.host_name(world_seed, lives.size())
+	life.host_name = host_name if host_name != "" else Names.host_name(world_seed, lives.size())
+	life.origin = origin
 	life.start_year = year
 	lives.append(life)
 	return life

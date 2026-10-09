@@ -7,6 +7,8 @@ extends RefCounted
 
 var host_type: StringName = &"colonist"
 var host_name := ""
+## Name of the place this host woke (a SpawnPoint's place_name).
+var origin := ""
 var start_year := 0
 ## -1 while the host is alive.
 var death_year := -1
@@ -39,7 +41,7 @@ func is_alive() -> bool:
 
 func to_dict() -> Dictionary:
 	return {
-		"host_type": host_type, "host_name": host_name,
+		"host_type": host_type, "host_name": host_name, "origin": origin,
 		"start_year": start_year, "death_year": death_year, "seconds_alive": seconds_alive,
 		"death_position": death_position, "killed_by": killed_by,
 		"carried_items": carried_items.duplicate(), "carried_mutations": carried_mutations.duplicate(),
@@ -53,6 +55,7 @@ static func from_dict(d: Dictionary) -> LifeRecord:
 	var life := LifeRecord.new()
 	life.host_type = d.get("host_type", &"colonist")
 	life.host_name = d.get("host_name", "")
+	life.origin = d.get("origin", "")
 	life.start_year = int(d.get("start_year", 0))
 	life.death_year = int(d.get("death_year", -1))
 	life.seconds_alive = float(d.get("seconds_alive", 0.0))
