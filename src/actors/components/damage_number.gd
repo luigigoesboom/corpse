@@ -11,6 +11,7 @@ static func spawn(parent: Node, world_position: Vector2, amount: int, color := C
 	label.add_theme_constant_override("outline_size", 4)
 	label.position = world_position + Vector2(-8, -40)
 	label.z_index = 50
+	label.material = preload("res://assets/materials/unshaded.tres")  # Readable in the dark.
 	parent.add_child(label)
 
 

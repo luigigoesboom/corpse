@@ -66,6 +66,10 @@ var _attack_timer := 0.0
 var _attack_cooldown_timer := 0.0
 var _hurt_timer := 0.0
 var _dead := false
+var _facing := 1.0
+## Squash and stretch, applied on top of facing. Springs back to (1, 1).
+var _squash := Vector2.ONE
+var _was_on_floor := true
 
 @onready var health: Health = $Health
 @onready var _visual: Node2D = $Visual
@@ -73,6 +77,8 @@ var _dead := false
 @onready var _attack_hitbox: Hitbox = $Visual/AttackHitbox
 @onready var _slash: Node2D = $Visual/Slash
 @onready var _mutations: MutationHost = $Mutations
+@onready var _camera: Camera2D = $Camera2D
+@onready var _dust: CPUParticles2D = $Dust
 
 
 func _ready() -> void:
@@ -98,19 +104,33 @@ func _physics_process(delta: float) -> void:
 		_apply_jump()
 	_mutations.physics_tick(delta)
 
+	var fall_speed := velocity.y
 	move_and_slide()
 
 	if not is_zero_approx(velocity.x) and not _clinging and has_control:
-		_visual.scale.x = signf(velocity.x)
+		_facing = signf(velocity.x)
+	if is_on_floor() and not _was_on_floor and fall_speed > 300.0:
+		_squash = Vector2(1.3, 0.75)  # Landing: squash.
+		_dust.restart()
+	_was_on_floor = is_on_floor()
 
 	if has_control:
 		_handle_attack()
 		_handle_items()
+	_update_visual(delta)
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	# Flicker while invulnerable after a hit.
 	_visual.visible = _dead or not health.is_invulnerable() or int(Time.get_ticks_msec() / 60) % 2 == 0
+	# Look ahead: the camera leans the way you face, and down when falling fast.
+	var look := Vector2(_facing * 56.0, clampf(velocity.y * 0.1, -16.0, 72.0))
+	_camera.offset = _camera.offset.lerp(look, minf(1.0, delta * 2.5))
+
+
+func _update_visual(delta: float) -> void:
+	_squash = _squash.lerp(Vector2.ONE, minf(1.0, delta * 12.0))
+	_visual.scale = Vector2(_facing * _squash.x, _squash.y)
 
 
 func is_dead() -> bool:
@@ -171,7 +191,7 @@ func is_clinging() -> bool:
 
 ## 1 = facing right, -1 = facing left.
 func facing() -> float:
-	return _visual.scale.x
+	return _facing
 
 
 ## The player only asks; ItemLayer decides and changes the world data.
@@ -216,7 +236,7 @@ func _update_wall_state(input_dir: float) -> void:
 	# Cling only while pushing into the wall and not rising.
 	if input_dir != 0.0 and signf(input_dir) == -signf(_wall_normal_x) and velocity.y >= 0.0:
 		_clinging = true
-		_visual.scale.x = signf(_wall_normal_x)
+		_facing = signf(_wall_normal_x)
 
 
 func _apply_gravity(delta: float) -> void:
@@ -243,11 +263,14 @@ func _apply_jump() -> void:
 	if _jump_buffer_timer > 0.0:
 		if _coyote_timer > 0.0:
 			velocity.y = _jump_velocity
+			_squash = Vector2(0.75, 1.3)  # Takeoff: stretch.
+			_dust.restart()
 			_consume_jump()
 		elif _wall_coyote_timer > 0.0:
 			velocity = Vector2(_wall_normal_x * wall_jump_push, _jump_velocity * wall_jump_height_ratio)
 			_wall_lock_timer = wall_jump_lock_time
-			_visual.scale.x = signf(_wall_normal_x)
+			_facing = signf(_wall_normal_x)
+			_squash = Vector2(0.8, 1.2)
 			_consume_jump()
 
 	if Input.is_action_just_released("jump") and velocity.y < 0.0:

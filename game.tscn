@@ -11,9 +11,19 @@
 [ext_resource type="Script" path="res://src/ui/hud.gd" id="8_hud"]
 [ext_resource type="PackedScene" path="res://src/ui/inventory_screen.tscn" id="9_inventory"]
 [ext_resource type="PackedScene" path="res://src/ui/pause_menu.tscn" id="10_pause"]
+[ext_resource type="PackedScene" path="res://scenes/backdrop.tscn" id="11_backdrop"]
+[ext_resource type="Shader" path="res://assets/shaders/vignette.gdshader" id="12_vignette"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vignette"]
+shader = ExtResource("12_vignette")
 
 [node name="Game" type="Node2D"]
 script = ExtResource("0_game")
+
+[node name="Backdrop" parent="." instance=ExtResource("11_backdrop")]
+
+[node name="Darkness" type="CanvasModulate" parent="."]
+color = Color(0.46, 0.35, 0.39, 1)
 
 [node name="ChunkManager" type="Node2D" parent="." node_paths=PackedStringArray("target")]
 script = ExtResource("1_chunks")
@@ -32,7 +42,19 @@ player = NodePath("../Player")
 chunks = NodePath("../ChunkManager")
 entities = NodePath("../World/Entities")
 
+[node name="Vignette" type="CanvasLayer" parent="."]
+
+[node name="Shade" type="ColorRect" parent="Vignette"]
+material = SubResource("ShaderMaterial_vignette")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
 [node name="UI" type="CanvasLayer" parent="."]
+layer = 10
 script = ExtResource("7_ui")
 
 [node name="HUD" type="Control" parent="UI"]

@@ -1,6 +1,7 @@
 extends Node2D
 ## Stand-in NPC until real ones exist (roadmap week 27). Bobs so you can see
-## it is alive, and shows its name. Rename it in the Inspector via `npc_name`.
+## it is alive, and shows its name when you come close. Rename it in the
+## Inspector via `npc_name`.
 
 @export var npc_name := "Parasite":
 	set(value):
@@ -19,3 +20,6 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_time += delta
 	$Visual.position.y = sin(_time * 3.0) * 2.0
+	var player := get_tree().get_first_node_in_group("player") as Node2D
+	var dist := player.global_position.distance_to(global_position) if player else INF
+	$Name.modulate.a = clampf(1.0 - (dist - 90.0) / 80.0, 0.0, 1.0)

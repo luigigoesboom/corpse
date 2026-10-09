@@ -1,0 +1,51 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="1_unshaded"]
+[ext_resource type="Texture2D" path="res://assets/lights/light_banded.tres" id="2_light"]
+[ext_resource type="Material" path="res://assets/materials/additive_glow.tres" id="4_glow"]
+
+[node name="FleshTenderCamp" type="Node2D"]
+
+[node name="TentBack" type="Polygon2D" parent="."]
+color = Color(0.36, 0.25, 0.24, 1)
+polygon = PackedVector2Array(-150, 0, -120, -70, -60, -84, -20, -60, -6, 0)
+
+[node name="TentFront" type="Polygon2D" parent="."]
+color = Color(0.5, 0.36, 0.32, 1)
+polygon = PackedVector2Array(-130, 0, -100, -56, -66, -66, -40, 0)
+
+[node name="Opening" type="Polygon2D" parent="."]
+color = Color(0.12, 0.05, 0.06, 1)
+polygon = PackedVector2Array(-96, 0, -84, -34, -72, -34, -62, 0)
+
+[node name="Rack" type="Polygon2D" parent="."]
+color = Color(0.35, 0.25, 0.22, 1)
+polygon = PackedVector2Array(60, 0, 62, -50, 66, -50, 68, 0, 120, 0, 122, -50, 126, -50, 128, 0, 128, -46, 60, -46)
+
+[node name="DryingMeat" type="Polygon2D" parent="."]
+color = Color(0.7, 0.28, 0.3, 1)
+polygon = PackedVector2Array(74, -46, 80, -46, 82, -24, 76, -20, 90, -46, 98, -46, 96, -30, 92, -28, 106, -46, 112, -46, 113, -26, 107, -22)
+
+[node name="LampPost" type="Polygon2D" parent="."]
+color = Color(0.3, 0.22, 0.2, 1)
+polygon = PackedVector2Array(14, 0, 16, -64, 30, -64, 30, -60, 19, -60, 18, 0)
+
+[node name="LampBulb" type="Polygon2D" parent="."]
+material = ExtResource("1_unshaded")
+color = Color(1, 0.85, 0.3, 1)
+polygon = PackedVector2Array(24, -60, 32, -60, 34, -52, 28, -46, 22, -52)
+
+[node name="LampHalo" type="Sprite2D" parent="."]
+material = ExtResource("4_glow")
+modulate = Color(1, 0.8, 0.4, 0.16)
+position = Vector2(28, -54)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("2_light")
+
+[node name="LampLight" type="PointLight2D" parent="."]
+shadow_enabled = true
+position = Vector2(28, -54)
+color = Color(1, 0.8, 0.4, 1)
+energy = 0.7
+texture = ExtResource("2_light")
+texture_scale = 2.2

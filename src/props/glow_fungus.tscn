@@ -1,0 +1,43 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/props/glow_fungus.gd" id="1_fungus"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="2_unshaded"]
+[ext_resource type="Texture2D" path="res://assets/lights/light_banded.tres" id="3_light"]
+[ext_resource type="Material" path="res://assets/materials/additive_glow.tres" id="4_glow"]
+
+[node name="GlowFungus" type="Node2D"]
+script = ExtResource("1_fungus")
+
+[node name="Stems" type="Polygon2D" parent="."]
+color = Color(0.3, 0.22, 0.26, 1)
+polygon = PackedVector2Array(-7, 0, -6, -10, -4, -10, -4, 0, 2, 0, 3, -16, 5, -16, 5, 0, 9, 0, 10, -7, 11, -7, 11, 0)
+
+[node name="CapSmall" type="Polygon2D" parent="."]
+material = ExtResource("2_unshaded")
+color = Color(0.6, 1, 0.8, 1)
+polygon = PackedVector2Array(-10, -9, -8, -13, -3, -13, -1, -9)
+
+[node name="CapBig" type="Polygon2D" parent="."]
+material = ExtResource("2_unshaded")
+color = Color(0.7, 1, 0.85, 1)
+polygon = PackedVector2Array(-2, -15, 0, -20, 4, -22, 8, -20, 10, -15)
+
+[node name="CapTiny" type="Polygon2D" parent="."]
+material = ExtResource("2_unshaded")
+color = Color(0.6, 1, 0.8, 1)
+polygon = PackedVector2Array(8, -6, 9, -9, 12, -9, 13, -6)
+
+[node name="Halo" type="Sprite2D" parent="."]
+material = ExtResource("4_glow")
+modulate = Color(0.5, 1, 0.7, 0.16)
+position = Vector2(2, -12)
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("3_light")
+
+[node name="Light" type="PointLight2D" parent="."]
+shadow_enabled = true
+position = Vector2(2, -12)
+color = Color(0.55, 1, 0.75, 1)
+energy = 1.1
+texture = ExtResource("3_light")
+texture_scale = 1.7

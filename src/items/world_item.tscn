@@ -1,6 +1,8 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://src/items/world_item.gd" id="1_item"]
+[ext_resource type="Texture2D" path="res://assets/lights/light_banded.tres" id="8_light"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="9_unshaded"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_reach"]
 radius = 14.0
@@ -15,9 +17,18 @@ position = Vector2(0, -10)
 shape = SubResource("CircleShape2D_reach")
 
 [node name="Visual" type="Polygon2D" parent="."]
+material = ExtResource("9_unshaded")
 polygon = PackedVector2Array(0, -20, 8, -10, 0, 0, -8, -10)
 
+[node name="Light" type="PointLight2D" parent="."]
+shadow_enabled = true
+position = Vector2(0, -10)
+energy = 0.7
+texture = ExtResource("8_light")
+texture_scale = 0.6
+
 [node name="Prompt" type="Label" parent="."]
+material = ExtResource("9_unshaded")
 offset_left = -80.0
 offset_top = -48.0
 offset_right = 80.0

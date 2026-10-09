@@ -17,6 +17,7 @@ func _ready() -> void:
 	var def := ItemDb.get_def(item_id)
 	if def:
 		$Visual.color = def.color
+		$Light.color = def.color
 	$Prompt.text = "E: %s" % ItemDb.display_name(item_id)
 	$Prompt.visible = false
 	body_entered.connect(_on_body_entered)

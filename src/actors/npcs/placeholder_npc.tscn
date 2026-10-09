@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://src/actors/npcs/placeholder_npc.gd" id="1_npc"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="9_unshaded"]
 
 [node name="PlaceholderNpc" type="Node2D"]
 script = ExtResource("1_npc")
@@ -16,6 +17,7 @@ color = Color(0.1, 0.1, 0.1, 1)
 polygon = PackedVector2Array(-6, -24, -2, -24, -2, -20, -6, -20)
 
 [node name="Name" type="Label" parent="."]
+material = ExtResource("9_unshaded")
 offset_left = -60.0
 offset_top = -56.0
 offset_right = 60.0

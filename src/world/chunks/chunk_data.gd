@@ -9,9 +9,12 @@ const SIZE := 64          ## Tiles per side.
 const TILE_PX := 32       ## Pixels per tile.
 const SIZE_PX := SIZE * TILE_PX
 
-## A cell is EMPTY, or rock stored as 1 + its open-sides mask, so one byte says
-## both "rock" and which tile to draw (autotiling).
+## A cell is EMPTY, rock stored as 1 + its open-sides mask (1..16), or rock
+## further from open space (NEAR: 2 tiles, DEEP: 3+). One byte says both
+## "what is here" and which tile to draw: atlas index = cell - 1.
 const EMPTY := 0
+const NEAR := 17
+const DEEP := 18
 ## Open-sides mask bits: which neighbors are open space.
 const OPEN_UP := 1
 const OPEN_RIGHT := 2

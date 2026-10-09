@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" path="res://src/items/world_item.tscn" id="4_item"]
 [ext_resource type="PackedScene" path="res://src/actors/creatures/training_dummy.tscn" id="5_dummy"]
 [ext_resource type="PackedScene" path="res://src/actors/creatures/gut_leech.tscn" id="6_leech"]
+[ext_resource type="PackedScene" path="res://src/props/glow_fungus.tscn" id="7_fungus"]
+[ext_resource type="PackedScene" path="res://scenes/setpieces/flesh_tender_camp.tscn" id="8_camp"]
 
 [node name="World" type="Node2D"]
 
@@ -58,3 +60,53 @@ position = Vector2(6000, 832)
 
 [node name="LeechCavern" parent="Entities" instance=ExtResource("6_leech")]
 position = Vector2(7100, 3872)
+
+[node name="FleshTenderCamp" parent="Entities" instance=ExtResource("8_camp")]
+position = Vector2(1150, 3200)
+
+[node name="Fungus1" parent="Entities" instance=ExtResource("7_fungus")]
+position = Vector2(320, 3200)
+
+[node name="Fungus2" parent="Entities" instance=ExtResource("7_fungus")]
+position = Vector2(1560, 3200)
+
+[node name="Fungus3" parent="Entities" instance=ExtResource("7_fungus")]
+position = Vector2(600, 2624)
+hanging = true
+
+[node name="Fungus4" parent="Entities" instance=ExtResource("7_fungus")]
+position = Vector2(1200, 2624)
+hanging = true
+
+[node name="Fungus5" parent="Entities" instance=ExtResource("7_fungus")]
+position = Vector2(2350, 3200)
+
+[node name="Fungus6" parent="Entities" instance=ExtResource("7_fungus")]
+position = Vector2(3500, 3200)
+
+[node name="Fungus7" parent="Entities" instance=ExtResource("7_fungus")]
+position = Vector2(2700, 1600)
+hanging = true
+
+[node name="Fungus8" parent="Entities" instance=ExtResource("7_fungus")]
+position = Vector2(3800, 1600)
+hanging = true
+
+[node name="Fungus9" parent="Entities" instance=ExtResource("7_fungus")]
+position = Vector2(3400, 2912)
+
+[node name="Fungus10" parent="Entities" instance=ExtResource("7_fungus")]
+position = Vector2(5400, 576)
+hanging = true
+
+[node name="Fungus11" parent="Entities" instance=ExtResource("7_fungus")]
+position = Vector2(5800, 832)
+
+[node name="Fungus12" parent="Entities" instance=ExtResource("7_fungus")]
+position = Vector2(4400, 3872)
+
+[node name="Fungus13" parent="Entities" instance=ExtResource("7_fungus")]
+position = Vector2(6500, 3872)
+
+[node name="Fungus14" parent="Entities" instance=ExtResource("7_fungus")]
+position = Vector2(7700, 3872)

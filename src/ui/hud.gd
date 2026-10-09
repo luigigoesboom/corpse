@@ -1,8 +1,17 @@
 extends Control
 ## Always-on gameplay HUD: health pips, mutation controls, short messages.
 
-const PIP_SIZE := Vector2(18, 18)
-const PIP_GAP := 6.0
+## One heart per hit point, drawn as pixel rows (1 = filled).
+const HEART := [
+	"0110110",
+	"1111111",
+	"1111111",
+	"0111110",
+	"0011100",
+	"0001000",
+]
+const HEART_PIXEL := 3.0
+const HEART_GAP := 6.0
 
 var _message_tween: Tween
 var _health: Health
@@ -29,11 +38,17 @@ func bind_health(health: Health) -> void:
 func _draw() -> void:
 	if _health == null:
 		return
+	var width: float = HEART[0].length() * HEART_PIXEL
 	for i in _health.max_health:
-		var rect := Rect2(Vector2(16 + i * (PIP_SIZE.x + PIP_GAP), 16), PIP_SIZE)
-		draw_rect(rect.grow(2), Color(0.1, 0.03, 0.04))
-		if i < _health.current:
-			draw_rect(rect, Color(0.85, 0.25, 0.3))
+		var origin := Vector2(16 + i * (width + HEART_GAP), 16)
+		var full := i < _health.current
+		for row in HEART.size():
+			for col in HEART[row].length():
+				if HEART[row][col] == "1":
+					var color := Color(0.88, 0.22, 0.28) if full else Color(0.22, 0.07, 0.09)
+					if full and row == 1 and col == 1:
+						color = Color(1, 0.7, 0.7)  # Shine.
+					draw_rect(Rect2(origin + Vector2(col, row) * HEART_PIXEL, Vector2.ONE * HEART_PIXEL), color)
 
 
 func _refresh_mutations() -> void:

@@ -48,6 +48,13 @@ The level is a PNG: `data/maps/world.png`, **one pixel = one tile** (32 x 32 px 
 
 **Tips:** sketch the big shapes with a large brush first (chambers, main routes), then carve details. Rooms that need precise layout or many props (colonies, boss arenas) will be Godot scenes placed on the map (roadmap week 10); paint just their outline.
 
+## Light and glow
+
+The world is dark (CanvasModulate on `Darkness` in game.tscn) and lit by PointLight2D nodes using `assets/lights/light_banded.tres` (hard steps, pixel-art friendly). Tiles block light (occluders in gut_tileset.tres).
+- Things that should glow in the dark (fungus caps, eyes, lamps, labels): set their material to `assets/materials/unshaded.tres`.
+- A visible halo around a light: a Sprite2D with the banded light texture and `assets/materials/additive_glow.tres`, low alpha.
+- Fonts: the default font is smooth. For crisp pixel text, drop a pixel font (.ttf, e.g. a free one from itch.io) into `assets/fonts/` and set it as the project's custom font (Project Settings > GUI > Theme > Custom Font).
+
 ## Terrain tiles
 
 The game picks a tile for every rock cell from which of its 4 sides face open space (autotiling). That needs 16 tiles, in a 4 x 4 grid of 32 x 32 px tiles, in this order:
@@ -64,6 +71,8 @@ The game picks a tile for every rock cell from which of its 4 sides face open sp
 | (3,1) | up + right + down | | (3,3) | all four |
 
 (Tile number = up 1 + right 2 + down 4 + left 8; column = number % 4, row = number / 4.)
+
+Row 4 holds two extra tiles without collision: (0,4) rock 2 tiles from open space, (1,4) rock 3+ tiles deep. They let big rock masses fade to dark.
 
 `assets/art/tiles/gut_placeholder.png` is a programmer-drawn version: flesh fill, light membrane rim on open sides, rounded corners where two open sides meet. To use real art, draw over it in Krita at 2x (256 x 256, then export at 128 x 128) keeping the same layout, and overwrite the PNG. Nothing else needs to change. Collision shapes live in `gut_tileset.tres` (squares, with corners cut where two open sides meet).
 

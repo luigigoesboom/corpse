@@ -5,6 +5,8 @@
 [ext_resource type="Script" path="res://src/actors/components/hurtbox.gd" id="3_hurtbox"]
 [ext_resource type="Script" path="res://src/actors/components/hitbox.gd" id="4_hitbox"]
 [ext_resource type="Script" path="res://src/mutations/mutation_host.gd" id="5_mutations"]
+[ext_resource type="Texture2D" path="res://assets/lights/light_banded.tres" id="6_light"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="7_unshaded"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
 radius = 10.0
@@ -19,6 +21,13 @@ size = Vector2(18, 40)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
 size = Vector2(44, 32)
 
+[sub_resource type="Gradient" id="Gradient_dust"]
+colors = PackedColorArray(0.75, 0.5, 0.5, 0.8, 0.75, 0.5, 0.5, 0)
+
+[sub_resource type="Gradient" id="Gradient_spores"]
+offsets = PackedFloat32Array(0, 0.2, 0.8, 1)
+colors = PackedColorArray(1, 0.8, 0.8, 0, 1, 0.85, 0.8, 0.5, 1, 0.85, 0.8, 0.5, 1, 0.8, 0.8, 0)
+
 [node name="Player" type="CharacterBody2D"]
 collision_layer = 4
 script = ExtResource("1_player")
@@ -29,6 +38,7 @@ shape = SubResource("CapsuleShape2D_body")
 [node name="Visual" type="Node2D" parent="."]
 
 [node name="Body" type="Polygon2D" parent="Visual"]
+material = ExtResource("7_unshaded")
 color = Color(0.85, 0.75, 0.6, 1)
 polygon = PackedVector2Array(-4, -22, 4, -22, 9, -17, 10, -12, 10, 12, 9, 17, 4, 22, -4, 22, -9, 17, -10, 12, -10, -12, -9, -17)
 
@@ -54,6 +64,7 @@ position = Vector2(8, 2)
 position = Vector2(9, 8)
 
 [node name="Slash" type="Polygon2D" parent="Visual"]
+material = ExtResource("7_unshaded")
 color = Color(1, 0.95, 0.85, 0.85)
 polygon = PackedVector2Array(14, -22, 32, -16, 44, -2, 42, 12, 30, 16, 36, 4, 34, -8, 24, -16)
 
@@ -91,6 +102,50 @@ monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Reach"]
 shape = SubResource("RectangleShape2D_reach")
+
+[node name="Light" type="PointLight2D" parent="."]
+shadow_enabled = true
+position = Vector2(0, -6)
+color = Color(1, 0.86, 0.72, 1)
+energy = 0.8
+texture = ExtResource("6_light")
+texture_scale = 3.0
+
+[node name="Dust" type="CPUParticles2D" parent="."]
+position = Vector2(0, 22)
+emitting = false
+amount = 10
+lifetime = 0.45
+one_shot = true
+explosiveness = 0.9
+local_coords = false
+emission_shape = 3
+emission_rect_extents = Vector2(10, 1)
+direction = Vector2(0, -1)
+spread = 70.0
+gravity = Vector2(0, 160)
+initial_velocity_min = 30.0
+initial_velocity_max = 70.0
+scale_amount_min = 2.0
+scale_amount_max = 3.0
+color_ramp = SubResource("Gradient_dust")
+
+[node name="Spores" type="CPUParticles2D" parent="."]
+material = ExtResource("7_unshaded")
+amount = 40
+lifetime = 12.0
+preprocess = 12.0
+local_coords = false
+emission_shape = 3
+emission_rect_extents = Vector2(700, 400)
+direction = Vector2(0, -1)
+spread = 180.0
+gravity = Vector2(0, -2)
+initial_velocity_min = 3.0
+initial_velocity_max = 10.0
+scale_amount_min = 1.0
+scale_amount_max = 2.0
+color_ramp = SubResource("Gradient_spores")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position_smoothing_enabled = true

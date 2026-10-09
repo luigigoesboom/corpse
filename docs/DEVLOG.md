@@ -13,6 +13,17 @@ Next:
 
 ---
 
+## Weeks 10-11: set piece, light and atmosphere (2026-10-09)
+Done:
+- Terrain: banded pixel-art placeholder tiles with a bright membrane on top-facing edges, plus two depth tiles (rock 2 and 3+ tiles from air) so big rock masses fade to dark. Chunk cut ~5 ms.
+- Light: CanvasModulate darkness, banded player light, rock casts shadows (occluders inset from open sides, so the surface rim stays lit). Glowing fungus prop (14 placed), camp lamp, glowing items, acid globs, leech eyes; additive halos on light sources. Player body ignores lighting so it stays readable.
+- Backdrop: two scrolling noise layers drawn by one full-screen shader on a CanvasLayer (Parallax2D left gaps with this camera setup).
+- Atmosphere: banded vignette, drifting spores. Juice: squash and stretch, landing dust, camera look-ahead. HUD hearts. NPC names fade in when close.
+- Week 10: Flesh-Tender camp set piece (scenes/setpieces), placed in world.tscn. Slots for the history sim are left for phase 4.
+- Checked with real-renderer screenshots: ~130-145 FPS with shadows on. All headless checks pass.
+Not done: The developer's real tile and prop art (week 11 art pass). Pixel font (needs a font file; see ART_PIPELINE).
+Next: Week 12 milestone: 10 minutes of exploring without bugs or stutter.
+
 ## UI, combat, mutations sweep (2026-10-09)
 Done (D-015, D-016), three commits:
 - UI: main menu (startup scene), pause menu, 8-pocket inventory with details, Eat and Drop, HUD messages, GameUI pauses the game while a screen is open. Save v3.
