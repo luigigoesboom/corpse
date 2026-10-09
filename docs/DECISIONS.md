@@ -99,13 +99,17 @@ Format: ID, date, decision, why, what it rules out.
 - Why: makes the corpse the point of the loop and keeps each host a fresh start. Cross-life progression, if any, belongs to the fragment (legend), not to inherited mutations.
 - Rules out: mutations surviving death in weakened form (the VISION idea), for now.
 
+**D-021 Time passes on death as rolled aftermath, not simulation** (2026-10-10, answers Q-002)
+- What: each death rolls a time gap tier (a few days / some months / years / decades). The tier sets a strength 0..1 and advances the year. A short list of aftermath rules applies at that strength: old bodies get scavenged and their mutations rot (the newest body always keeps something), killed creatures may be replaced, dropped items may vanish, and the death plus what happened is written to an event log. The player sees "N years later" and a hint or two, not a list.
+- Why: keeps the pitch (every death moves history forward) without simulating years: nothing ages, the hand-placed world stays hand-placed, and each system opts in with its own small rule. Phase 4 factions add rules instead of a calendar sim.
+- Rules out: year-by-year simulation between lives, for now.
+
 ---
 
 ## Open questions
 
 | ID | Question | Decide by |
 |---|---|---|
-| Q-002 | How many years pass on death, fixed or variable? | Week 23 |
 | Q-004 | Outlines or no outlines in the art style? | Week 15 |
 | Q-005 | Final name of the game. | Before the Steam page, week 45 |
 | Q-006 | Breakable terrain at all? Developer doubts it. If not, week 8 becomes "chunk diffs for entity state only" (dead NPCs, taken items, corpses). | Week 8 |

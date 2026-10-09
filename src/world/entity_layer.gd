@@ -102,5 +102,5 @@ func _on_chunk_unloaded(coord: Vector2i) -> void:
 func _on_entity_killed(entity: Node) -> void:
 	if entity.get_parent() != self:
 		return
-	WorldState.data.removed_entities[key_of(entity)] = true
+	WorldState.data.removed_entities[key_of(entity)] = CombatRules.kind_of(entity)
 	remove_child.call_deferred(entity)

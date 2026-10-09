@@ -26,7 +26,7 @@ func run() -> void:
 	check(is_equal_approx(corpse.position.y, 3200.0), "the body lies on the floor, not in the air")
 	check(not player.get_node("Visual").visible, "the dying host is replaced by its body")
 
-	game.get_node("UI").death_screen.continue_pressed.emit()
+	game.get_node("UI").death_screen.wake_pressed.emit()  # Skips time passing (tested in test_aftermath).
 	await wait_frames(3)
 	check(data.inventory.all(func(item): return item == &"") and data.mutations.is_empty(), "the new host wakes with nothing")
 	check(player.get_node("Mutations").get_child_count() == 0, "and without the old host's abilities")

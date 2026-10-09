@@ -1,7 +1,10 @@
 extends Control
 ## Shown when the host dies: a short epitaph of the life that just ended.
 
+## "Wake in a new host" on the epitaph: the game runs the aftermath now.
 signal continue_pressed
+## "Wake" on the time screen: start the next life.
+signal wake_pressed
 
 ## Display names for creature kinds (CombatRules.kind_of).
 const CREATURE_NAMES := {
@@ -11,12 +14,34 @@ const CREATURE_NAMES := {
 }
 
 
+var _showing_time := false
+
+
 func _ready() -> void:
 	process_mode = PROCESS_MODE_ALWAYS
-	%ContinueButton.pressed.connect(continue_pressed.emit)
+	%ContinueButton.pressed.connect(_on_button_pressed)
+
+
+func _on_button_pressed() -> void:
+	if _showing_time:
+		wake_pressed.emit()
+	else:
+		continue_pressed.emit()
+
+
+## Second step: how much time passed, and a hint or two of what changed.
+func show_time(report: Dictionary) -> void:
+	_showing_time = true
+	%Title.text = Aftermath.gap_text(report)
+	var hints: Array = report.hints
+	%Summary.text = "\n".join(hints) if not hints.is_empty() else "The body goes on without you."
+	%ContinueButton.text = "Wake"
+	%ContinueButton.grab_focus()
 
 
 func show_life(life: LifeRecord, life_number: int) -> void:
+	_showing_time = false
+	%ContinueButton.text = "Wake in a new host"
 	%Title.text = "Here lies %s" % life.host_name
 	var lines := PackedStringArray()
 	lines.append("%s, host number %d." % [String(life.host_type).capitalize(), life_number])

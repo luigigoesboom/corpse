@@ -233,6 +233,10 @@ Text is generated from events when shown (murals, rumors, artifact descriptions)
 
 ## Death and rebirth flow
 
+Current version (weeks 21-23, D-021): `end_life()` closes the LifeRecord and moves pockets and mutations onto the body; the epitaph shows; `Aftermath.run()` rolls a time gap tier and applies its rules to WorldData at that strength (no year-by-year simulation); EntityLayer rebuilds and chunks reload so the changes show; "N years later" with a hint; the next host starts. Factions will add their own aftermath rules in phase 4.
+
+Original plan:
+
 1. `player_died` on EventBus.
 2. Finish the current `LifeRecord`, record a death event.
 3. Turn the player's body into a `Corpse` entity in the chunk diff, with carried items and mutations.

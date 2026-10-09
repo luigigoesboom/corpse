@@ -66,7 +66,7 @@ func run() -> void:
 	check(player.sprite.current_animation() == &"die" and not player.sprite.is_playing(), "the death animation plays once and holds its last frame")
 	await create_timer(0.3).timeout
 	check(game.get_node("UI").death_screen.visible and paused, "the death screen shows and pauses the game")
-	game.get_node("UI").death_screen.continue_pressed.emit()
+	game.get_node("UI").death_screen.wake_pressed.emit()  # Skips time passing (tested in test_aftermath).
 	await wait_frames(2)
 	check(not player.is_dead() and player.health.current == player.health.max_health and not paused, "waking in a new host: alive, full health")
 	saves.load_game(98)

@@ -31,14 +31,17 @@ var inventory: Array = []
 ## Unloaded chunks keep their changes here, so they survive leaving the area
 ## and saving. Empty chunks are removed to keep saves small.
 var chunk_diffs: Dictionary = {}
-## Node names of hand-placed entities (children of Entities in world.tscn) that
-## are gone for good, e.g. an item someone picked up. name -> true
+## Hand-placed entities (children of Entities in world.tscn) that are gone,
+## by node name -> what they were: &"item" (picked up, never returns) or a
+## creature kind like &"gut_leech" (killed; may be replaced after a death).
 var removed_entities: Dictionary = {}
 ## Next free ID for things created at runtime (dropped items, later corpses).
 var next_id := 1
 ## Every host the player has had, oldest first (LifeRecord). The last one is
 ## the current host while it is alive.
 var lives: Array[LifeRecord] = []
+## Everything that happened, oldest first (EventRecord). Append only.
+var events: Array[EventRecord] = []
 
 
 static func create(seed_value: int) -> WorldData:
@@ -82,6 +85,7 @@ func end_life(position: Vector2, corpse_position: Vector2, killed_by: StringName
 	for i in inventory.size():
 		inventory[i] = &""
 	mutations.clear()
+	log_event(&"host_died", [life.host_name], {"killed_by": killed_by, "position": corpse_position})
 	return life
 
 
@@ -101,6 +105,17 @@ func reclaim_corpse(index: int) -> Dictionary:
 			taken.mutations.append(life.corpse_mutations[slot])
 			life.corpse_mutations.erase(slot)
 	return taken
+
+
+func log_event(type: StringName, actors: Array, details: Dictionary) -> EventRecord:
+	var event := EventRecord.new()
+	event.id = new_id()
+	event.year = year
+	event.type = type
+	event.actors = actors
+	event.data = details
+	events.append(event)
+	return event
 
 
 func record_kill(creature_kind: StringName) -> void:
@@ -173,6 +188,7 @@ func to_dict() -> Dictionary:
 		"removed_entities": removed_entities.duplicate(),
 		"next_id": next_id,
 		"lives": lives.map(func(life): return life.to_dict()),
+		"events": events.map(func(event): return event.to_dict()),
 	}
 
 
@@ -189,6 +205,8 @@ static func from_dict(d: Dictionary) -> WorldData:
 	data.next_id = int(d.get("next_id", 1))
 	for life in d.get("lives", []):
 		data.lives.append(LifeRecord.from_dict(life))
+	for event in d.get("events", []):
+		data.events.append(EventRecord.from_dict(event))
 	data._fit_inventory()
 	return data
 

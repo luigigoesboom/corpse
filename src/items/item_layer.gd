@@ -90,7 +90,7 @@ func _on_pickup_requested(item: Node) -> void:
 		EventBus.notify.emit("Pockets are full")
 		return
 	if world_item.is_placed():
-		data.removed_entities[EntityLayer.key_of(world_item)] = true
+		data.removed_entities[EntityLayer.key_of(world_item)] = &"item"
 		# EntityLayer keeps the node; it just never re-adds a removed one.
 		world_item.get_parent().remove_child(world_item)
 	else:

@@ -74,7 +74,7 @@ This is the heart of the game. It comes before factions so everything after is b
 |---|---|---|
 | 21 | Life records. LifeRecord data (host type, start year, death year, death place, carried mutations and items, deeds list). Death screen showing the life summary. | Dying shows a summary and the record is saved. |
 | 22 | The corpse. On death, spawn a Corpse entity in the world with the carried items and mutations. Walking up to it lets you reclaim them. | Die, respawn, walk back, reclaim your stuff. |
-| 23 | Time skip v1. Advance the world year by a random amount. Simple world changes: rot spreads in a few chunks, item decay, corpse fate rolled randomly (stays, looted, moved). | After death, the world is visibly a bit different. |
+| 23 | Time skip v1 (D-021). Roll a time gap tier whose strength scales aftermath rules: bodies scavenged, mutations rot, creatures return, dropped items decay. Event log starts. | After death, the world is visibly a bit different. |
 | 24 | Host choice. Rebirth screen offering 3 hosts at different spawn points, with different starting bodies. | You pick a host and start in a different colony. |
 | 25 | **Milestone 3.** Play 5 lives in a row. Note what feels good and what feels like busywork. | Write a one-page DEVLOG entry about how the loop feels. |
 

@@ -13,6 +13,11 @@ Next:
 
 ---
 
+## Week 23: time passes (2026-10-10)
+Done: D-020 (nothing carries over except through the body) and D-021 (time passes as rolled aftermath, not simulation). `Aftermath` (src/sim/history): each death rolls a gap tier (days / months / years / decades) whose strength scales the rules: bodies scavenged and mutations rotting (the newest body always keeps one thing), killed creatures replaced, dropped items rotting. Year advances; new hosts are born in the new year. `EventRecord` log in WorldData.events (host_died, corpse_scavenged, corpse_rotted, creatures_returned), the seed of phase 4 history. Death screen has a second step: "Nine years later." plus a hint. removed_entities now stores what was removed (item or creature kind). Save v8. Deterministic per world and death.
+Not done: Factions adding their own aftermath rules (phase 4).
+Next: Week 24, host choice on rebirth.
+
 ## Week 22: the corpse (2026-10-10)
 Done: On death, everything the host carried and grew moves onto its body (LifeRecord.corpse_items / corpse_mutations, corpse_position on the floor under the death spot). The dying host gives way to a Corpse (death pose, held on its last frame, with its mutation layers). The next host wakes with nothing. E on the body takes back what fits: items into free pockets, mutations into empty slots; the rest stays. CorpseLayer shows bodies per chunk from the life records, like ItemLayer. Every old body stays; the debug map (M) marks them. Interact now works on anything with interact(). Save v7.
 Fixes found by tests: the dead host stayed visible over its corpse (the death screen pauses _process).

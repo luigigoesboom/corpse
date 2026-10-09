@@ -25,7 +25,8 @@ func _ready() -> void:
 	_player.health.changed.connect(_on_player_health_changed)
 	$UI/PauseMenu.save_pressed.connect(quick_save)
 	$UI/PauseMenu.load_pressed.connect(quick_load)
-	$UI.death_screen.continue_pressed.connect(_start_next_life)
+	$UI.death_screen.continue_pressed.connect(_pass_time)
+	$UI.death_screen.wake_pressed.connect(_start_next_life)
 	EventBus.entity_killed.connect(_on_entity_killed)
 	if WorldState.data:
 		# "Continue" in the main menu already loaded a save.
@@ -112,6 +113,15 @@ func _ground_below(point: Vector2) -> Vector2:
 	var query := PhysicsRayQueryParameters2D.create(point, point + Vector2(0, 2000), 1)
 	var hit := get_world_2d().direct_space_state.intersect_ray(query)
 	return hit.position if hit else point + Vector2(0, 22)
+
+
+## Time passes (D-021): roll the gap, apply the aftermath, then rebuild what
+## is shown from the changed data (respawned creatures, scavenged bodies).
+func _pass_time() -> void:
+	var report := Aftermath.run(WorldState.data)
+	_entities.rebuild()
+	_chunks.reset()
+	$UI.death_screen.show_time(report)
 
 
 ## Placeholder rebirth until week 24 (host choice): same host type, at the
