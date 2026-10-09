@@ -15,9 +15,11 @@ extends Node
 signal world_loaded
 ## The player wants to pick up this WorldItem.
 signal pickup_requested(item: Node)
-## The player wants to drop their last item, at this world position (feet).
-signal drop_requested(position: Vector2)
+## The player wants to drop what is in this inventory pocket.
+signal drop_requested(slot: int)
 ## WorldState.data.inventory changed.
 signal inventory_changed
+## Show a short message to the player (pickups, saves, warnings).
+signal notify(text: String)
 
 @warning_ignore_restore("unused_signal")

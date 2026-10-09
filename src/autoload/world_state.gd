@@ -7,6 +7,11 @@ extends Node
 var data: WorldData
 
 
+## Forget the current world (e.g. "New game" from the main menu).
+func clear() -> void:
+	data = null
+
+
 func set_data(new_data: WorldData) -> void:
 	data = new_data
 	EventBus.world_loaded.emit()

@@ -16,11 +16,13 @@ extends Node2D
 const ITEM_SCENE := preload("res://src/items/world_item.tscn")
 
 var _chunks: ChunkManager
+var _player: Player
 var _spawned := {}  # Vector2i chunk -> Array of WorldItem, so unloading never depends on the data
 
 
-func attach(chunks: ChunkManager) -> void:
+func attach(chunks: ChunkManager, player: Player) -> void:
 	_chunks = chunks
+	_player = player
 	chunks.chunk_loaded.connect(_on_chunk_loaded)
 	chunks.chunk_unloaded.connect(_on_chunk_unloaded)
 	EventBus.pickup_requested.connect(_on_pickup_requested)
@@ -49,16 +51,30 @@ func _spawn(coord: Vector2i, record: Dictionary) -> void:
 	_spawned.get_or_add(coord, []).append(item)
 
 
-func _on_drop_requested(pos: Vector2) -> void:
+func _on_drop_requested(slot: int) -> void:
 	var data := WorldState.data
-	if data.inventory.is_empty():
+	var item_id := data.take_from_inventory(slot)
+	if item_id == &"":
 		return
-	var item_id: StringName = data.inventory.pop_back()
+	var pos := _drop_position()
 	var coord := ChunkData.world_to_chunk(pos)
 	var record := data.add_dropped_item(coord, item_id, pos)
 	if _chunks.is_loaded(coord):
 		_spawn(coord, record)
 	EventBus.inventory_changed.emit()
+	EventBus.notify.emit("Dropped %s" % ItemDb.display_name(item_id))
+
+
+## On the ground a little in front of the player, so items never float.
+func _drop_position() -> Vector2:
+	var space := get_world_2d().direct_space_state
+	var center := _player.global_position
+	var front := center + Vector2(_player.facing() * 24.0, 0.0)
+	# Not in front if a wall is there; then straight below the player.
+	var wall := space.intersect_ray(PhysicsRayQueryParameters2D.create(center, front, 1))
+	var from := center if wall else front
+	var floor_hit := space.intersect_ray(PhysicsRayQueryParameters2D.create(from, from + Vector2(0, 4000), 1))
+	return floor_hit.position if floor_hit else from + Vector2(0, 22)
 
 
 func _on_pickup_requested(item: Node) -> void:
@@ -66,7 +82,9 @@ func _on_pickup_requested(item: Node) -> void:
 	if world_item == null or not is_instance_valid(world_item):
 		return
 	var data := WorldState.data
-	data.inventory.append(world_item.item_id)
+	if data.add_to_inventory(world_item.item_id) < 0:
+		EventBus.notify.emit("Pockets are full")
+		return
 	if world_item.is_placed():
 		data.removed_entities[String(world_item.name)] = true
 		# EntityLayer keeps the node; it just never re-adds a removed one.
@@ -76,3 +94,4 @@ func _on_pickup_requested(item: Node) -> void:
 		_spawned.get(world_item.record_chunk, []).erase(world_item)
 		world_item.queue_free()
 	EventBus.inventory_changed.emit()
+	EventBus.notify.emit("+ %s" % ItemDb.display_name(world_item.item_id))

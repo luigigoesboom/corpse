@@ -1,0 +1,92 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/ui/inventory_screen.gd" id="1_inv"]
+
+[node name="InventoryScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_inv")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -380.0
+offset_top = -200.0
+offset_right = 380.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Panel/Margin/VBox"]
+layout_mode = 2
+text = "Pockets"
+
+[node name="HBox" type="HBoxContainer" parent="Panel/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="Grid" type="GridContainer" parent="Panel/Margin/VBox/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+columns = 4
+
+[node name="Details" type="VBoxContainer" parent="Panel/Margin/VBox/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ItemName" type="Label" parent="Panel/Margin/VBox/HBox/Details"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Empty pocket"
+
+[node name="ItemDescription" type="Label" parent="Panel/Margin/VBox/HBox/Details"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 0)
+layout_mode = 2
+size_flags_vertical = 3
+modulate = Color(1, 1, 1, 0.75)
+autowrap_mode = 3
+
+[node name="Actions" type="HBoxContainer" parent="Panel/Margin/VBox/HBox/Details"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="DropButton" type="Button" parent="Panel/Margin/VBox/HBox/Details/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Drop"
+
+[node name="Hint" type="Label" parent="Panel/Margin/VBox"]
+layout_mode = 2
+modulate = Color(1, 1, 1, 0.5)
+text = "Tab / Esc: close"

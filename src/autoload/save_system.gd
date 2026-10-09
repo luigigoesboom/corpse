@@ -14,7 +14,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 2
+const SAVE_VERSION := 3
 
 
 func slot_path(slot: int) -> String:
@@ -74,4 +74,13 @@ func _migrate(save: Dictionary) -> Dictionary:
 		save.world["removed_entities"] = {}
 		save.world["next_id"] = 1
 		save.save_version = 2
+	if save.save_version == 2:
+		# v3: inventory became fixed pockets. Empty pockets are &"".
+		var pockets: Array = save.world.get("inventory", []).duplicate()
+		pockets.resize(WorldData.INVENTORY_SIZE)
+		for i in pockets.size():
+			if pockets[i] == null:
+				pockets[i] = &""
+		save.world["inventory"] = pockets
+		save.save_version = 3
 	return save

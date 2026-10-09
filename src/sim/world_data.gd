@@ -12,11 +12,15 @@ extends RefCounted
 ## To add a field: add it here, write it in to_dict(), read it with a default in
 ## from_dict(), bump SaveSystem.SAVE_VERSION and add a step in SaveSystem._migrate().
 
+## Pockets the current host has. An empty pocket holds &"".
+const INVENTORY_SIZE := 8
+
 var world_seed: int
 var year: int = 0
 ## Where the current host is. Written by the game right before saving.
 var player_position := Vector2.ZERO
-## Item ids the current host carries. Moves into LifeRecord in week 21.
+## Item id per pocket (INVENTORY_SIZE entries, &"" = empty). Moves into
+## LifeRecord in week 21.
 var inventory: Array = []
 ## Vector2i chunk coord -> Dictionary of runtime changes in that chunk:
 ##   "items": Array of {"id": int, "item": StringName, "pos": Vector2}
@@ -33,12 +37,30 @@ var next_id := 1
 static func create(seed_value: int) -> WorldData:
 	var data := WorldData.new()
 	data.world_seed = seed_value
+	data._fit_inventory()
 	return data
 
 
 func new_id() -> int:
 	next_id += 1
 	return next_id - 1
+
+
+## Puts the item in the first empty pocket. Returns the pocket, or -1 if full.
+func add_to_inventory(item: StringName) -> int:
+	var slot := inventory.find(&"")
+	if slot >= 0:
+		inventory[slot] = item
+	return slot
+
+
+## Empties the pocket and returns what was in it (&"" if it was empty).
+func take_from_inventory(slot: int) -> StringName:
+	if slot < 0 or slot >= inventory.size():
+		return &""
+	var item: StringName = inventory[slot]
+	inventory[slot] = &""
+	return item
 
 
 func items_in_chunk(chunk: Vector2i) -> Array:
@@ -85,4 +107,11 @@ static func from_dict(d: Dictionary) -> WorldData:
 	data.chunk_diffs = d.get("chunk_diffs", {})
 	data.removed_entities = d.get("removed_entities", {})
 	data.next_id = int(d.get("next_id", 1))
+	data._fit_inventory()
 	return data
+
+
+func _fit_inventory() -> void:
+	while inventory.size() < INVENTORY_SIZE:
+		inventory.append(&"")
+	inventory.resize(INVENTORY_SIZE)

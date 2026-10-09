@@ -87,7 +87,13 @@ func is_clinging() -> bool:
 	return _clinging
 
 
+## 1 = facing right, -1 = facing left.
+func facing() -> float:
+	return _visual.scale.x
+
+
 ## The player only asks; ItemLayer decides and changes the world data.
+## Dropping happens from the inventory screen.
 func _handle_items() -> void:
 	if Input.is_action_just_pressed("interact"):
 		var nearest: Area2D = null
@@ -97,9 +103,6 @@ func _handle_items() -> void:
 				nearest = area
 		if nearest:
 			EventBus.pickup_requested.emit(nearest)
-	if Input.is_action_just_pressed("drop") and is_on_floor():
-		# Drop at the feet, a little in front.
-		EventBus.drop_requested.emit(global_position + Vector2(_visual.scale.x * 24.0, 22.0))
 
 
 ## From the classic formulas: g = 2h / t^2, v0 = 2h / t.
