@@ -13,6 +13,10 @@ Next:
 
 ---
 
+## Bug fixes from playing (2026-10-10)
+- Running jitter: physics runs 60 steps a second, the developer's screen 165 frames, so the drawn player zig-zagged against the smoothed camera (measured: +2.6 / -1.5 px per frame). Fixed with physics interpolation (project setting); `Player.teleport()` resets it after jumps across the map. Now under 0.15 px per frame. The `--render` test checks it.
+- Leech flipping left and right under a player above it: a 12 px dead zone, and after 2.5 s out of reach it gives up and ignores the player for 3 s. test_ai.gd reproduces the old behaviour (66 flips in 5 s) and checks the fix (0). Bile Spitter got the same dead zone.
+
 ## Week 24: host choice (2026-10-10)
 Done: HostDef resources in data/hosts (colonist 5 hearts; pilgrim 4 hearts, faster, starts with a Bone Shard; antibody 7 hearts, slower, born with a Bone Spur) with HostDb. SpawnPoint markers in world.tscn (Flesh-Tender camp, upper corridor, cavern floor, chamber heights), each listing which host types can wake there. After "N years later", three options: different places (never the last host's when avoidable), host types, generated names; deterministic per world and death. Player.apply_host() sets health, speed and body frames; the kit only comes with a new life. LifeRecord.origin. Placeholder pilgrim (hooded) and antibody (pale, round) art shares the colonist's poses, so mutation overlays fit all three. Corpses use their host's frames. Save v9.
 Not done: Host standing with factions (phase 4).

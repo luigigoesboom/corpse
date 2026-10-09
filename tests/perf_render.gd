@@ -14,6 +14,8 @@ func run() -> void:
 	for i in 60:
 		await process_frame  # Warm-up: shaders compile, first chunks build.
 
+	await _check_running_is_smooth()
+
 	var frame_ms: Array[float] = []
 	var elapsed := 0.0
 	var next_teleport := 3.0
@@ -39,3 +41,35 @@ func run() -> void:
 		n, frame_ms[n / 2], 1000.0 / frame_ms[n / 2], frame_ms[int(n * 0.99)], frame_ms[n - 1], spikes])
 	check(frame_ms[int(n * 0.99)] < 33.4, "99% of frames under 33 ms")
 	check(spikes < n / 200, "fewer than 0.5% of frames are spikes")
+
+
+## Runs right for 2.5 s and tracks where the player is drawn on screen. With
+## physics interpolation the camera keeps the drawn player steady; without it
+## (60 physics steps on a faster screen) it zig-zags back and forth.
+func _check_running_is_smooth() -> void:
+	player.teleport(Vector2(300, 3178))
+	await wait_frames(30)
+	var interpolated: bool = ProjectSettings.get_setting("physics/common/physics_interpolation")
+	var track := {"prev": player.global_position, "cur": player.global_position}  # Lambdas copy plain locals.
+	var follow := func():
+		track.prev = track.cur
+		track.cur = player.global_position
+	physics_frame.connect(follow)
+	Input.action_press("move_right")
+	var xs: Array[float] = []
+	var start := Time.get_ticks_msec()
+	while Time.get_ticks_msec() - start < 2500:
+		await process_frame
+		# Interpolation on: drawn between the last two physics positions. Off: drawn where it is.
+		var drawn: Vector2 = track.prev.lerp(track.cur, Engine.get_physics_interpolation_fraction()) if interpolated else player.global_position
+		xs.append((root.get_canvas_transform() * drawn).x)
+	Input.action_release("move_right")
+	physics_frame.disconnect(follow)
+	var steady := xs.slice(xs.size() / 2)
+	var reversals := 0
+	for i in range(2, steady.size()):
+		var a: float = steady[i - 1] - steady[i - 2]
+		var b: float = steady[i] - steady[i - 1]
+		if a * b < 0.0 and absf(a) > 0.25 and absf(b) > 0.25:
+			reversals += 1
+	check(reversals < steady.size() / 20, "running looks smooth on screen (%d zig-zags in %d frames)" % [reversals, steady.size()])

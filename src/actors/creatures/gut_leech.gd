@@ -23,6 +23,8 @@ enum State { IDLE, WANDER, NOTICE, CHASE, ATTACK, FLEE, DEAD }
 @export var lunge_speed := 380.0
 ## Flees when health drops to this or below.
 @export var flee_health := 1
+## Gives up after the player has been out of reach above it this long.
+@export var patience := 2.5
 
 var state := State.IDLE
 var _state_time := 0.0
@@ -31,6 +33,9 @@ var _gravity := 1400.0
 var _rng := RandomNumberGenerator.new()
 var _player: Player
 var _hurt_time := 0.0
+var _out_of_reach_time := 0.0
+## While above zero, it does not notice the player (it just gave up).
+var _ignore_time := 0.0
 
 @onready var _health: Health = $Health
 @onready var _visual: Node2D = $Visual
@@ -58,6 +63,7 @@ func _physics_process(delta: float) -> void:
 		_enter(State.WANDER)
 	_state_time += delta
 	_hurt_time -= delta
+	_ignore_time -= delta
 	if not is_on_floor():
 		velocity.y += _gravity * delta
 
@@ -84,11 +90,20 @@ func _physics_process(delta: float) -> void:
 				_enter(State.CHASE)
 		State.CHASE:
 			var dx := _player.global_position.x - global_position.x
-			_face(dx)
-			velocity.x = 0.0 if _blocked() else _dir * chase_speed
-			if absf(dx) < attack_range and absf(_player.global_position.y - global_position.y) < 48.0:
+			var dy := _player.global_position.y - global_position.y
+			if absf(dx) > 12.0:
+				_face(dx)
+				velocity.x = 0.0 if _blocked() else _dir * chase_speed
+			else:
+				velocity.x = 0.0  # Right below the player: wait instead of flipping.
+			# A crawler cannot reach a player standing well above it. Give up after a while.
+			_out_of_reach_time = _out_of_reach_time + delta if dy < -48.0 else 0.0
+			if absf(dx) < attack_range and absf(dy) < 48.0:
 				_enter(State.ATTACK)
 			elif global_position.distance_to(_player.global_position) > lose_range:
+				_enter(State.WANDER)
+			elif _out_of_reach_time > patience:
+				_ignore_time = 3.0
 				_enter(State.WANDER)
 		State.ATTACK:
 			_update_attack()
@@ -140,6 +155,7 @@ func _pick_animation() -> StringName:
 func _enter(new_state: State) -> void:
 	state = new_state
 	_state_time = 0.0
+	_out_of_reach_time = 0.0
 	_bite.deactivate()
 	_visual.scale = Vector2(_dir, 1.0)
 
@@ -156,7 +172,7 @@ func _blocked() -> bool:
 
 
 func _sees_player() -> bool:
-	if _player == null or _player.is_dead():
+	if _player == null or _player.is_dead() or _ignore_time > 0.0:
 		return false
 	var to_player := _player.global_position - global_position
 	if to_player.length() > sight_range:

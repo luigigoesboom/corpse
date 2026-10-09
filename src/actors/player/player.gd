@@ -215,9 +215,18 @@ func respawn(at: Vector2) -> void:
 	_dead = false
 	body_hidden = false
 	_hurt_timer = 0.0
+	teleport(at)
+	health.heal_full()
+
+
+## Moves instantly. Physics interpolation (project setting) draws movement
+## smoothly between physics steps; after a jump across the map it must be
+## told not to slide there.
+func teleport(at: Vector2) -> void:
 	global_position = at
 	velocity = Vector2.ZERO
-	health.heal_full()
+	reset_physics_interpolation()
+	_camera.reset_smoothing()
 
 
 func _handle_attack() -> void:

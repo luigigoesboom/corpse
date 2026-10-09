@@ -135,7 +135,7 @@ func _enter(new_state: State) -> void:
 
 
 func _face(dx: float) -> void:
-	if dx != 0.0:
+	if absf(dx) > 8.0:  # Do not flip back and forth when the player is right above.
 		_dir = signf(dx)
 		_visual.scale.x = _dir
 
