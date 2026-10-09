@@ -33,6 +33,8 @@ func show_life(life: LifeRecord, life_number: int) -> void:
 		lines.append("Grew: %s." % ", ".join(parts))
 	if not life.carried_items.is_empty():
 		lines.append("Carried: %s." % ", ".join(life.carried_items.map(func(id): return ItemDb.display_name(id))))
+	if life.has_corpse_loot():
+		lines.append("It all stays on the body, where it fell.")
 	if life.kills.is_empty():
 		lines.append("Killed nothing.")
 	else:

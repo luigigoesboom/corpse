@@ -65,16 +65,42 @@ func start_life(host_type: StringName) -> LifeRecord:
 
 
 ## Closes the current life: when, where, how, and what the body held.
-func end_life(position: Vector2, killed_by: StringName) -> LifeRecord:
+## Everything the host had moves onto the corpse at `corpse_position`; the
+## next host starts with empty pockets and an unchanged body.
+func end_life(position: Vector2, corpse_position: Vector2, killed_by: StringName) -> LifeRecord:
 	var life := current_life()
 	if life == null:
 		return null
 	life.death_year = year
 	life.death_position = position
+	life.corpse_position = corpse_position
 	life.killed_by = killed_by
 	life.carried_items = inventory.filter(func(item): return item != &"")
 	life.carried_mutations = mutations.duplicate()
+	life.corpse_items = life.carried_items.duplicate()
+	life.corpse_mutations = life.carried_mutations.duplicate()
+	for i in inventory.size():
+		inventory[i] = &""
+	mutations.clear()
 	return life
+
+
+## The current host searches an old body (lives[index]): items go into free
+## pockets, mutations into empty body slots. What does not fit stays.
+## Returns what was taken: {"items": [...], "mutations": [...]}.
+func reclaim_corpse(index: int) -> Dictionary:
+	var taken := {"items": [], "mutations": []}
+	var life: LifeRecord = lives[index]
+	for item in life.corpse_items.duplicate():
+		if add_to_inventory(item) >= 0:
+			life.corpse_items.erase(item)
+			taken.items.append(item)
+	for slot in life.corpse_mutations.keys():
+		if not mutations.has(slot):
+			mutations[slot] = life.corpse_mutations[slot]
+			taken.mutations.append(life.corpse_mutations[slot])
+			life.corpse_mutations.erase(slot)
+	return taken
 
 
 func record_kill(creature_kind: StringName) -> void:

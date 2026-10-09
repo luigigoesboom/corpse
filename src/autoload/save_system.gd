@@ -14,7 +14,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 6
+const SAVE_VERSION := 7
 
 
 func slot_path(slot: int) -> String:
@@ -95,4 +95,11 @@ func _migrate(save: Dictionary) -> Dictionary:
 		# v6 (week 21): life records. The game starts a life for a world without one.
 		save.world["lives"] = []
 		save.save_version = 6
+	if save.save_version == 6:
+		# v7 (week 22): corpses. Dead hosts keep what they carried on the body.
+		for life in save.world.get("lives", []):
+			life["corpse_position"] = life.get("death_position", Vector2.ZERO)
+			life["corpse_items"] = life.get("carried_items", []).duplicate()
+			life["corpse_mutations"] = life.get("carried_mutations", {}).duplicate()
+		save.save_version = 7
 	return save

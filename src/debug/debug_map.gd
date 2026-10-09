@@ -48,6 +48,15 @@ func _draw() -> void:
 		var coord := ChunkData.world_to_chunk(c.position + Vector2.ONE)
 		draw_rect(Rect2(origin + Vector2(coord) * chunk_px, Vector2.ONE * chunk_px), Color.LIME, false, 2.0)
 
+	# Old bodies: grey crosses (brighter while something is still on them).
+	if WorldState.data:
+		for life in WorldState.data.lives:
+			if not life.is_alive():
+				var c := origin + life.corpse_position / ChunkData.TILE_PX * px
+				var col := Color(0.9, 0.85, 0.7) if life.has_corpse_loot() else Color(0.5, 0.5, 0.5)
+				draw_line(c + Vector2(-4, -4), c + Vector2(4, 4), col, 2.0)
+				draw_line(c + Vector2(-4, 4), c + Vector2(4, -4), col, 2.0)
+
 	if player:
 		var p := origin + player.global_position / ChunkData.TILE_PX * px
 		draw_circle(p, maxf(3.0, px), Color.RED)

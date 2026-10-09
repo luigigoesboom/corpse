@@ -13,6 +13,12 @@ Next:
 
 ---
 
+## Week 22: the corpse (2026-10-10)
+Done: On death, everything the host carried and grew moves onto its body (LifeRecord.corpse_items / corpse_mutations, corpse_position on the floor under the death spot). The dying host gives way to a Corpse (death pose, held on its last frame, with its mutation layers). The next host wakes with nothing. E on the body takes back what fits: items into free pockets, mutations into empty slots; the rest stays. CorpseLayer shows bodies per chunk from the life records, like ItemLayer. Every old body stays; the debug map (M) marks them. Interact now works on anything with interact(). Save v7.
+Fixes found by tests: the dead host stayed visible over its corpse (the death screen pauses _process).
+Not done: Anything happening to bodies over time (week 23).
+Next: Week 23, time passes on death.
+
 ## Weeks 20-21 (2026-10-10)
 Done:
 - Week 20: developer chose loose and systemic combat (D-018). Friendly fire is now the default in the world (leech bites exclude their own hurtbox). Felt rigid: base resolution 960 x 540 (D-019, exact 2x on 1080p, zoomed in), camera with vertical drag margins and softer smoothing; inventory panel resized. Phantom Camera planned by the developer.

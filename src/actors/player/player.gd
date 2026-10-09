@@ -71,6 +71,8 @@ var _hurt_timer := 0.0
 var _dead := false
 var _facing := 1.0
 var _was_on_floor := true
+## Hides the host while it lies dead (its Corpse is drawn instead).
+var body_hidden := false
 ## Screen shake strength in pixels; fades out by itself.
 var _shake := 0.0
 var _look := Vector2.ZERO
@@ -128,7 +130,7 @@ func _physics_process(delta: float) -> void:
 func _process(delta: float) -> void:
 	sprite.play(_pick_animation())
 	# Flicker while invulnerable after a hit.
-	_visual.visible = _dead or not health.is_invulnerable() or int(Time.get_ticks_msec() / 60) % 2 == 0
+	_visual.visible = not body_hidden and (_dead or not health.is_invulnerable() or int(Time.get_ticks_msec() / 60) % 2 == 0)
 	# Look ahead: the camera leans the way you face, and down when falling fast.
 	var look := Vector2(_facing * 40.0, clampf(velocity.y * 0.08, -12.0, 56.0))
 	_look = _look.lerp(look, minf(1.0, delta * 2.5))
@@ -188,8 +190,16 @@ func socket(slot: String) -> Node2D:
 
 
 ## Brings the host back (placeholder until death and rebirth, roadmap week 21).
+## The dead host gives way to its Corpse. Hides right away: the death screen
+## pauses the game, so _process() would not get to it.
+func hide_body() -> void:
+	body_hidden = true
+	_visual.visible = false
+
+
 func respawn(at: Vector2) -> void:
 	_dead = false
+	body_hidden = false
 	_hurt_timer = 0.0
 	global_position = at
 	velocity = Vector2.ZERO
@@ -238,13 +248,16 @@ func facing() -> float:
 ## Dropping happens from the inventory screen.
 func _handle_items() -> void:
 	if Input.is_action_just_pressed("interact"):
+		# The nearest thing in reach: an item to pick up, or anything with interact().
 		var nearest: Area2D = null
 		for area in _reach.get_overlapping_areas():
-			if area is WorldItem and (nearest == null
+			if (area is WorldItem or area.has_method("interact")) and (nearest == null
 					or area.global_position.distance_to(global_position) < nearest.global_position.distance_to(global_position)):
 				nearest = area
-		if nearest:
+		if nearest is WorldItem:
 			EventBus.pickup_requested.emit(nearest)
+		elif nearest:
+			nearest.interact()
 
 
 ## From the classic formulas: g = 2h / t^2, v0 = 2h / t.

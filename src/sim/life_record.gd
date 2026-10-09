@@ -25,6 +25,12 @@ var kills: Dictionary = {}
 var deed_event_ids: Array = []
 ## What became of the body: intact, looted, eaten, enshrined, studied (week 22+).
 var corpse_state: StringName = &"intact"
+## Where the body lies (on the ground under where the host died).
+var corpse_position := Vector2.ZERO
+## What is still on the body. Starts as everything the host had; shrinks as
+## a later host (or someone else) takes things.
+var corpse_items: Array = []
+var corpse_mutations: Dictionary = {}
 
 
 func is_alive() -> bool:
@@ -38,7 +44,8 @@ func to_dict() -> Dictionary:
 		"death_position": death_position, "killed_by": killed_by,
 		"carried_items": carried_items.duplicate(), "carried_mutations": carried_mutations.duplicate(),
 		"kills": kills.duplicate(), "deed_event_ids": deed_event_ids.duplicate(),
-		"corpse_state": corpse_state,
+		"corpse_state": corpse_state, "corpse_position": corpse_position,
+		"corpse_items": corpse_items.duplicate(), "corpse_mutations": corpse_mutations.duplicate(),
 	}
 
 
@@ -56,4 +63,11 @@ static func from_dict(d: Dictionary) -> LifeRecord:
 	life.kills = d.get("kills", {})
 	life.deed_event_ids = d.get("deed_event_ids", [])
 	life.corpse_state = d.get("corpse_state", &"intact")
+	life.corpse_position = d.get("corpse_position", life.death_position)
+	life.corpse_items = d.get("corpse_items", [])
+	life.corpse_mutations = d.get("corpse_mutations", {})
 	return life
+
+
+func has_corpse_loot() -> bool:
+	return not corpse_items.is_empty() or not corpse_mutations.is_empty()

@@ -50,6 +50,17 @@ func play(animation: StringName) -> void:
 	_body.play(animation)
 
 
+## Shows the last frame of an animation without playing it (a body that
+## has long since fallen, not one falling right now).
+func hold_last_frame(animation: StringName) -> void:
+	if not _body.sprite_frames.has_animation(animation):
+		return
+	_body.animation = animation
+	_body.frame = _body.sprite_frames.get_frame_count(animation) - 1
+	_body.pause()
+	_sync()
+
+
 func current_animation() -> StringName:
 	return _body.animation
 

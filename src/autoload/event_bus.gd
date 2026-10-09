@@ -25,6 +25,8 @@ signal inventory_changed
 signal eat_requested(slot: int)
 ## WorldState.data.mutations changed.
 signal mutations_changed
+## The player searches an old body: WorldData.lives[life_index].
+signal corpse_search_requested(life_index: int)
 ## Show a short message to the player (pickups, saves, warnings).
 signal notify(text: String)
 ## The player's host died.

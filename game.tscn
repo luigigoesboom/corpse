@@ -15,6 +15,7 @@
 [ext_resource type="Shader" path="res://assets/shaders/vignette.gdshader" id="12_vignette"]
 [ext_resource type="Script" path="res://src/actors/components/combat_feel.gd" id="13_feel"]
 [ext_resource type="PackedScene" path="res://src/ui/death_screen.tscn" id="14_death"]
+[ext_resource type="Script" path="res://src/world/corpse_layer.gd" id="15_corpses"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_vignette"]
 shader = ExtResource("12_vignette")
@@ -32,6 +33,9 @@ script = ExtResource("1_chunks")
 target = NodePath("../Player")
 
 [node name="World" parent="." instance=ExtResource("5_world")]
+
+[node name="Corpses" type="Node2D" parent="."]
+script = ExtResource("15_corpses")
 
 [node name="Items" type="Node2D" parent="."]
 script = ExtResource("6_items")

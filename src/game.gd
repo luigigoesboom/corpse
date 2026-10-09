@@ -12,6 +12,7 @@ extends Node2D
 @onready var _world: Node2D = $World
 @onready var _items: ItemLayer = $Items
 @onready var _entities: EntityLayer = $World/Entities
+@onready var _corpses: CorpseLayer = $Corpses
 
 
 func _ready() -> void:
@@ -19,6 +20,7 @@ func _ready() -> void:
 	EventBus.player_died.connect(_on_player_died)
 	_entities.attach(_chunks)
 	_items.attach(_chunks, _player)
+	_corpses.attach(_chunks)
 	$UI/HUD.bind_health(_player.health)
 	_player.health.changed.connect(_on_player_health_changed)
 	$UI/PauseMenu.save_pressed.connect(quick_save)
@@ -92,17 +94,28 @@ func _on_player_health_changed(current: int, max_value: int) -> void:
 	WorldState.data.player_health = -1 if current == max_value else current
 
 
-## The host died: close its life record, then show the epitaph.
+## The host died: close its life record (its things go onto the body), let
+## the death animation play, swap the host for its Corpse, show the epitaph.
 func _on_player_died() -> void:
-	var life := WorldState.data.end_life(_player.global_position, _player.health.last_hit_source)
-	await get_tree().create_timer(1.2).timeout  # Let the death animation play.
+	var data := WorldState.data
+	var life := data.end_life(_player.global_position, _ground_below(_player.global_position), _player.health.last_hit_source)
+	await get_tree().create_timer(1.2).timeout
 	if not _player.is_dead() or life == null:
 		return  # A save was loaded in the meantime.
-	$UI.show_death(life, WorldState.data.lives.size())
+	_player.hide_body()
+	_corpses.add_corpse(data.lives.find(life))
+	$UI.show_death(life, data.lives.size())
 
 
-## Placeholder rebirth until week 24 (host choice): same host type, at the spawn.
-## Items and mutations stay for now; week 22 leaves them on the corpse.
+## The floor under a point, so bodies never hang in the air.
+func _ground_below(point: Vector2) -> Vector2:
+	var query := PhysicsRayQueryParameters2D.create(point, point + Vector2(0, 2000), 1)
+	var hit := get_world_2d().direct_space_state.intersect_ray(query)
+	return hit.position if hit else point + Vector2(0, 22)
+
+
+## Placeholder rebirth until week 24 (host choice): same host type, at the
+## spawn, with nothing: the old things are on the old body.
 func _start_next_life() -> void:
 	var data := WorldState.data
 	data.start_life(&"colonist")
@@ -110,7 +123,9 @@ func _start_next_life() -> void:
 	_player.respawn(_world.get_node("PlayerSpawn").global_position)
 	_player.get_node("Camera2D").reset_smoothing()
 	$UI.close_all()
-	EventBus.notify.emit("You wake as %s" % data.current_life().host_name)
+	EventBus.inventory_changed.emit()
+	EventBus.mutations_changed.emit()
+	EventBus.notify.emit("You wake as %s. Your old body lies where it fell." % data.current_life().host_name)
 
 
 ## Kills by the player count toward the current life's deeds.
