@@ -43,6 +43,10 @@ item_id = &"bile_bulb"
 position = Vector2(736, 3104)
 item_id = &"bone_shard"
 
+[node name="BreathSac" parent="Entities" instance=ExtResource("4_item")]
+position = Vector2(3904, 2240)
+item_id = &"breath_sac"
+
 [node name="TrainingDummy" parent="Entities" instance=ExtResource("5_dummy")]
 position = Vector2(1760, 3200)
 

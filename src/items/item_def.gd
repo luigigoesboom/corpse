@@ -10,3 +10,5 @@ extends Resource
 @export_multiline var description := ""
 ## Placeholder look until item art exists.
 @export var color := Color.WHITE
+## Eating it grows this mutation (MutationDef id). Empty = not edible.
+@export var grants_mutation: StringName

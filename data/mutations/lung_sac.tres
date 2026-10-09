@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="MutationDef" format=3]
+
+[ext_resource type="Script" path="res://src/mutations/mutation_def.gd" id="1_def"]
+[ext_resource type="Script" path="res://src/mutations/abilities/glide.gd" id="2_ability"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"lung_sac"
+display_name = "Lung Sac"
+description = "A translucent bladder on the back that fills with old breath. Hold jump to drift."
+slot = "back"
+ability = ExtResource("2_ability")
+control_hint = "hold Jump"
+part_color = Color(0.85, 0.65, 0.7, 0.85)
+part_polygon = PackedVector2Array(0, -8, -8, -12, -14, -6, -12, 4, -4, 6, 0, 2)

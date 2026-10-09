@@ -28,9 +28,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -380.0
-offset_top = -200.0
+offset_top = -250.0
 offset_right = 380.0
-offset_bottom = 200.0
+offset_bottom = 250.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -81,10 +81,24 @@ autowrap_mode = 3
 unique_name_in_owner = true
 layout_mode = 2
 
+[node name="EatButton" type="Button" parent="Panel/Margin/VBox/HBox/Details/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Eat"
+
 [node name="DropButton" type="Button" parent="Panel/Margin/VBox/HBox/Details/Actions"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Drop"
+
+[node name="BodyTitle" type="Label" parent="Panel/Margin/VBox/HBox/Details"]
+layout_mode = 2
+text = "Body"
+
+[node name="Body" type="Label" parent="Panel/Margin/VBox/HBox/Details"]
+unique_name_in_owner = true
+layout_mode = 2
+modulate = Color(1, 1, 1, 0.75)
 
 [node name="Hint" type="Label" parent="Panel/Margin/VBox"]
 layout_mode = 2

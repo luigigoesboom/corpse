@@ -73,6 +73,20 @@ script = ExtResource("4_map")
 player = NodePath("../../Player")
 chunks = NodePath("../../ChunkManager")
 
+[node name="Mutations" type="Label" parent="UI/HUD"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -36.0
+offset_right = 816.0
+offset_bottom = -12.0
+grow_vertical = 0
+modulate = Color(1, 1, 1, 0.8)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+
 [node name="InventoryScreen" parent="UI" instance=ExtResource("9_inventory")]
 
 [node name="PauseMenu" parent="UI" instance=ExtResource("10_pause")]

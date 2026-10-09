@@ -72,6 +72,7 @@ var _dead := false
 @onready var _reach: Area2D = $Reach
 @onready var _attack_hitbox: Hitbox = $Visual/AttackHitbox
 @onready var _slash: Node2D = $Visual/Slash
+@onready var _mutations: MutationHost = $Mutations
 
 
 func _ready() -> void:
@@ -95,6 +96,7 @@ func _physics_process(delta: float) -> void:
 	_apply_run(input_dir, delta)
 	if has_control:
 		_apply_jump()
+	_mutations.physics_tick(delta)
 
 	move_and_slide()
 
@@ -113,6 +115,16 @@ func _process(_delta: float) -> void:
 
 func is_dead() -> bool:
 	return _dead
+
+
+## True when the player is in control (alive, not reeling from a hit).
+func can_act() -> bool:
+	return not _dead and _hurt_timer <= 0.0
+
+
+## Where mutations attach: "head", "mouth", "back", "arm", "belly".
+func socket(slot: String) -> Node2D:
+	return $Visual/Sockets.get_node("socket_" + slot)
 
 
 ## Brings the host back (placeholder until death and rebirth, roadmap week 21).

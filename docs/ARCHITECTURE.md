@@ -57,7 +57,7 @@ corpse/
       creatures/
       npcs/
     items/           ItemDef, ItemDb, WorldItem, ItemLayer
-    mutations/
+    mutations/       MutationDef, MutationDb, MutationHost, MutationAbility, abilities/
     ui/
     debug/           overlays, debug map, cheat console
   scenes/            top-level scenes (main, menus)
@@ -249,6 +249,10 @@ standing(faction, player) =
 `senses` is 1.0 for priests, nerve-dwellers and heart factions, 0.0 for most others. Rumors can slowly move host standing for non-sensing factions when your current host matches a known description.
 
 ## Mutations
+
+Current implementation (D-015): `MutationDef` resources in data/mutations (id, slot, ability script, placeholder polygon). `ItemDef.grants_mutation` makes an item edible. `WorldData.mutations` (slot -> id) is the truth; `MutationHost` on the player rebuilds parts (at `Visual/Sockets/socket_<slot>`) and ability nodes from it. The player calls each ability's `physics_tick()` after its own movement and before `move_and_slide()`, so abilities can change `player.velocity`.
+
+Original plan:
 
 - `MutationData` is a Resource: id, display name, part scene, socket name, ability script, stat changes, which regions it can come from.
 - Grafting = instance the part scene, attach to the named socket on the host rig, add the ability node to the player.

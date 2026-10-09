@@ -97,7 +97,7 @@ Mutations attach to the host as extra parts, so every host rig needs named socke
 | Socket | Where |
 |---|---|
 | `socket_back` | Upper back, for sacs, spines, wings |
-| `socket_arm_l` / `socket_arm_r` | Forearm, for spurs, claws |
+| `socket_arm` | Forearm, for spurs, claws (one arm slot for now) |
 | `socket_head` | Top of head |
 | `socket_mouth` | Mouth, for glands that spit |
 | `socket_belly` | Torso front |

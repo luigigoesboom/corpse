@@ -69,6 +69,15 @@ Format: ID, date, decision, why, what it rules out.
 - Why: more detail per tile and character (closer to Blasphemous than Celeste), and current tile size and movement numbers stay valid.
 - Trade-off: crisp at 1440p (2x) and 4K (3x); at 1080p the scale is 1.5x, so some pixels are one screen pixel wider than others. Accepted, common for 720p-based pixel games. Each tile is ~4x the pixels of a 16 px tile, so drawing takes longer; reuse and variation tiles help.
 
+**D-015 Progression lives in the body, not a skill tree** (2026-10-09)
+- What: no XP, no skill tree on the character. Mutations come from eating (later grafting) god-matter and fill body slots (head, mouth, back, arm, belly), one per slot; a new one replaces the old. Mutations are lost with the body (recoverable from the corpse, week 22). A small cross-life tree for the fragment itself (unlocked by deeds and legend, not XP) is an idea for after phase 3.
+- Why: a classic tree gives the player a reason to never die, which fights the core loop (death moves history forward). Body slots make the build visible and physical, as VISION describes.
+- Rules out: XP-based character skill trees.
+
+**D-016 Basic UI, combat and mutations pulled forward** (2026-10-09)
+- What: built together after week 9: main menu, pause menu, 8-pocket inventory, HUD (roadmap week 41 basics); combat components, player attack, training dummy, Gut Leech (weeks 13-14); mutations v1 with three abilities (week 17). All grey-box.
+- Why: developer wanted a playable loop sooner. Weeks 10-12 (set pieces, light, milestone) still to do; weeks 13, 14 and 17 are largely done but get re-checked against their "done when" when reached, and week 15-16 art rigs wait on Q-007.
+
 ---
 
 ## Open questions

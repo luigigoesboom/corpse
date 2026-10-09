@@ -14,7 +14,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 4
+const SAVE_VERSION := 5
 
 
 func slot_path(slot: int) -> String:
@@ -87,4 +87,8 @@ func _migrate(save: Dictionary) -> Dictionary:
 		# v4: host health (-1 = full).
 		save.world["player_health"] = -1
 		save.save_version = 4
+	if save.save_version == 4:
+		# v5: host mutations (slot -> mutation id).
+		save.world["mutations"] = {}
+		save.save_version = 5
 	return save

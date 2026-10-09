@@ -22,7 +22,7 @@ Early prototype. A placeholder character runs, jumps and wall-clings through a h
 2. Open Godot, choose Import, and select `project.godot` in this folder.
 3. Press F5.
 
-Controls: A/D or arrows to run, Space/W/Up to jump (hold for higher), push into a wall in the air to cling, E to pick up, Q to drop. Gamepad works too. F3 toggles the debug overlay. F9 quick saves, F10 quick loads. F4 reloads the world map after you repaint it, M shows the map.
+Controls: A/D or arrows to run, Space/W/Up to jump (hold for higher), push into a wall in the air to cling, J / left mouse to attack, E to pick up, Tab / I for the inventory (eat or drop items there), Esc to pause. Mutations: K spit, L / Shift dash, hold jump to glide. Gamepad works too. F3 toggles the debug overlay. F9 quick saves, F10 quick loads. F4 reloads the world map after you repaint it, M shows the map.
 
 To build the world: paint terrain in `data/maps/world.png` (see docs/ART_PIPELINE.md), then open `scenes/world.tscn` in Godot to see it and place NPCs, props and the player spawn on top.
 

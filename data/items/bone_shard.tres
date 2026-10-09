@@ -8,3 +8,4 @@ id = &"bone_shard"
 display_name = "Bone Shard"
 description = "A splinter of divine bone. Still faintly humming."
 color = Color(0.92, 0.88, 0.76, 1)
+grants_mutation = &"bone_spur"

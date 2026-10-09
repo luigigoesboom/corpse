@@ -21,6 +21,8 @@ var year: int = 0
 var player_position := Vector2.ZERO
 ## Current host's health. -1 = full.
 var player_health := -1
+## Current host's body: slot ("mouth", "arm", ...) -> MutationDef id.
+var mutations: Dictionary = {}
 ## Item id per pocket (INVENTORY_SIZE entries, &"" = empty). Moves into
 ## LifeRecord in week 21.
 var inventory: Array = []
@@ -65,6 +67,13 @@ func take_from_inventory(slot: int) -> StringName:
 	return item
 
 
+## Grows a mutation into a body slot. Returns what was there before (&"" if empty).
+func graft(slot: String, mutation: StringName) -> StringName:
+	var old: StringName = mutations.get(slot, &"")
+	mutations[slot] = mutation
+	return old
+
+
 func items_in_chunk(chunk: Vector2i) -> Array:
 	return chunk_diffs.get(chunk, {}).get("items", [])
 
@@ -94,6 +103,7 @@ func to_dict() -> Dictionary:
 		"year": year,
 		"player_position": player_position,
 		"player_health": player_health,
+		"mutations": mutations.duplicate(),
 		"inventory": inventory.duplicate(),
 		"chunk_diffs": chunk_diffs.duplicate(true),
 		"removed_entities": removed_entities.duplicate(),
@@ -107,6 +117,7 @@ static func from_dict(d: Dictionary) -> WorldData:
 	data.year = int(d.get("year", 0))
 	data.player_position = d.get("player_position", Vector2.ZERO)
 	data.player_health = int(d.get("player_health", -1))
+	data.mutations = d.get("mutations", {})
 	data.inventory = d.get("inventory", [])
 	data.chunk_diffs = d.get("chunk_diffs", {})
 	data.removed_entities = d.get("removed_entities", {})

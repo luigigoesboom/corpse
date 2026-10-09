@@ -19,6 +19,10 @@ signal pickup_requested(item: Node)
 signal drop_requested(slot: int)
 ## WorldState.data.inventory changed.
 signal inventory_changed
+## The player wants to eat what is in this inventory pocket.
+signal eat_requested(slot: int)
+## WorldState.data.mutations changed.
+signal mutations_changed
 ## Show a short message to the player (pickups, saves, warnings).
 signal notify(text: String)
 ## The player's host died.

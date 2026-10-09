@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="MutationDef" format=3]
+
+[ext_resource type="Script" path="res://src/mutations/mutation_def.gd" id="1_def"]
+[ext_resource type="Script" path="res://src/mutations/abilities/bone_dash.gd" id="2_ability"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"bone_spur"
+display_name = "Bone Spur"
+description = "A blade of divine bone pushing out of the forearm. Dash through things."
+slot = "arm"
+ability = ExtResource("2_ability")
+control_hint = "L / Shift"
+part_color = Color(0.92, 0.88, 0.76, 1)
+part_polygon = PackedVector2Array(-2, -3, 16, -1, -2, 3)

@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://src/actors/components/health.gd" id="2_health"]
 [ext_resource type="Script" path="res://src/actors/components/hurtbox.gd" id="3_hurtbox"]
 [ext_resource type="Script" path="res://src/actors/components/hitbox.gd" id="4_hitbox"]
+[ext_resource type="Script" path="res://src/mutations/mutation_host.gd" id="5_mutations"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
 radius = 10.0
@@ -35,6 +36,23 @@ polygon = PackedVector2Array(-4, -22, 4, -22, 9, -17, 10, -12, 10, 12, 9, 17, 4,
 color = Color(0.15, 0.1, 0.1, 1)
 polygon = PackedVector2Array(3, -14, 7, -14, 7, -10, 3, -10)
 
+[node name="Sockets" type="Node2D" parent="Visual"]
+
+[node name="socket_head" type="Marker2D" parent="Visual/Sockets"]
+position = Vector2(0, -22)
+
+[node name="socket_mouth" type="Marker2D" parent="Visual/Sockets"]
+position = Vector2(9, -10)
+
+[node name="socket_back" type="Marker2D" parent="Visual/Sockets"]
+position = Vector2(-9, -6)
+
+[node name="socket_arm" type="Marker2D" parent="Visual/Sockets"]
+position = Vector2(8, 2)
+
+[node name="socket_belly" type="Marker2D" parent="Visual/Sockets"]
+position = Vector2(9, 8)
+
 [node name="Slash" type="Polygon2D" parent="Visual"]
 color = Color(1, 0.95, 0.85, 0.85)
 polygon = PackedVector2Array(14, -22, 32, -16, 44, -2, 42, 12, 30, 16, 36, 4, 34, -8, 24, -16)
@@ -48,6 +66,9 @@ knockback = 320.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Visual/AttackHitbox"]
 shape = SubResource("RectangleShape2D_attack")
+
+[node name="Mutations" type="Node" parent="."]
+script = ExtResource("5_mutations")
 
 [node name="Health" type="Node" parent="."]
 script = ExtResource("2_health")

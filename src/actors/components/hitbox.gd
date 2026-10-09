@@ -6,6 +6,9 @@ extends Area2D
 ## "player_attacks" layer and enemy attacks on "enemy_attacks"; each Hurtbox
 ## only looks at the other side's layer.
 
+## Emitted when this hits a Hurtbox (e.g. so a projectile can vanish).
+signal landed(hurtbox: Node)
+
 @export var damage := 1
 @export var knockback := 250.0
 ## Attacks: hit each target once per activate(). Leave off for contact damage
@@ -39,4 +42,5 @@ func try_hit(hurtbox: Node) -> bool:
 		if id in _already_hit:
 			return false
 		_already_hit.append(id)
+	landed.emit(hurtbox)
 	return true

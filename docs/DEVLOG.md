@@ -13,6 +13,15 @@ Next:
 
 ---
 
+## UI, combat, mutations sweep (2026-10-09)
+Done (D-015, D-016), three commits:
+- UI: main menu (startup scene), pause menu, 8-pocket inventory with details, Eat and Drop, HUD messages, GameUI pauses the game while a screen is open. Save v3.
+- Combat: Health / Hitbox / Hurtbox components, damage numbers, player attack (J / left mouse / pad X), knockback and i-frames, health pips, placeholder respawn on death. Training dummy, Gut Leech state machine (idle, wander, notice, chase, attack, flee, dead). Killed placed enemies stay dead; loading rebuilds placed entities fresh. Save v4.
+- Mutations: eat Bile Bulb / Bone Shard / Breath Sac to grow Acid Gland (K, spit), Bone Spur (L / Shift, damaging dash with i-frames), Lung Sac (hold jump, glide). One per body slot, replacing withers the old one. Parts appear at sockets, HUD lists controls. Save v5.
+All checked headless, including saves from v1 to v4 loading.
+Not done: Death keeps everything (corpse and loss are week 21-22). Enemies do not use mutations yet (week 18). No hitstop or screen shake (week 19). `src/ui/inventory_label.gd` is unused and should be deleted.
+Next: Playtest the loop. Then weeks 10-12 (set pieces, light, milestone 1).
+
 ## Week 9 (2026-10-09)
 Done: Items that persist (D-013). ItemDef resources in data/items (Bile Bulb, Bone Shard), WorldItem scene, ItemLayer spawns dropped items from WorldData per chunk. E picks up the nearest item, Q drops the last one. Two items hand-placed in world.tscn; picking them up is permanent. Inventory shown top right. Save version 2 with a migration from v1. Checked headless: pick up, drop, leave (nodes freed, data kept), come back, save, change things, load: exactly the saved state. v1 save loads. Pixel art decided (D-012), Nearest filter on; Q-007 and Q-008 opened.
 Not done: Dropping only works on the ground (no falling items). NPC state is not saved yet. Week 8 still waits on Q-006.
