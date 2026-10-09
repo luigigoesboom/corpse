@@ -1,6 +1,6 @@
 # Art pipeline
 
-> **Pixel art (D-012).** The game is pixel art. Sections below written for smooth hand-drawn art (canvas size, cutout rigs) get reworked when Q-007 (animation) and Q-008 (resolution, tile size) are decided. Until then: draw at 1x, no anti-aliasing, export PNG, Godot already uses Nearest filtering.
+> **Pixel art (D-012).** The game is pixel art. Scale (D-014): tiles are 32 x 32 px, the game renders at 1280 x 720, the host is about 48 px tall. Draw at 1x (one canvas pixel = one game pixel), no anti-aliasing, export PNG; Godot already uses Nearest filtering. Sections below written for smooth hand-drawn art (canvas size, cutout rigs) get reworked when Q-007 (animation) is decided.
 
 You are learning to draw while making this. That is fine. Plan for early art to be replaced, and keep the style simple enough that you can produce a lot of it.
 

@@ -64,6 +64,11 @@ Format: ID, date, decision, why, what it rules out.
 - What: runtime things (dropped items now, corpses later) live in `WorldData` from the moment they exist. Chunk loads spawn view nodes from the data; unloads free them. Hand-placed things live in world.tscn; their permanent changes (picked up, killed) go into `WorldData.removed_entities` by node name.
 - Why: nothing to write back on unload, saves are always complete, and the history sim can act on things nobody is looking at.
 
+**D-014 32 px tiles, 1280 x 720 base resolution** (2026-10-09, answers Q-008)
+- What: the game renders at 1280 x 720 (stretch mode "viewport", pixels snapped) and scales up to the window (opens at 1920 x 1080). Tiles stay 32 x 32; the host is about 48 px tall. About 40 x 22 tiles on screen.
+- Why: more detail per tile and character (closer to Blasphemous than Celeste), and current tile size and movement numbers stay valid.
+- Trade-off: crisp at 1440p (2x) and 4K (3x); at 1080p the scale is 1.5x, so some pixels are one screen pixel wider than others. Accepted, common for 720p-based pixel games. Each tile is ~4x the pixels of a 16 px tile, so drawing takes longer; reuse and variation tiles help.
+
 ---
 
 ## Open questions
@@ -76,5 +81,4 @@ Format: ID, date, decision, why, what it rules out.
 | Q-004 | Outlines or no outlines in the art style? | Week 15 |
 | Q-005 | Final name of the game. | Before the Steam page, week 45 |
 | Q-007 | Pixel art animation: frame-by-frame sprites, or a pixel-friendly rig (no rotation, parts only move)? Decides how mutations attach. | Week 15 |
-| Q-008 | Base resolution and tile size for pixel art (e.g. 640 x 360 with 16 px tiles, or 32 px tiles). Changes TILE_PX and movement numbers. | Before art week 11 |
 | Q-006 | Breakable terrain at all? Developer doubts it. If not, week 8 becomes "chunk diffs for entity state only" (dead NPCs, taken items, corpses). | Week 8 |

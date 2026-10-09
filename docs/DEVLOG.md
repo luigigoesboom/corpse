@@ -16,7 +16,8 @@ Next:
 ## Week 9 (2026-10-09)
 Done: Items that persist (D-013). ItemDef resources in data/items (Bile Bulb, Bone Shard), WorldItem scene, ItemLayer spawns dropped items from WorldData per chunk. E picks up the nearest item, Q drops the last one. Two items hand-placed in world.tscn; picking them up is permanent. Inventory shown top right. Save version 2 with a migration from v1. Checked headless: pick up, drop, leave (nodes freed, data kept), come back, save, change things, load: exactly the saved state. v1 save loads. Pixel art decided (D-012), Nearest filter on; Q-007 and Q-008 opened.
 Not done: Dropping only works on the ground (no falling items). NPC state is not saved yet. Week 8 still waits on Q-006.
-Next: Answer Q-008 (resolution, tile size). Then week 10 (set pieces and slots) or week 11 (light and atmosphere).
+Also: Q-008 answered (D-014): 32 px tiles, 1280 x 720 base, viewport stretch with pixel snapping, window opens at 1920 x 1080.
+Next: Week 10 (set pieces and slots) or week 11 (light and atmosphere).
 
 ## Weeks 6-7 (2026-10-09)
 Done: Week 6 skipped: cutting a chunk is ~4 ms and building is spread over frames, no hitches seen; revisit only if one appears. Week 7 tech: autotiling. Each rock cell stores its open-sides mask, which picks one of 16 tiles. Placeholder Gut atlas (flesh, membrane rim, rounded corners) and `gut_tileset.tres` with chamfered collision on outer corners. Dark background color. Tile layout documented in ART_PIPELINE.md so real art can replace the placeholder 1:1.
