@@ -12,9 +12,9 @@ extends Node2D
 signal chunk_loaded(coord: Vector2i)
 signal chunk_unloaded(coord: Vector2i)
 
-const TILE_SET := preload("res://assets/art/tiles/test_tileset.tres")
-const ATLAS_EDGE := Vector2i(1, 1)   # Has collision.
-const ATLAS_INNER := Vector2i(8, 2)  # No collision.
+## 16 tiles in a 4 x 4 atlas, one per open-sides mask: tile (mask % 4, mask / 4).
+## See docs/ART_PIPELINE.md, "Terrain tiles".
+const TILE_SET := preload("res://assets/art/tiles/gut_tileset.tres")
 
 @export var target: Node2D
 ## Chunks loaded in each direction around the target's chunk. 1 means 3x3.
@@ -135,11 +135,10 @@ func _build_some(budget: int) -> void:
 		var total := cells.size()
 		var end := total if budget < 0 else mini(total, job.next + budget)
 		for i in range(job.next, end):
-			match cells[i]:
-				ChunkData.Cell.SOLID_EDGE:
-					layer.set_cell(Vector2i(i % ChunkData.SIZE, i / ChunkData.SIZE), 0, ATLAS_EDGE)
-				ChunkData.Cell.SOLID_INNER:
-					layer.set_cell(Vector2i(i % ChunkData.SIZE, i / ChunkData.SIZE), 0, ATLAS_INNER)
+			var cell := cells[i]
+			if cell != ChunkData.EMPTY:
+				var open := cell - 1
+				layer.set_cell(Vector2i(i % ChunkData.SIZE, i / ChunkData.SIZE), 0, Vector2i(open % 4, open / 4))
 		if budget > 0:
 			budget -= end - job.next
 		job.next = end

@@ -84,11 +84,15 @@ func make_chunk(chunk_coord: Vector2i) -> ChunkData:
 	for y in ChunkData.SIZE:
 		for x in ChunkData.SIZE:
 			var i := (y + 1) * w + (x + 1)
-			var cell := ChunkData.Cell.EMPTY
+			var cell := ChunkData.EMPTY
 			if solid[i]:
-				# Only rock next to open space gets collision. Inner rock never
-				# touches the player, and skipping it saves thousands of shapes.
-				var buried := solid[i - 1] and solid[i + 1] and solid[i - w] and solid[i + w]
-				cell = ChunkData.Cell.SOLID_INNER if buried else ChunkData.Cell.SOLID_EDGE
+				# Which sides face open space picks the tile (rims, rounded corners).
+				# Buried rock (mask 0) uses a tile without collision.
+				var open := 0
+				if not solid[i - w]: open |= ChunkData.OPEN_UP
+				if not solid[i + 1]: open |= ChunkData.OPEN_RIGHT
+				if not solid[i + w]: open |= ChunkData.OPEN_DOWN
+				if not solid[i - 1]: open |= ChunkData.OPEN_LEFT
+				cell = 1 + open
 			data.cells[ChunkData.index_of(x, y)] = cell
 	return data

@@ -52,6 +52,8 @@ Week 3 built: `WorldData` (src/sim), `WorldState.set_data()` -> `EventBus.world_
 
 Weeks 4 and 5 built (D-010): `WorldMap` (src/world/world_map.gd) reads `data/maps/world.png` (1 px = 1 tile), `ChunkManager` cuts it into 64 x 64 `ChunkData` and streams one TileMapLayer per chunk (3 x 3 around the player). F4 reloads the map, M shows the debug map.
 
-D-011: `scenes/world.tscn` is the authoring scene: `MapPreview` (@tool) shows world.png in the editor, `PlayerSpawn` marker, `Entities` (`EntityLayer`) holds hand-placed NPCs/props that stream with their chunk. Placeholder NPC: `src/actors/npcs/placeholder_npc.tscn`. Next: developer paints a real map; then ROADMAP week 7 (paint the Gut, autotiling) or week 8 (breakable tiles, chunk diffs).
+D-011: `scenes/world.tscn` is the authoring scene: `MapPreview` (@tool) shows world.png in the editor, `PlayerSpawn` marker, `Entities` (`EntityLayer`) holds hand-placed NPCs/props that stream with their chunk. Placeholder NPC: `src/actors/npcs/placeholder_npc.tscn`.
+
+Week 6 skipped (not needed). Week 7 tech done: autotiling. `ChunkData` cells are `EMPTY` or `1 + open-sides mask`; tile = atlas (mask % 4, mask / 4) in `assets/art/tiles/gut_tileset.tres` (16 tiles, layout in ART_PIPELINE.md). Developer still paints the Gut. Next: ROADMAP week 9 (item persistence) or week 11 (light and atmosphere). Week 8 waits on Q-006 (breakable terrain at all?).
 
 Headless testing: `Godot_v4.7.2-stable_win64.exe --headless --path . --script <test.gd>` works. In such a test script, do not type variables as classes that use autoloads (e.g. `ChunkManager`), and reach autoloads via `root.get_node("/root/Name")`: the script compiles before autoloads exist.

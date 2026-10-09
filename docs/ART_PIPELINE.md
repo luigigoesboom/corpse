@@ -46,6 +46,27 @@ The level is a PNG: `data/maps/world.png`, **one pixel = one tile** (32 x 32 px 
 
 **Tips:** sketch the big shapes with a large brush first (chambers, main routes), then carve details. Rooms that need precise layout or many props (colonies, boss arenas) will be Godot scenes placed on the map (roadmap week 10); paint just their outline.
 
+## Terrain tiles
+
+The game picks a tile for every rock cell from which of its 4 sides face open space (autotiling). That needs 16 tiles, in a 4 x 4 grid of 32 x 32 px tiles, in this order:
+
+| Tile | Open sides | | Tile | Open sides |
+|---|---|---|---|---|
+| (0,0) | none (buried rock, no collision) | | (0,2) | left |
+| (1,0) | up | | (1,2) | up + left |
+| (2,0) | right | | (2,2) | right + left |
+| (3,0) | up + right | | (3,2) | up + right + left |
+| (0,1) | down | | (0,3) | down + left |
+| (1,1) | up + down | | (1,3) | up + down + left |
+| (2,1) | right + down | | (2,3) | right + down + left |
+| (3,1) | up + right + down | | (3,3) | all four |
+
+(Tile number = up 1 + right 2 + down 4 + left 8; column = number % 4, row = number / 4.)
+
+`assets/art/tiles/gut_placeholder.png` is a programmer-drawn version: flesh fill, light membrane rim on open sides, rounded corners where two open sides meet. To use real art, draw over it in Krita at 2x (256 x 256, then export at 128 x 128) keeping the same layout, and overwrite the PNG. Nothing else needs to change. Collision shapes live in `gut_tileset.tres` (squares, with corners cut where two open sides meet).
+
+Rules so tiles join cleanly: the fill must reach the tile border on every closed side, and rims must sit only on open sides. Inside corners (rock on all 4 sides but open diagonally) are not handled by 16 tiles; if they look bad, we move to the 47-tile "blob" set later.
+
 ## Cutout rigs
 
 Instead of drawing every animation frame, draw each body part once and animate the parts.

@@ -2,14 +2,21 @@ class_name ChunkData
 extends RefCounted
 ## The generated contents of one chunk, as plain data. No nodes.
 ##
-## The generator fills this in (later on a worker thread), the ChunkManager
+## WorldMap cuts this out of the painted map, the ChunkManager
 ## turns it into a TileMapLayer on the main thread.
 
 const SIZE := 64          ## Tiles per side.
 const TILE_PX := 32       ## Pixels per tile.
 const SIZE_PX := SIZE * TILE_PX
 
-enum Cell { EMPTY, SOLID_EDGE, SOLID_INNER }
+## A cell is EMPTY, or rock stored as 1 + its open-sides mask, so one byte says
+## both "rock" and which tile to draw (autotiling).
+const EMPTY := 0
+## Open-sides mask bits: which neighbors are open space.
+const OPEN_UP := 1
+const OPEN_RIGHT := 2
+const OPEN_DOWN := 4
+const OPEN_LEFT := 8
 
 var coord: Vector2i
 ## SIZE * SIZE cells, row by row. Index with index_of(x, y).
