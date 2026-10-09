@@ -36,17 +36,24 @@ func _ready() -> void:
 	play(&"idle")
 
 
-## Plays an animation, unless it is already playing. Falls back to "idle".
+## Plays an animation, unless it is already the current one. A one-shot
+## animation (die, attack...) that has finished stays on its last frame for as
+## long as it keeps being asked for. Falls back to "idle".
 func play(animation: StringName) -> void:
 	if not _body.sprite_frames.has_animation(animation):
 		animation = &"idle"
-	if _body.animation == animation and _body.is_playing():
-		return
+	if _body.animation == animation:
+		if _body.is_playing() or not _body.sprite_frames.get_animation_loop(animation):
+			return
 	_body.play(animation)
 
 
 func current_animation() -> StringName:
 	return _body.animation
+
+
+func is_playing() -> bool:
+	return _body.is_playing()
 
 
 func add_layer(id: StringName, frames: SpriteFrames, behind := false, layer_material: Material = null) -> void:

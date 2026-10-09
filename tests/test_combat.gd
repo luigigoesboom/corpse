@@ -53,7 +53,9 @@ func run() -> void:
 	player.health.take_damage(99, player.global_position + Vector2(10, 0))
 	await wait_frames(2)
 	check(player.is_dead(), "lethal damage kills the host")
-	await create_timer(2.2).timeout
+	await create_timer(1.2).timeout
+	check(player.sprite.current_animation() == &"die" and not player.sprite.is_playing(), "the death animation plays once and holds its last frame")
+	await create_timer(1.0).timeout
 	check(not player.is_dead() and player.health.current == player.health.max_health, "the host respawns with full health (placeholder)")
 	saves.load_game(98)
 	await wait_frames(5)
