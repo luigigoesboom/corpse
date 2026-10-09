@@ -46,6 +46,7 @@ func _ready() -> void:
 	_health.hurt.connect(_on_hurt)
 	_health.died.connect(_on_died)
 	_bite.deactivate()
+	_bite.collision_layer = CombatRules.enemy_attack_layer()
 	_enter(State.IDLE)
 
 
@@ -176,6 +177,7 @@ func _on_hurt(amount: int, from: Vector2, knockback: float) -> void:
 
 func _on_died() -> void:
 	_enter(State.DEAD)
+	Sfx.play(&"enemy_die", global_position)
 	_contact.deactivate()
 	var tween := create_tween()
 	tween.tween_interval(0.45)  # Let the death frames play.

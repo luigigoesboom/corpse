@@ -1,0 +1,58 @@
+extends "res://tests/test_case.gd"
+## Creatures from week 18: Bile Spitter (uses the Acid Gland) and Rot Fly.
+
+
+func run() -> void:
+	var state := autoload("WorldState")
+	await start_scene("res://game.tscn")
+
+	# Bile Spitter in the chamber at x = 3700: stand in sight and get spat at.
+	var spitter = entity("SpitterChamber")
+	check(spitter.get_node("Mutations").ability(&"acid_gland") != null, "the spitter has the same Acid Gland ability as the player")
+	await goto(Vector2(3450, 3178), 1)
+	var hp: int = player.health.current
+	var spat := false
+	for i in 150:
+		await physics_frame
+		for child in spitter.get_parent().get_children():  # Projectiles spawn beside their shooter.
+			if child.has_node("Hitbox") and child.get_node("Hitbox").collision_layer == 32:
+				spat = true
+		if player.health.current < hp:
+			break
+	check(spat, "the spitter fires acid on the enemy attack layer")
+	check(player.health.current < hp, "its aimed spit hits the player")
+
+	# Kill it: it drops a Bile Bulb and stays dead.
+	player.health.invulnerable = true
+	for i in 6:
+		if spitter.get_parent() == null:
+			break
+		await goto(spitter.global_position + Vector2(-36, -22), 1)
+		player._facing = 1.0
+		await press("attack")
+		await wait_frames(20)
+	await create_timer(1.2).timeout
+	var bulbs := game.get_node("Items").get_children().filter(func(item): return item.item_id == &"bile_bulb")
+	check(bulbs.size() == 1, "a dead spitter drops a Bile Bulb")
+	check(state.data.removed_entities.has("SpitterChamber"), "a killed spitter is gone for good")
+
+	# Rot Fly: put it above the player, it should stalk and dive into them.
+	player.health.invulnerable = false
+	player.health.heal_full()
+	await goto(Vector2(3500, 3178), 5)  # Away from the chamber leech.
+	var fly = entity("FlyChamber")
+	fly.position = player.global_position + Vector2(120, -160)
+	var dove := false
+	for i in 400:
+		await physics_frame
+		dove = dove or fly.state == 3  # State.DIVE
+		if player.health.current < player.health.max_health:
+			break
+	check(dove, "the fly stalks and dives")
+	check(player.health.current < player.health.max_health, "the dive hurts the player")
+
+	# Friendly fire switch for the systemic style.
+	check(CombatRules.enemy_attack_layer() == 32, "normally enemy attacks only hit the player")
+	CombatRules.friendly_fire = true
+	check(CombatRules.enemy_attack_layer() == 48, "with friendly fire they also hit creatures")
+	CombatRules.friendly_fire = false

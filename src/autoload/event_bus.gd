@@ -17,6 +17,8 @@ signal world_loaded
 signal pickup_requested(item: Node)
 ## The player wants to drop what is in this inventory pocket.
 signal drop_requested(slot: int)
+## Something (e.g. a dying creature) leaves an item in the world.
+signal item_drop_requested(item: StringName, position: Vector2)
 ## WorldState.data.inventory changed.
 signal inventory_changed
 ## The player wants to eat what is in this inventory pocket.
@@ -27,6 +29,8 @@ signal mutations_changed
 signal notify(text: String)
 ## The player's host died.
 signal player_died
+## Something with a Hurtbox took damage (for hitstop, shake, sound).
+signal hit_landed(target: Node, amount: int)
 ## A hand-placed entity (child of Entities in world.tscn) died for good.
 signal entity_killed(entity: Node)
 

@@ -17,6 +17,8 @@ signal landed(hurtbox: Node)
 @export var once_per_activation := true
 @export var active := true
 
+## A Hurtbox this never hits (e.g. the one who fired the projectile).
+var exclude: Node
 var _already_hit: Array[int] = []
 
 
@@ -35,7 +37,7 @@ func deactivate() -> void:
 
 ## Asked by a Hurtbox. Returns true (and remembers it) if this may hit it now.
 func try_hit(hurtbox: Node) -> bool:
-	if not active:
+	if not active or hurtbox == exclude:
 		return false
 	if once_per_activation:
 		var id := hurtbox.get_instance_id()

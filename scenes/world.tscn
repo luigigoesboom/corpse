@@ -8,6 +8,8 @@
 [ext_resource type="PackedScene" path="res://src/actors/creatures/gut_leech.tscn" id="6_leech"]
 [ext_resource type="PackedScene" path="res://src/props/glow_fungus.tscn" id="7_fungus"]
 [ext_resource type="PackedScene" path="res://scenes/setpieces/flesh_tender_camp.tscn" id="8_camp"]
+[ext_resource type="PackedScene" path="res://src/actors/creatures/bile_spitter.tscn" id="9_spitter"]
+[ext_resource type="PackedScene" path="res://src/actors/creatures/rot_fly.tscn" id="10_fly"]
 
 [node name="World" type="Node2D"]
 
@@ -110,3 +112,15 @@ position = Vector2(6500, 3872)
 
 [node name="Fungus14" parent="Entities" instance=ExtResource("7_fungus")]
 position = Vector2(7700, 3872)
+
+[node name="SpitterChamber" parent="Entities" instance=ExtResource("9_spitter")]
+position = Vector2(3700, 3200)
+
+[node name="SpitterCavern" parent="Entities" instance=ExtResource("9_spitter")]
+position = Vector2(7500, 2400)
+
+[node name="FlyChamber" parent="Entities" instance=ExtResource("10_fly")]
+position = Vector2(3000, 2000)
+
+[node name="FlyCavern" parent="Entities" instance=ExtResource("10_fly")]
+position = Vector2(7000, 2000)

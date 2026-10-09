@@ -11,10 +11,18 @@ var _cooldown := 0.0
 
 func physics_tick(delta: float) -> void:
 	_cooldown -= delta
-	if _cooldown > 0.0 or not player.can_act() or not Input.is_action_just_pressed("ability_mouth"):
+	if _cooldown > 0.0 or not host.can_act() or not host.ability_pressed(def.slot):
 		return
 	_cooldown = COOLDOWN
 	var glob := PROJECTILE.instantiate()
-	glob.position = player.socket(def.slot).global_position
-	glob.velocity = Vector2(SPEED.x * player.facing(), SPEED.y)
-	player.get_parent().add_child(glob)
+	glob.position = host.socket(def.slot).global_position
+	# Creatures may aim (spit_velocity); the player spits straight ahead.
+	if host.has_method("spit_velocity"):
+		glob.velocity = host.spit_velocity(glob.position)
+	else:
+		glob.velocity = Vector2(SPEED.x * host.facing(), SPEED.y)
+	var hitbox: Hitbox = glob.get_node("Hitbox")
+	hitbox.collision_layer = host.attack_layer()
+	hitbox.exclude = host.get_node_or_null("Hurtbox")  # Never hit the spitter.
+	host.get_parent().add_child(glob)
+	Sfx.play(&"spit", host.global_position)

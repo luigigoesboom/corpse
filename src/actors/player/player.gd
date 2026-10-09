@@ -47,6 +47,9 @@ extends CharacterBody2D
 ## immediately steer back into the same wall.
 @export var wall_jump_lock_time := 0.14
 
+## Which input uses the ability in each body slot.
+const ABILITY_ACTIONS := {"mouth": &"ability_mouth", "arm": &"ability_arm", "back": &"jump"}
+
 @export_group("Combat")
 ## How long the attack hitbox stays on, and the time between attacks.
 @export var attack_active_time := 0.1
@@ -68,6 +71,9 @@ var _hurt_timer := 0.0
 var _dead := false
 var _facing := 1.0
 var _was_on_floor := true
+## Screen shake strength in pixels; fades out by itself.
+var _shake := 0.0
+var _look := Vector2.ZERO
 
 @onready var health: Health = $Health
 @onready var _visual: Node2D = $Visual
@@ -110,6 +116,7 @@ func _physics_process(delta: float) -> void:
 		_facing = signf(velocity.x)
 	if is_on_floor() and not _was_on_floor and fall_speed > 300.0:
 		_dust.restart()
+		Sfx.play(&"land")
 	_was_on_floor = is_on_floor()
 
 	if has_control:
@@ -124,7 +131,15 @@ func _process(delta: float) -> void:
 	_visual.visible = _dead or not health.is_invulnerable() or int(Time.get_ticks_msec() / 60) % 2 == 0
 	# Look ahead: the camera leans the way you face, and down when falling fast.
 	var look := Vector2(_facing * 56.0, clampf(velocity.y * 0.1, -16.0, 72.0))
-	_camera.offset = _camera.offset.lerp(look, minf(1.0, delta * 2.5))
+	_look = _look.lerp(look, minf(1.0, delta * 2.5))
+	# Shake: a random jolt each frame, whole pixels so pixel art stays crisp.
+	var jolt := Vector2(randf_range(-1, 1), randf_range(-1, 1)) * _shake
+	_camera.offset = (_look + jolt).round()
+	_shake = move_toward(_shake, 0.0, delta * 40.0)
+
+
+func shake(strength: float) -> void:
+	_shake = maxf(_shake, strength)
 
 
 ## Which animation fits what the host is doing right now. Order matters:
@@ -154,6 +169,19 @@ func can_act() -> bool:
 	return not _dead and _hurt_timer <= 0.0
 
 
+## Mutation host interface (see MutationAbility): the player's abilities follow input.
+func ability_pressed(slot: String) -> bool:
+	return ABILITY_ACTIONS.has(slot) and Input.is_action_just_pressed(ABILITY_ACTIONS[slot])
+
+
+func ability_held(slot: String) -> bool:
+	return ABILITY_ACTIONS.has(slot) and Input.is_action_pressed(ABILITY_ACTIONS[slot])
+
+
+func attack_layer() -> int:
+	return 16  # player_attacks
+
+
 ## Where mutations attach: "head", "mouth", "back", "arm", "belly".
 func socket(slot: String) -> Node2D:
 	return $Visual/Sockets.get_node("socket_" + slot)
@@ -177,6 +205,7 @@ func _handle_attack() -> void:
 		_slash.visible = true
 		_attack_timer = attack_active_time
 		_attack_cooldown_timer = attack_cooldown
+		Sfx.play(&"swing")
 
 
 func _on_hurt(amount: int, from: Vector2, knockback: float) -> void:
@@ -192,6 +221,7 @@ func _on_hurt(amount: int, from: Vector2, knockback: float) -> void:
 
 func _on_died() -> void:
 	_dead = true
+	Sfx.play(&"die")
 	EventBus.player_died.emit()
 
 
@@ -274,6 +304,7 @@ func _apply_jump() -> void:
 		if _coyote_timer > 0.0:
 			velocity.y = _jump_velocity
 			_dust.restart()
+			Sfx.play(&"jump")
 			_consume_jump()
 		elif _wall_coyote_timer > 0.0:
 			velocity = Vector2(_wall_normal_x * wall_jump_push, _jump_velocity * wall_jump_height_ratio)

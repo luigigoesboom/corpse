@@ -13,7 +13,7 @@ var _hitbox: Hitbox
 
 func _ready() -> void:
 	_hitbox = Hitbox.new()
-	_hitbox.collision_layer = 16  # player_attacks
+	_hitbox.collision_layer = host.attack_layer()
 	_hitbox.collision_mask = 0
 	_hitbox.damage = 2
 	_hitbox.knockback = 380.0
@@ -23,29 +23,34 @@ func _ready() -> void:
 	rect.size = Vector2(44, 34)
 	shape.shape = rect
 	_hitbox.add_child(shape)
-	player.get_node("Visual").add_child(_hitbox)
+	host.get_node("Visual").add_child(_hitbox)
 	_hitbox.deactivate()
 
 
 func _exit_tree() -> void:
 	if is_instance_valid(_hitbox):
 		_hitbox.queue_free()
-	player.health.invulnerable = false
+	host.health.invulnerable = false
+
+
+func is_dashing() -> bool:
+	return _time_left > 0.0
 
 
 func physics_tick(delta: float) -> void:
 	_cooldown -= delta
-	if _time_left <= 0.0 and _cooldown <= 0.0 and player.can_act() and Input.is_action_just_pressed("ability_arm"):
-		_dir = player.facing()
+	if _time_left <= 0.0 and _cooldown <= 0.0 and host.can_act() and host.ability_pressed(def.slot):
+		_dir = host.facing()
 		_time_left = DURATION
 		_cooldown = COOLDOWN
 		_hitbox.activate()
-		player.health.invulnerable = true
+		host.health.invulnerable = true
+		Sfx.play(&"dash", host.global_position)
 	if _time_left > 0.0:
 		# Moves on the very frame it starts, so the dash feels instant.
 		_time_left -= delta
-		player.velocity = Vector2(_dir * SPEED, 0.0)
+		host.velocity = Vector2(_dir * SPEED, 0.0)
 		if _time_left <= 0.0:
 			_hitbox.deactivate()
-			player.health.invulnerable = false
-			player.velocity.x = _dir * player.run_speed
+			host.health.invulnerable = false
+			host.velocity.x = _dir * host.run_speed

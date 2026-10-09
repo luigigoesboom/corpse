@@ -45,6 +45,8 @@ func autoload(autoload_name: String) -> Node:
 
 func start_scene(path: String) -> void:
 	game = load(path).instantiate()
+	if game.has_node("CombatFeel"):
+		game.get_node("CombatFeel").hitstop_enabled = false  # Frame-counting tests.
 	root.add_child(game)
 	for i in 5:
 		await physics_frame

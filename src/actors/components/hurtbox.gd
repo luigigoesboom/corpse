@@ -19,5 +19,6 @@ func _physics_process(_delta: float) -> void:
 	for area in get_overlapping_areas():
 		var hitbox := area as Hitbox
 		if hitbox and hitbox.try_hit(self):
-			health.take_damage(hitbox.damage, hitbox.global_position, hitbox.knockback)
+			if health.take_damage(hitbox.damage, hitbox.global_position, hitbox.knockback):
+				EventBus.hit_landed.emit(get_parent(), hitbox.damage)
 			return

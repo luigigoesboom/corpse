@@ -27,6 +27,7 @@ func attach(chunks: ChunkManager, player: Player) -> void:
 	chunks.chunk_unloaded.connect(_on_chunk_unloaded)
 	EventBus.pickup_requested.connect(_on_pickup_requested)
 	EventBus.drop_requested.connect(_on_drop_requested)
+	EventBus.item_drop_requested.connect(_place_item)
 
 
 func _on_chunk_loaded(coord: Vector2i) -> void:
@@ -52,17 +53,20 @@ func _spawn(coord: Vector2i, record: Dictionary) -> void:
 
 
 func _on_drop_requested(slot: int) -> void:
-	var data := WorldState.data
-	var item_id := data.take_from_inventory(slot)
+	var item_id := WorldState.data.take_from_inventory(slot)
 	if item_id == &"":
 		return
-	var pos := _drop_position()
-	var coord := ChunkData.world_to_chunk(pos)
-	var record := data.add_dropped_item(coord, item_id, pos)
-	if _chunks.is_loaded(coord):
-		_spawn(coord, record)
+	_place_item(item_id, _drop_position())
 	EventBus.inventory_changed.emit()
 	EventBus.notify.emit("Dropped %s" % ItemDb.display_name(item_id))
+
+
+## Adds an item to the world data and shows it if its chunk is loaded.
+func _place_item(item_id: StringName, pos: Vector2) -> void:
+	var coord := ChunkData.world_to_chunk(pos)
+	var record := WorldState.data.add_dropped_item(coord, item_id, pos)
+	if _chunks.is_loaded(coord):
+		_spawn(coord, record)
 
 
 ## On the ground a little in front of the player, so items never float.
@@ -95,3 +99,4 @@ func _on_pickup_requested(item: Node) -> void:
 		world_item.queue_free()
 	EventBus.inventory_changed.emit()
 	EventBus.notify.emit("+ %s" % ItemDb.display_name(world_item.item_id))
+	Sfx.play(&"pickup")

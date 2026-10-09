@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 EventBus="*res://src/autoload/event_bus.gd"
 WorldState="*res://src/autoload/world_state.gd"
 SaveSystem="*res://src/autoload/save_system.gd"
+Sfx="*res://src/autoload/sfx.gd"
 
 [display]
 
