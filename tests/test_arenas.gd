@@ -16,7 +16,7 @@ func run() -> void:
 	check(game.enemies_left() == 0 and messages.any(func(m): return m.begins_with("Clear in")), "clearing the room reports the time")
 	game.queue_free()
 	await wait_frames(3)
-	check(not CombatRules.friendly_fire, "leaving an arena resets the combat rules")
+	check(CombatRules.friendly_fire == CombatRules.DEFAULT_FRIENDLY_FIRE, "leaving an arena resets the combat rules")
 
 	# Loose arena: big, 8 hearts, all mutations, friendly fire.
 	await start_scene("res://scenes/arenas/arena_loose.tscn")

@@ -47,6 +47,7 @@ func _ready() -> void:
 	_health.died.connect(_on_died)
 	_bite.deactivate()
 	_bite.collision_layer = CombatRules.enemy_attack_layer()
+	_bite.exclude = $Hurtbox  # With friendly fire on, never bite itself.
 	_enter(State.IDLE)
 
 

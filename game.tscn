@@ -14,6 +14,7 @@
 [ext_resource type="PackedScene" path="res://scenes/backdrop.tscn" id="11_backdrop"]
 [ext_resource type="Shader" path="res://assets/shaders/vignette.gdshader" id="12_vignette"]
 [ext_resource type="Script" path="res://src/actors/components/combat_feel.gd" id="13_feel"]
+[ext_resource type="PackedScene" path="res://src/ui/death_screen.tscn" id="14_death"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_vignette"]
 shader = ExtResource("12_vignette")
@@ -78,3 +79,5 @@ chunks = NodePath("../../ChunkManager")
 [node name="InventoryScreen" parent="UI" instance=ExtResource("9_inventory")]
 
 [node name="PauseMenu" parent="UI" instance=ExtResource("10_pause")]
+
+[node name="DeathScreen" parent="UI" instance=ExtResource("14_death")]

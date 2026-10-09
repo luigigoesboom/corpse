@@ -115,6 +115,8 @@ var deed_event_ids: Array = []       # links into WorldData.events
 var corpse_state: StringName = &"intact"   # intact, looted, eaten, enshrined, studied
 ```
 
+Implemented (week 21): `LifeRecord` as above plus `host_name`, `seconds_alive` and `kills` (creature kind -> count). `WorldData.lives` holds them; the last one is the current host while alive.
+
 Everything refers to other things by ID, never by object reference. That keeps saves simple and lets history point at anything.
 
 ## The painted world

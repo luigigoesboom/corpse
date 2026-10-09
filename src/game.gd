@@ -23,6 +23,8 @@ func _ready() -> void:
 	_player.health.changed.connect(_on_player_health_changed)
 	$UI/PauseMenu.save_pressed.connect(quick_save)
 	$UI/PauseMenu.load_pressed.connect(quick_load)
+	$UI.death_screen.continue_pressed.connect(_start_next_life)
+	EventBus.entity_killed.connect(_on_entity_killed)
 	if WorldState.data:
 		# "Continue" in the main menu already loaded a save.
 		_on_world_loaded()
@@ -35,6 +37,7 @@ func _start_new_world() -> void:
 	var seed_value := new_world_seed if new_world_seed != 0 else randi()
 	var data := WorldData.create(seed_value)
 	data.player_position = _world.get_node("PlayerSpawn").global_position
+	data.start_life(&"colonist")
 	WorldState.set_data(data)
 
 
@@ -63,8 +66,18 @@ func quick_load() -> void:
 	EventBus.notify.emit("Loaded" if err == OK else "Load failed: %s" % error_string(err))
 
 
+func _process(delta: float) -> void:
+	# Pausable node: does not count while a menu is open.
+	var life := WorldState.data.current_life() if WorldState.data else null
+	if life:
+		life.seconds_alive += delta
+
+
 func _on_world_loaded() -> void:
 	var data := WorldState.data
+	if data.current_life() == null:
+		data.start_life(&"colonist")  # Saves from before week 21 have no lives.
+	$UI.close_all()
 	var saved_health := data.player_health  # respawn() heals, which overwrites it.
 	_player.respawn(data.player_position)
 	if saved_health >= 0:
@@ -79,11 +92,29 @@ func _on_player_health_changed(current: int, max_value: int) -> void:
 	WorldState.data.player_health = -1 if current == max_value else current
 
 
-## Placeholder until death and rebirth (roadmap week 21): wake up at the spawn.
+## The host died: close its life record, then show the epitaph.
 func _on_player_died() -> void:
-	EventBus.notify.emit("Your host has died")
-	await get_tree().create_timer(2.0).timeout
-	if not _player.is_dead():
+	var life := WorldState.data.end_life(_player.global_position, _player.health.last_hit_source)
+	await get_tree().create_timer(1.2).timeout  # Let the death animation play.
+	if not _player.is_dead() or life == null:
 		return  # A save was loaded in the meantime.
+	$UI.show_death(life, WorldState.data.lives.size())
+
+
+## Placeholder rebirth until week 24 (host choice): same host type, at the spawn.
+## Items and mutations stay for now; week 22 leaves them on the corpse.
+func _start_next_life() -> void:
+	var data := WorldState.data
+	data.start_life(&"colonist")
+	data.player_health = -1
 	_player.respawn(_world.get_node("PlayerSpawn").global_position)
 	_player.get_node("Camera2D").reset_smoothing()
+	$UI.close_all()
+	EventBus.notify.emit("You wake as %s" % data.current_life().host_name)
+
+
+## Kills by the player count toward the current life's deeds.
+func _on_entity_killed(entity: Node) -> void:
+	var health := entity.get_node_or_null("Health") as Health
+	if health and health.last_hit_source == &"player":
+		WorldState.data.record_kill(CombatRules.kind_of(entity))

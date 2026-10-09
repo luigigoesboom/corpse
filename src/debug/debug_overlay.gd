@@ -43,6 +43,9 @@ func _process(_delta: float) -> void:
 	])
 	if WorldState.data:
 		lines.append("seed %d  year %d" % [WorldState.data.world_seed, WorldState.data.year])
+		var life := WorldState.data.current_life()
+		if life:
+			lines.append("life %d: %s, %d s, kills %s" % [WorldState.data.lives.size(), life.host_name, life.seconds_alive, life.kills])
 	if chunks:
 		lines.append("chunks loaded %d  building %d" % [chunks.loaded_count(), chunks.pending_count()])
 	if entities:

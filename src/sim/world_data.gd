@@ -36,6 +36,9 @@ var chunk_diffs: Dictionary = {}
 var removed_entities: Dictionary = {}
 ## Next free ID for things created at runtime (dropped items, later corpses).
 var next_id := 1
+## Every host the player has had, oldest first (LifeRecord). The last one is
+## the current host while it is alive.
+var lives: Array[LifeRecord] = []
 
 
 static func create(seed_value: int) -> WorldData:
@@ -43,6 +46,41 @@ static func create(seed_value: int) -> WorldData:
 	data.world_seed = seed_value
 	data._fit_inventory()
 	return data
+
+
+## The current host's record, or null between death and the next host.
+func current_life() -> LifeRecord:
+	if lives.is_empty() or not lives[-1].is_alive():
+		return null
+	return lives[-1]
+
+
+func start_life(host_type: StringName) -> LifeRecord:
+	var life := LifeRecord.new()
+	life.host_type = host_type
+	life.host_name = Names.host_name(world_seed, lives.size())
+	life.start_year = year
+	lives.append(life)
+	return life
+
+
+## Closes the current life: when, where, how, and what the body held.
+func end_life(position: Vector2, killed_by: StringName) -> LifeRecord:
+	var life := current_life()
+	if life == null:
+		return null
+	life.death_year = year
+	life.death_position = position
+	life.killed_by = killed_by
+	life.carried_items = inventory.filter(func(item): return item != &"")
+	life.carried_mutations = mutations.duplicate()
+	return life
+
+
+func record_kill(creature_kind: StringName) -> void:
+	var life := current_life()
+	if life:
+		life.kills[creature_kind] = life.kills.get(creature_kind, 0) + 1
 
 
 func new_id() -> int:
@@ -108,6 +146,7 @@ func to_dict() -> Dictionary:
 		"chunk_diffs": chunk_diffs.duplicate(true),
 		"removed_entities": removed_entities.duplicate(),
 		"next_id": next_id,
+		"lives": lives.map(func(life): return life.to_dict()),
 	}
 
 
@@ -122,6 +161,8 @@ static func from_dict(d: Dictionary) -> WorldData:
 	data.chunk_diffs = d.get("chunk_diffs", {})
 	data.removed_entities = d.get("removed_entities", {})
 	data.next_id = int(d.get("next_id", 1))
+	for life in d.get("lives", []):
+		data.lives.append(LifeRecord.from_dict(life))
 	data._fit_inventory()
 	return data
 

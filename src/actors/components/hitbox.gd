@@ -19,11 +19,16 @@ signal landed(hurtbox: Node)
 
 ## A Hurtbox this never hits (e.g. the one who fired the projectile).
 var exclude: Node
+## Who deals this damage, as a kind (&"player", &"gut_leech"...). Filled in
+## from the scene this hitbox belongs to; projectiles get their shooter's kind.
+var source: StringName
 var _already_hit: Array[int] = []
 
 
 func _ready() -> void:
 	monitoring = false  # Hurtboxes do the looking.
+	if source == &"" and owner:
+		source = CombatRules.kind_of(owner)
 
 
 func activate() -> void:

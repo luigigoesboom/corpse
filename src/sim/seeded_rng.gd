@@ -12,3 +12,11 @@ static func for_chunk(world_seed: int, chunk: Vector2i) -> RandomNumberGenerator
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash([world_seed, chunk.x, chunk.y])
 	return rng
+
+
+## A generator for anything repeatable: the same parts give the same numbers.
+## E.g. SeededRng.make([world_seed, "host_name", index]).
+static func make(parts: Array) -> RandomNumberGenerator:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(parts)
+	return rng

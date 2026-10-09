@@ -12,6 +12,8 @@ signal died
 @export var invulnerable_time := 0.0
 
 var current := 0
+## Kind of whatever hit last (see Hitbox.source): who killed this, on death.
+var last_hit_source: StringName
 ## Set by abilities (e.g. a dash) to ignore hits for a while.
 var invulnerable := false
 var _invulnerable_timer := 0.0
@@ -34,9 +36,10 @@ func is_dead() -> bool:
 
 
 ## Returns true if the hit landed.
-func take_damage(amount: int, from: Vector2, knockback := 0.0) -> bool:
+func take_damage(amount: int, from: Vector2, knockback := 0.0, source: StringName = &"") -> bool:
 	if is_dead() or is_invulnerable():
 		return false
+	last_hit_source = source
 	current = maxi(0, current - amount)
 	_invulnerable_timer = invulnerable_time
 	hurt.emit(amount, from, knockback)

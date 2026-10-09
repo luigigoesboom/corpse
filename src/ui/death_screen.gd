@@ -1,0 +1,54 @@
+extends Control
+## Shown when the host dies: a short epitaph of the life that just ended.
+
+signal continue_pressed
+
+## Display names for creature kinds (CombatRules.kind_of).
+const CREATURE_NAMES := {
+	&"gut_leech": ["Gut Leech", "Gut Leeches"],
+	&"rot_fly": ["Rot Fly", "Rot Flies"],
+	&"bile_spitter": ["Bile Spitter", "Bile Spitters"],
+}
+
+
+func _ready() -> void:
+	process_mode = PROCESS_MODE_ALWAYS
+	%ContinueButton.pressed.connect(continue_pressed.emit)
+
+
+func show_life(life: LifeRecord, life_number: int) -> void:
+	%Title.text = "Here lies %s" % life.host_name
+	var lines := PackedStringArray()
+	lines.append("%s, host number %d." % [String(life.host_type).capitalize(), life_number])
+	lines.append("Woke in year %d, died in year %d, after %s." % [life.start_year, life.death_year, _duration(life.seconds_alive)])
+	if life.killed_by == &"":
+		lines.append("Died of causes no one saw.")
+	else:
+		lines.append("Killed by a %s." % _creature(life.killed_by, 1))
+	if not life.carried_mutations.is_empty():
+		var parts := PackedStringArray()
+		for slot in life.carried_mutations:
+			var mutation := MutationDb.get_def(life.carried_mutations[slot])
+			parts.append(mutation.display_name if mutation else String(life.carried_mutations[slot]))
+		lines.append("Grew: %s." % ", ".join(parts))
+	if not life.carried_items.is_empty():
+		lines.append("Carried: %s." % ", ".join(life.carried_items.map(func(id): return ItemDb.display_name(id))))
+	if life.kills.is_empty():
+		lines.append("Killed nothing.")
+	else:
+		var killed := PackedStringArray()
+		for kind in life.kills:
+			killed.append("%d %s" % [life.kills[kind], _creature(kind, life.kills[kind])])
+		lines.append("Killed %s." % ", ".join(killed))
+	%Summary.text = "\n".join(lines)
+	%ContinueButton.grab_focus()
+
+
+func _creature(kind: StringName, count: int) -> String:
+	var names: Array = CREATURE_NAMES.get(kind, [String(kind).capitalize(), String(kind).capitalize()])
+	return names[0] if count == 1 else names[1]
+
+
+func _duration(seconds: float) -> String:
+	var minutes := int(seconds) / 60
+	return "%d min %d s" % [minutes, int(seconds) % 60] if minutes > 0 else "%d seconds" % int(seconds)

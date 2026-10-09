@@ -15,7 +15,7 @@ func run() -> void:
 	for i in 150:
 		await physics_frame
 		for child in spitter.get_parent().get_children():  # Projectiles spawn beside their shooter.
-			if child.has_node("Hitbox") and child.get_node("Hitbox").collision_layer == 32:
+			if child.has_node("Hitbox") and child.get_node("Hitbox").collision_layer & 32:
 				spat = true
 		if player.health.current < hp:
 			break
@@ -52,7 +52,8 @@ func run() -> void:
 	check(player.health.current < player.health.max_health, "the dive hurts the player")
 
 	# Friendly fire switch for the systemic style.
-	check(CombatRules.enemy_attack_layer() == 32, "normally enemy attacks only hit the player")
-	CombatRules.friendly_fire = true
-	check(CombatRules.enemy_attack_layer() == 48, "with friendly fire they also hit creatures")
+	check(CombatRules.friendly_fire, "friendly fire is on by default (D-018)")
+	check(CombatRules.enemy_attack_layer() == 48, "so enemy attacks also hit creatures")
 	CombatRules.friendly_fire = false
+	check(CombatRules.enemy_attack_layer() == 32, "with it off they only hit the player")
+	CombatRules.friendly_fire = CombatRules.DEFAULT_FRIENDLY_FIRE

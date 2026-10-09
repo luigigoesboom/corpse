@@ -45,7 +45,7 @@ func _ready() -> void:
 
 
 func _exit_tree() -> void:
-	CombatRules.friendly_fire = false
+	CombatRules.friendly_fire = CombatRules.DEFAULT_FRIENDLY_FIRE
 
 
 func _unhandled_input(event: InputEvent) -> void:

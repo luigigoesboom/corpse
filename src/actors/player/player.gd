@@ -130,7 +130,7 @@ func _process(delta: float) -> void:
 	# Flicker while invulnerable after a hit.
 	_visual.visible = _dead or not health.is_invulnerable() or int(Time.get_ticks_msec() / 60) % 2 == 0
 	# Look ahead: the camera leans the way you face, and down when falling fast.
-	var look := Vector2(_facing * 56.0, clampf(velocity.y * 0.1, -16.0, 72.0))
+	var look := Vector2(_facing * 40.0, clampf(velocity.y * 0.08, -12.0, 56.0))
 	_look = _look.lerp(look, minf(1.0, delta * 2.5))
 	# Shake: a random jolt each frame, whole pixels so pixel art stays crisp.
 	var jolt := Vector2(randf_range(-1, 1), randf_range(-1, 1)) * _shake

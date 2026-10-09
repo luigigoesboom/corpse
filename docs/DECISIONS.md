@@ -84,13 +84,22 @@ Format: ID, date, decision, why, what it rules out.
 - Costs: more drawing per animation than a rig; overlays must match the host's frame counts; several host body types will need one overlay set each. Squash and stretch removed (fractional scaling distorts pixels).
 - Rules out: Skeleton2D cutout rigs.
 
+**D-018 Combat style: loose and systemic** (2026-10-10, answers Q-001)
+- What: forgiving, systemic combat (Noita, Caves of Qud) over precision (Hollow Knight). More health, more tools (mutations), creatures that interact (friendly fire on enemy attacks), many ways through a fight.
+- Why: the developer preferred the loose arena after playing both. Fits pillar 4 (many answers to one problem).
+- Consequences: friendly fire becomes the default in the world; tuning favors readable but not twitchy enemies; precision platforming stays in movement, not in combat.
+
+**D-019 Base resolution 960 x 540** (2026-10-10, replaces the resolution part of D-014)
+- What: the game renders at 960 x 540 (was 1280 x 720). Tiles stay 32 px; about 30 x 17 tiles on screen.
+- Why: the developer wanted the view slightly zoomed in, and 960 x 540 scales by exactly 2 on 1080p (and 4 on 4K), so pixels stay even. 1280 x 720 scaled by 1.5 on 1080p, which made pixels uneven and camera motion steppy. A Camera2D zoom would have brought uneven pixels back.
+- Trade-off: less of the world visible at once. 1440p scales by 2.67 (uneven), acceptable.
+
 ---
 
 ## Open questions
 
 | ID | Question | Decide by |
 |---|---|---|
-| Q-001 | Combat difficulty: precision (Hollow Knight) or forgiving and systemic (Noita, Qud)? | Week 20 |
 | Q-002 | How many years pass on death, fixed or variable? | Week 23 |
 | Q-003 | Do any mutations carry over between lives without reclaiming the corpse? | Week 25 |
 | Q-004 | Outlines or no outlines in the art style? | Week 15 |

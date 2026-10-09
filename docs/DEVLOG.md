@@ -13,6 +13,14 @@ Next:
 
 ---
 
+## Weeks 20-21 (2026-10-10)
+Done:
+- Week 20: developer chose loose and systemic combat (D-018). Friendly fire is now the default in the world (leech bites exclude their own hurtbox). Felt rigid: base resolution 960 x 540 (D-019, exact 2x on 1080p, zoomed in), camera with vertical drag margins and softer smoothing; inventory panel resized. Phantom Camera planned by the developer.
+- Week 21: LifeRecord (src/sim): generated host name, start/death year, seconds alive, death position, killer, carried items and mutations, kills by kind. WorldData.lives, start_life / end_life / record_kill. Hitbox.source -> Health.last_hit_source says who dealt each blow, so kills by creatures (friendly fire) do not count as yours. Death screen epitaph; "Wake in a new host" starts the next life (placeholder: same spot, keeps items until week 22). Save v6.
+- test_lives.gd; all tests pass.
+Not done: Corpse and losing your things (week 22). Years do not pass yet (week 23).
+Next: Week 22, the corpse.
+
 ## Weeks 17-19 (2026-10-09)
 Done:
 - Week 17 (mutations v1) was already done in the UI/combat sweep.

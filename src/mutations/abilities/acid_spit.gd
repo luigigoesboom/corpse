@@ -24,5 +24,6 @@ func physics_tick(delta: float) -> void:
 	var hitbox: Hitbox = glob.get_node("Hitbox")
 	hitbox.collision_layer = host.attack_layer()
 	hitbox.exclude = host.get_node_or_null("Hurtbox")  # Never hit the spitter.
+	hitbox.source = CombatRules.kind_of(host)
 	host.get_parent().add_child(glob)
 	Sfx.play(&"spit", host.global_position)

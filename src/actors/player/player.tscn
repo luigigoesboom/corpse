@@ -146,4 +146,7 @@ color_ramp = SubResource("Gradient_spores")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position_smoothing_enabled = true
-position_smoothing_speed = 8.0
+position_smoothing_speed = 5.0
+drag_vertical_enabled = true
+drag_top_margin = 0.15
+drag_bottom_margin = 0.1

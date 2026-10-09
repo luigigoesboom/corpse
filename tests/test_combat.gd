@@ -64,8 +64,11 @@ func run() -> void:
 	check(player.is_dead(), "lethal damage kills the host")
 	await create_timer(1.2).timeout
 	check(player.sprite.current_animation() == &"die" and not player.sprite.is_playing(), "the death animation plays once and holds its last frame")
-	await create_timer(1.0).timeout
-	check(not player.is_dead() and player.health.current == player.health.max_health, "the host respawns with full health (placeholder)")
+	await create_timer(0.3).timeout
+	check(game.get_node("UI").death_screen.visible and paused, "the death screen shows and pauses the game")
+	game.get_node("UI").death_screen.continue_pressed.emit()
+	await wait_frames(2)
+	check(not player.is_dead() and player.health.current == player.health.max_health and not paused, "waking in a new host: alive, full health")
 	saves.load_game(98)
 	await wait_frames(5)
 	check(player.health.current == 3, "loading restores the saved health")

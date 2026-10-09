@@ -8,16 +8,20 @@ extends CanvasLayer
 
 @onready var _inventory: Control = $InventoryScreen
 @onready var _pause: Control = $PauseMenu
+@onready var death_screen: Control = $DeathScreen
 
 
 func _ready() -> void:
 	process_mode = PROCESS_MODE_ALWAYS
 	_inventory.visible = false
 	_pause.visible = false
+	death_screen.visible = false
 	_pause.resume_pressed.connect(close_all)
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if death_screen.visible:
+		return  # Only its own button moves on.
 	if event.is_action_pressed("pause"):
 		# Escape closes whatever is open first, and only pauses from gameplay.
 		if _inventory.visible or _pause.visible:
@@ -36,7 +40,15 @@ func _unhandled_input(event: InputEvent) -> void:
 func close_all() -> void:
 	_inventory.visible = false
 	_pause.visible = false
+	death_screen.visible = false
 	get_tree().paused = false
+
+
+func show_death(life: LifeRecord, life_number: int) -> void:
+	close_all()
+	death_screen.visible = true
+	death_screen.show_life(life, life_number)
+	get_tree().paused = true
 
 
 func _open(screen: Control) -> void:

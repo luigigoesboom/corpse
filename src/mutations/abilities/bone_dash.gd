@@ -14,6 +14,7 @@ var _hitbox: Hitbox
 func _ready() -> void:
 	_hitbox = Hitbox.new()
 	_hitbox.collision_layer = host.attack_layer()
+	_hitbox.source = CombatRules.kind_of(host)
 	_hitbox.collision_mask = 0
 	_hitbox.damage = 2
 	_hitbox.knockback = 380.0
