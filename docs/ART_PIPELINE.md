@@ -21,6 +21,31 @@ You are learning to draw while making this. That is fine. Plan for early art to 
 - Export PNG with transparency.
 - In Godot, for hand-drawn art keep texture filter on Linear (the project default). Only switch to Nearest if you go pixel art.
 
+## Painting the world
+
+The level is a PNG: `data/maps/world.png`, **one pixel = one tile** (32 x 32 px in game). See D-010.
+
+| Paint | Means |
+|---|---|
+| Black / dark | Rock |
+| White, light, or transparent | Open space |
+
+**Krita setup (once):**
+1. Open `data/maps/world.png` in Krita (or File > New, e.g. 1024 x 512 px for a 16 x 8 chunk world).
+2. Pick a brush with **no anti-aliasing** for edges you want crisp: the "Pixel Art" brush presets, or Basic-1 with "Anti-aliasing" off. Soft brushes are OK too: grey pixels count as rock if darker than mid-grey.
+3. View > Show Grid, grid spacing 64 px: each square is one chunk (2048 px in game).
+4. Keep your working file as `data/maps/world.kra` (layers, sketches, notes); File > Export to `world.png` when you want to play it. Hide sketch layers before exporting.
+
+**The loop:** paint, export, switch to the running game, press **F4**. The world rebuilds from the new PNG on the spot. Press **M** for a map view with your position. If you painted rock where the player stands, move or reload a save (F10).
+
+**Placing things in Godot:** open `scenes/world.tscn`. The MapPreview node draws your painting at real size with a chunk grid (it refreshes a second after you export from Krita and click back into Godot). On top of it:
+- Drag **PlayerSpawn** to where a fresh game starts. Put it just above a floor.
+- Add NPCs, props and items as children of **Entities** (drag a `.tscn` from the FileSystem dock onto the viewport while Entities is selected) and position them on the map. They only exist in the running game while their chunk is loaded, so place as many as you like.
+
+**Scale, to plan rooms:** the player is about 1.5 tiles tall. A full jump is about 4 tiles high, so ledges 3 tiles apart are comfortable. A shaft 4 tiles wide is a good wall-jump climb. A tunnel needs to be at least 2 tiles tall to walk through.
+
+**Tips:** sketch the big shapes with a large brush first (chambers, main routes), then carve details. Rooms that need precise layout or many props (colonies, boss arenas) will be Godot scenes placed on the map (roadmap week 10); paint just their outline.
+
 ## Cutout rigs
 
 Instead of drawing every animation frame, draw each body part once and animate the parts.

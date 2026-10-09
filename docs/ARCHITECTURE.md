@@ -11,7 +11,7 @@ There are three layers:
 | Layer | What lives here | Knows about |
 |---|---|---|
 | **Sim** | World state, factions, history, reputation, life records, chunk diffs. Plain GDScript classes (RefCounted / Resource). | Nothing below it. |
-| **World** | Turning sim data into chunks: generation, streaming, applying diffs, spawning entities. | Sim. |
+| **World** | Turning the painted map and sim data into chunks: streaming, applying diffs, spawning entities. | Sim. |
 | **Presentation** | Nodes, scenes, rigs, UI, audio, camera. | Sim (read) and World. Writes to the sim only through clear functions or EventBus signals. |
 
 Why: the whole body keeps "existing" when you are not looking, and history runs for thousands of years at worldgen. That only works if world state is plain data you can tick, save and inspect without spawning anything. This is the lesson from Dwarf Fortress.
@@ -24,7 +24,7 @@ corpse/
   README.md
   docs/
   data/
-    maps/            painted PNG layers (regions, markers, depth)
+    maps/            world.png, the hand-painted world (1 px = 1 tile)
     factions/        faction definitions (.tres)
     mutations/       MutationData resources (.tres)
     names/           word lists for name generation
@@ -48,9 +48,8 @@ corpse/
       reputation/
     world/
       chunks/        chunk manager, chunk data, streaming
-      gen/           region generators, noise, cellular automata
-      setpieces/     authored rooms stamped into terrain
-      map_reader.gd  reads painted PNG layers
+      setpieces/     detailed rooms built as Godot scenes, placed on the map
+      world_map.gd   reads the painted world PNG
     actors/
       components/    health, hitbox, hurtbox, ai state machine
       player/
@@ -115,78 +114,60 @@ var corpse_state: StringName = &"intact"   # intact, looted, eaten, enshrined, s
 
 Everything refers to other things by ID, never by object reference. That keeps saves simple and lets history point at anything.
 
-## The painted maps
+## The painted world
 
-The macro world is drawn by hand. Generation fills it in.
+The whole world is painted by hand (D-010). There is no terrain generation.
 
-| File | Meaning of a pixel |
+`data/maps/world.png`: **one pixel = one tile.** `WorldMap` (src/world/world_map.gd) reads it once and classifies every pixel:
+
+| Pixel | Meaning |
 |---|---|
-| `data/maps/regions.png` | Which region a chunk belongs to (Gut, Lungs, Bones...). One color per region. |
-| `data/maps/markers.png` | Special colors place set pieces or force features (vessel entrance, valve chamber). Transparent means nothing. |
-| `data/maps/depth.png` | Grayscale "age". Darker means older and stranger. Feeds creature tiers, ruin age, rot. |
+| Transparent, or light (white, light grey) | Open space |
+| Dark (black, dark grey) | Rock |
 
-**One pixel = one chunk.** A 128 x 256 map is 32,768 chunks, which is plenty.
+Colors are matched loosely (dark vs light), so soft brush edges still work. Outside the image is rock. Pixels are only read when a chunk is cut, so startup does not grow with map size (an 8192 x 4096 map starts instantly, ~4 ms per chunk).
 
-Import settings matter: select each map PNG in Godot, set **Compress Mode: Lossless**, turn **Mipmaps** off, then reimport. Lossy compression changes colors and breaks the lookup.
+### The world scene
 
-```gdscript
-# src/world/map_reader.gd
-class_name MapReader
-extends RefCounted
+`scenes/world.tscn` is where the world is authored in the editor, on top of the painting:
 
-const REGION_COLORS := {
-    Color("8c2828"): &"gut",
-    Color("c8a0aa"): &"lungs",
-    Color("e6dcbe"): &"bones",
-    Color("5078c8"): &"nerves",
-}
+| Node | Job |
+|---|---|
+| `MapPreview` | `@tool`: draws world.png at real size (rock colored, air transparent) with a chunk grid, in the editor only. Polls the PNG's modified time and refreshes. Frees itself at runtime. |
+| `PlayerSpawn` | Marker2D. Where a fresh game puts the player. |
+| `Entities` (`EntityLayer`) | Hand-placed NPCs, props, items. At runtime each child is bucketed by chunk and only kept in the tree while that chunk is loaded (detached otherwise: keeps state, costs nothing). Things that move are re-bucketed when their chunk unloads. |
 
-var _regions: Image
+`game.tscn` instances world.tscn next to the ChunkManager and Player. Later, when entity state must survive saves (a dead NPC stays dead), it goes into `WorldData` keyed by the entity's node name under Entities, which must therefore stay unique and stable. More colors (acid, flesh, one-way platforms, markers for set pieces and colonies) get added to this table as they are needed. How to paint it: docs/ART_PIPELINE.md, "Painting the world".
 
-func _init() -> void:
-    _regions = load("res://data/maps/regions.png").get_image()
+The PNG is imported as an **Image** (not a texture) via its `.import` file, so the pixels stay exact and exported builds can read it. In the editor, `WorldMap` reads the PNG straight from disk instead, so F4 in game picks up a fresh save from Krita without restarting.
 
-func region_at(chunk: Vector2i) -> StringName:
-    if chunk.x < 0 or chunk.y < 0 or chunk.x >= _regions.get_width() or chunk.y >= _regions.get_height():
-        return &"void"
-    var c := _regions.get_pixelv(chunk)
-    for key in REGION_COLORS:
-        if c.is_equal_approx(key):
-            return REGION_COLORS[key]
-    return &"void"
-```
+Later, regions (Gut, Lungs...) and depth can be extra painted layers at the same resolution, or a coarser one.
+
+The history sim does not invent places on the map. It fills hand-made slots (a painted marker or set piece: "a colony could be here", "a shrine could be here") with whatever its story produced.
 
 ## Chunks
 
 - Chunk size: 64 x 64 tiles. Tile size: 32 px (revisit after the first art week).
 - Each loaded chunk is a `Node2D` with its own `TileMapLayer` and an entity container.
-- Load radius around the player: start with 2 chunks each way, tune later.
+- Load radius: 1 chunk each way (3 x 3). One chunk is 2048 px, much wider than the screen.
+- Only rock tiles next to open space get collision. Buried rock uses a tile with no collision shape.
 
-### Determinism
+### Randomness
 
-A chunk must always generate the same way from the same seed. Each chunk gets its own RNG:
-
-```gdscript
-static func chunk_rng(world_seed: int, chunk: Vector2i) -> RandomNumberGenerator:
-    var rng := RandomNumberGenerator.new()
-    rng.seed = hash([world_seed, chunk.x, chunk.y])
-    return rng
-```
-
-Never use the global `randi()` in generation code. It makes generation depend on load order.
+Anything random that must be repeatable (history events, loot rolls tied to a place) uses a seeded RNG from `SeededRng` (src/sim/seeded_rng.gd), never the global `randi()`. The global RNG depends on what ran before, so results would change with load order.
 
 ### Streaming
 
 1. Player crosses into a new chunk.
 2. Chunk manager works out which chunks should be loaded.
-3. For each missing chunk, generate tile data on a worker thread (`WorkerThreadPool.add_task`). Generation returns plain data (arrays of cell coords and atlas coords), no nodes.
+3. For each missing chunk, cut its tiles out of the WorldMap as plain data (`ChunkData`), no nodes. If this gets slow, move it to a worker thread (`WorkerThreadPool.add_task`).
 4. Back on the main thread, apply the chunk's diff, then build the `TileMapLayer` a few hundred cells per frame.
-5. Spawn entities from chunk data.
+5. Attach the hand-placed entities of that chunk (`EntityLayer`).
 6. Unloading writes entity state back to the chunk diff, then frees the node.
 
 ### Diffs, not snapshots
 
-Generated content is never saved. Only changes are:
+The painted map is never saved, it ships with the game. Only changes to it are:
 
 ```gdscript
 class_name ChunkDiff
@@ -198,7 +179,7 @@ var entities: Array = []             # serialized entity dictionaries
 var rot_level: float = 0.0
 ```
 
-Load = generate from seed, then apply diff. This keeps saves small even with a huge world.
+Load = cut the chunk from the painted map, then apply its diff. This keeps saves small even with a huge world.
 
 ## Saving
 

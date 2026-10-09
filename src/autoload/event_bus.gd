@@ -8,3 +8,7 @@ extends Node
 ##
 ## No class_name on purpose: an autoload is already reachable by its name,
 ## and a matching class_name would clash with it.
+
+## WorldState.data was replaced (new world or loaded save). Rebuild from it.
+@warning_ignore("unused_signal")
+signal world_loaded

@@ -26,7 +26,7 @@ Every feature should serve at least one of these. If it serves none, cut it.
 
 ## The world
 
-The god's body is the map. It is painted by hand as a set of PNG layers (see ARCHITECTURE.md) and filled in by generation.
+The god's body is the map. Every tunnel and chamber is painted by hand in Krita, one pixel per tile (see ARCHITECTURE.md and D-010). The world is the same in every playthrough; what changes between saves is its history.
 
 Planned regions, roughly from outside in:
 

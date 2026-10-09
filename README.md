@@ -8,13 +8,13 @@ Somewhere at the center is the heart.
 
 ## Status
 
-Early prototype. A placeholder character runs, jumps and wall-clings through a generated cave world that streams in chunks. See [docs/ROADMAP.md](docs/ROADMAP.md) for where things stand.
+Early prototype. A placeholder character runs, jumps and wall-clings through a hand-painted test world that streams in chunks. See [docs/ROADMAP.md](docs/ROADMAP.md) for where things stand.
 
 ## Tech
 
 - Engine: Godot 4.x (latest stable), GDScript
 - Art: hand-drawn on a tablet, animated as cutout rigs (Skeleton2D / AnimationPlayer)
-- World: painted macro maps (PNG) drive procedural generation of chunks
+- World: painted by hand in Krita as one PNG, 1 pixel = 1 tile, streamed in chunks
 
 ## Running the project
 
@@ -22,7 +22,9 @@ Early prototype. A placeholder character runs, jumps and wall-clings through a g
 2. Open Godot, choose Import, and select `project.godot` in this folder.
 3. Press F5.
 
-Controls: A/D or arrows to run, Space/W/Up to jump (hold for higher), push into a wall in the air to cling. Gamepad works too. F3 toggles the debug overlay.
+Controls: A/D or arrows to run, Space/W/Up to jump (hold for higher), push into a wall in the air to cling. Gamepad works too. F3 toggles the debug overlay. F9 quick saves, F10 quick loads. F4 reloads the world map after you repaint it, M shows the map.
+
+To build the world: paint terrain in `data/maps/world.png` (see docs/ART_PIPELINE.md), then open `scenes/world.tscn` in Godot to see it and place NPCs, props and the player spawn on top.
 
 `scenes/test_room.tscn` is a small hand-made room for tuning movement (open it and press F6).
 

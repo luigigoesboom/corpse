@@ -20,7 +20,7 @@
 | Phase | Weeks | Result |
 |---|---|---|
 | 0. Foundations | 1 to 4 | A character moving in a saved, seeded test world driven by a painted map |
-| 1. The world | 5 to 12 | A streamed, persistent, generated Gut region with lighting and set pieces |
+| 1. The world | 5 to 12 | A streamed, persistent, hand-painted Gut region with lighting and set pieces |
 | 2. Combat and creatures | 13 to 20 | Fighting rigged creatures, grafting the first mutations |
 | 3. Death and rebirth | 21 to 25 | The core loop: die, time passes, corpse persists, new host |
 | 4. Factions and history | 26 to 36 | Generated history, two factions, reputation, dialogue, ruins |
@@ -38,18 +38,18 @@
 | 1 | Project setup. Create the Godot project in this repo, folder layout from ARCHITECTURE.md, empty autoloads (EventBus, WorldState, SaveSystem). Player capsule with run and jump on a hand-placed TileMapLayer. Camera follows. | You can run and jump around a test room. First commit pushed. |
 | 2 | Movement feel. Coyote time, jump buffering, variable jump height, acceleration curves, a simple wall cling or ledge grab (pick one). Debug overlay (F3) showing position, velocity, FPS, chunk coord. | Moving feels good with a grey box. Ask someone else to try it. |
 | 3 | Data layer and saves. WorldData class (seed, year, player position). Seeded RNG helper per chunk. Save and load with a version number in the file. | Save, quit, reopen, load: player is where they were. Same seed gives same numbers. |
-| 4 | Painted map reader. Load `data/maps/regions.png`, map colors to region IDs, one pixel = one chunk. Debug screen that draws the region map with the player's position on it. | Repaint the PNG in Krita, reload, and the debug map changes. |
+| 4 | Painted world (D-010). `data/maps/world.png`, 1 pixel = 1 tile, read by WorldMap. F4 reloads the map in game, M shows a debug map with the player's position. Learn the Krita workflow (ART_PIPELINE.md). | Repaint the PNG in Krita, press F4, and the world and debug map change. |
 
 ## Phase 1: The world (weeks 5 to 12)
 
 | Week | Goal | Done when |
 |---|---|---|
-| 5 | Chunk system. Chunk coords, generate a chunk's tiles from its region + noise, load chunks in a radius around the player, unload outside it. | You can walk across 20+ chunks and memory stays flat. |
-| 6 | Threaded loading. Generate chunk data off the main thread, build TileMapLayers on the main thread in small batches. | No visible hitch when crossing chunk borders. |
-| 7 | Gut terrain. Cave shapes from noise plus cellular automata smoothing, guaranteed connectivity between neighbor chunks (shared border openings). Gut-specific tile set (placeholder). | Gut tunnels look organic and you never hit a dead seam at a chunk edge. |
-| 8 | Persistence of changes. Breakable tiles. Store only diffs per chunk, apply diffs after generation. | Break a wall, walk far away, come back, save and load: the wall is still broken. |
+| 5 | Chunk system. Cut the painted map into 64 x 64 chunks, load chunks in a radius around the player, unload outside it. | You can walk across 20+ chunks and memory stays flat. |
+| 6 | Threaded loading if needed. Cut chunk data off the main thread, build TileMapLayers on the main thread in small batches. | No visible hitch when crossing chunk borders. |
+| 7 | Paint the Gut. Lay out the first real region in world.png: main routes, side caves, secrets, where colonies and set pieces go. Gut-specific tile set (placeholder). Autotiling so painted edges look organic, not blocky. | Exploring the painted Gut is fun with grey boxes, and edges look like flesh, not squares. |
+| 8 | Persistence of changes. Breakable tiles. Store only diffs per chunk, apply diffs after cutting the chunk from the map. | Break a wall, walk far away, come back, save and load: the wall is still broken. |
 | 9 | Entities in chunks. Items and simple props live in chunk data, spawn when chunk loads, write back when it unloads. | Drop an item, leave, come back after a save and load: it is there. |
-| 10 | Set pieces. A second painted layer `markers.png` where special colors mean "place authored room X here". Authored scenes get stamped into generated terrain. | Two hand-made rooms appear exactly where you painted them, blended into the caves. |
+| 10 | Set pieces and slots. Marker colors in world.png (or a second layer at the same size) mean "place room scene X here" or "a colony / shrine / ruin could go here". Detailed rooms are Godot scenes stamped into the painted terrain. | Two hand-made rooms appear exactly where you painted them, blended into the caves. |
 | 11 | Light and atmosphere. CanvasModulate darkness, player light, glowing fungus props, simple parallax background layer. First art pass: draw 5 Gut tiles and 3 props for real. | A screenshot of the Gut looks moody, even with rough art. |
 | 12 | **Milestone 1.** Bug fixing, cleanup, performance check, write DEVLOG summary. | You can explore a big Gut region for 10 minutes without bugs or stutter. |
 
@@ -85,7 +85,7 @@ This is the heart of the game. It comes before factions so everything after is b
 | 26 | Faction data. Two Gut factions with beliefs, attitudes, territory. Suggested: the Flesh-Tenders (farmers who cultivate the gut lining) and the Choir of Waking (theocracy waiting for the god to rise). | Factions exist as data and show on the debug map. |
 | 27 | Settlements. Colony set pieces built from faction data, with NPCs that idle, walk and work. | Walking into a colony feels like a place with people. |
 | 28 | History sim v1, text only. Yearly ticks: factions grow, found sites, trade, fight, split, decline. Writes to an event log. Run 2000 years at worldgen. | Reading the generated log is interesting. Run it 5 times, get 5 different stories. |
-| 29 | History into the world. Dead settlements become ruins placed in the Gut. Artifacts get generated names and descriptions from events. | You find a ruin and an artifact whose description matches the log. |
+| 29 | History into the world. Dead settlements become ruins in the Gut's hand-made slots. Artifacts get generated names and descriptions from events. | You find a ruin and an artifact whose description matches the log. |
 | 30 | Dialogue v1. Talk to NPCs: greetings by faction and standing, rumors pulled from recent events, simple barter. | NPCs mention things that actually happened in your world. |
 | 31 | Host standing. Per-faction standing for the current host. Visible consequences: prices, hostility, guards refusing entry. | Attacking a Flesh-Tender makes their colony hostile. |
 | 32 | Legend standing. Deeds from LifeRecords add to the fragment's legend. Fragment-sensing NPCs (Choir priests) recognize you across lives. | A priest reacts to something you did two lives ago. |
@@ -116,7 +116,7 @@ Goal: one region, complete and polished enough to show strangers.
 Each region follows the same six-week template. Adjust per region after the slice.
 
 **Region template:**
-1. Paint the region on the maps, write its terrain generator.
+1. Paint the region into world.png and give it its tile set.
 2. Set pieces and landmarks.
 3. Creatures (two or three new rigs, one week of art).
 4. Faction for the region, hooked into the history sim.

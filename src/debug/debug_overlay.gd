@@ -8,6 +8,8 @@ extends CanvasLayer
 @export var player: Player
 ## Optional. Scenes without chunk streaming (the test room) leave it empty.
 @export var chunks: ChunkManager
+## Optional, like chunks.
+@export var entities: EntityLayer
 
 var _label := Label.new()
 
@@ -39,6 +41,10 @@ func _process(_delta: float) -> void:
 		"chunk %s" % ChunkData.world_to_chunk(pos),
 		"floor %s  wall %s  cling %s" % [player.is_on_floor(), player.is_on_wall(), player.is_clinging()],
 	])
+	if WorldState.data:
+		lines.append("seed %d  year %d" % [WorldState.data.world_seed, WorldState.data.year])
 	if chunks:
 		lines.append("chunks loaded %d  building %d" % [chunks.loaded_count(), chunks.pending_count()])
+	if entities:
+		lines.append("entities active %d / %d" % [entities.count_active(), entities.count_total()])
 	_label.text = "\n".join(lines)

@@ -1,4 +1,12 @@
 extends Node
 ## Holds the current WorldData. Single source of truth for the sim.
 ##
-## WorldData (plain data, no nodes) arrives in roadmap week 3.
+## Replace the world only through set_data(), so everyone listening on
+## EventBus.world_loaded can rebuild from it.
+
+var data: WorldData
+
+
+func set_data(new_data: WorldData) -> void:
+	data = new_data
+	EventBus.world_loaded.emit()

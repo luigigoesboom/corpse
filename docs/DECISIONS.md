@@ -42,6 +42,18 @@ Format: ID, date, decision, why, what it rules out.
 - Why: simpler, and climbing up flesh walls fits the setting. Push into a wall in the air to slide slowly, jump to kick off.
 - Rules out: ledge grab, for now.
 
+**D-010 Hand-painted world, no terrain generation** (2026-10-09, replaces D-005 and the generation part of D-008)
+- What: the whole world is painted in Krita as `data/maps/world.png`, 1 pixel = 1 tile (dark = rock, light/transparent = air, red = spawn). The game cuts it into 64 x 64 chunks and streams them as before. No noise, no procedural terrain.
+- Why: the developer wants to craft every space by hand and has the time. The world persists across lives, so per-run variety from generation matters less than in a roguelite; variety comes from history instead. Painting is fast (big brushes for caves, small ones for details) and needs no level editor.
+- Kept: chunk streaming, chunk diffs (now diffs against the painted map), saves, the history sim. The world seed stays for per-save things like history.
+- Changes: the history sim places ruins, shrines and colonies into hand-made slots instead of generated spots. Detailed rooms (colonies, boss arenas) can still be built as Godot scenes and placed on the map (week 10).
+- Rules out: procedural terrain, per-run random worlds.
+
+**D-011 Author the world in Godot on top of the painting** (2026-10-09)
+- What: terrain is still painted in Krita (D-010), but `scenes/world.tscn` shows the painting in the editor (`MapPreview`, @tool) so NPCs, props and the player spawn are placed in Godot as normal nodes. The red spawn pixel is gone; spawn is a Marker2D. Placed entities stream with their chunk (`EntityLayer`).
+- Why: painting is great for terrain, bad for placing and configuring things. Godot's editor is the right tool for that.
+- Rules out: encoding NPCs or items as pixel colors.
+
 ---
 
 ## Open questions
@@ -53,3 +65,4 @@ Format: ID, date, decision, why, what it rules out.
 | Q-003 | Do any mutations carry over between lives without reclaiming the corpse? | Week 25 |
 | Q-004 | Outlines or no outlines in the art style? | Week 15 |
 | Q-005 | Final name of the game. | Before the Steam page, week 45 |
+| Q-006 | Breakable terrain at all? Developer doubts it. If not, week 8 becomes "chunk diffs for entity state only" (dead NPCs, taken items, corpses). | Week 8 |

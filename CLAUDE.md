@@ -20,7 +20,7 @@ A god fell from the sky and died. Its body is a continent. Parasite civilization
 ## How we got here (summary of the planning conversation)
 
 1. Started from "fun to make, fun to play, possibly big, proc gen or a large handmade world". Developer likes both deep systems (DF, Qud) and exploration (NMS, Subnautica).
-2. Chose a hybrid world: the macro layout is painted by hand as PNG layers (one pixel = one chunk), generation fills in detail. Huge levels without hand-placing everything.
+2. First chose a hybrid world (painted layout + generated detail), then dropped generation entirely (D-010): the whole world is painted by hand in Krita as `data/maps/world.png`, one pixel = one tile. Same world every playthrough; history is what differs per save.
 3. Chose 2D over 3D: 3D asset production would eat the time meant for systems.
 4. Art: hand-drawn with the tablet, simple bold style (closer to Isaac than Hollow Knight in detail), animated as cutout rigs (Skeleton2D + AnimationPlayer). Mutations attach to the rig as body parts, so hosts visibly transform without redrawing.
 5. Considered an underwater setting, dropped it (floaty controls, Subnautica comparisons). Kept its structure: descend through layers, deeper means older and stranger.
@@ -34,7 +34,7 @@ A god fell from the sky and died. Its body is a continent. Parasite civilization
 ## Rules for working in this repo
 
 - **The simulation never touches nodes.** Sim = plain data (RefCounted/Resource). World layer turns data into chunks. Presentation = nodes. See ARCHITECTURE.md.
-- Generation is deterministic per chunk: seed each chunk's RNG with `hash([world_seed, chunk.x, chunk.y])`. Never use global `randi()` in generation.
+- No procedural terrain (D-010). The world is `data/maps/world.png`, read by `WorldMap`. Repeatable randomness (history, loot) uses `SeededRng`, never global `randi()`.
 - Save diffs, never generated content. Version every save, write migrations, never break old saves silently.
 - Refer to things by ID, not object references, in sim data.
 - Snake_case files, PascalCase `class_name`. Keep autoloads under ~300 lines.
@@ -46,4 +46,12 @@ A god fell from the sky and died. Its body is a continent. Parasite civilization
 
 ## Current status
 
-Weeks 1 and 2 built: player with tuned movement and wall cling, F3 overlay, test room (`scenes/test_room.tscn`). A chunk streaming prototype (D-008) runs in `game.tscn`: `ChunkGenerator` (src/world/gen) makes plain `ChunkData`, `ChunkManager` (src/world/chunks) builds one TileMapLayer per chunk. Week 2 still needs an outside playtester. Next: ROADMAP week 3 (WorldData, versioned save/load).
+Weeks 1 and 2 built: player with tuned movement and wall cling, F3 overlay, test room (`scenes/test_room.tscn`). Week 2 still needs an outside playtester.
+
+Week 3 built: `WorldData` (src/sim), `WorldState.set_data()` -> `EventBus.world_loaded` -> `src/game.gd` moves the player and calls `ChunkManager.reset()`. `SaveSystem` writes versioned saves (F9 save, F10 load).
+
+Weeks 4 and 5 built (D-010): `WorldMap` (src/world/world_map.gd) reads `data/maps/world.png` (1 px = 1 tile), `ChunkManager` cuts it into 64 x 64 `ChunkData` and streams one TileMapLayer per chunk (3 x 3 around the player). F4 reloads the map, M shows the debug map.
+
+D-011: `scenes/world.tscn` is the authoring scene: `MapPreview` (@tool) shows world.png in the editor, `PlayerSpawn` marker, `Entities` (`EntityLayer`) holds hand-placed NPCs/props that stream with their chunk. Placeholder NPC: `src/actors/npcs/placeholder_npc.tscn`. Next: developer paints a real map; then ROADMAP week 7 (paint the Gut, autotiling) or week 8 (breakable tiles, chunk diffs).
+
+Headless testing: `Godot_v4.7.2-stable_win64.exe --headless --path . --script <test.gd>` works. In such a test script, do not type variables as classes that use autoloads (e.g. `ChunkManager`), and reach autoloads via `root.get_node("/root/Name")`: the script compiles before autoloads exist.
