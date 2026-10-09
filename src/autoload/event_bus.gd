@@ -9,6 +9,15 @@ extends Node
 ## No class_name on purpose: an autoload is already reachable by its name,
 ## and a matching class_name would clash with it.
 
+@warning_ignore_start("unused_signal")
+
 ## WorldState.data was replaced (new world or loaded save). Rebuild from it.
-@warning_ignore("unused_signal")
 signal world_loaded
+## The player wants to pick up this WorldItem.
+signal pickup_requested(item: Node)
+## The player wants to drop their last item, at this world position (feet).
+signal drop_requested(position: Vector2)
+## WorldState.data.inventory changed.
+signal inventory_changed
+
+@warning_ignore_restore("unused_signal")

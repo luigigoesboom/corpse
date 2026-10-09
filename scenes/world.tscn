@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://src/world/map_preview.gd" id="1_preview"]
 [ext_resource type="Script" path="res://src/world/entity_layer.gd" id="2_entities"]
 [ext_resource type="PackedScene" path="res://src/actors/npcs/placeholder_npc.tscn" id="3_npc"]
+[ext_resource type="PackedScene" path="res://src/items/world_item.tscn" id="4_item"]
 
 [node name="World" type="Node2D"]
 
@@ -31,3 +32,11 @@ npc_name = "Shaft Hermit"
 [node name="LostPilgrim" parent="Entities" instance=ExtResource("3_npc")]
 position = Vector2(7360, 3872)
 npc_name = "Lost Pilgrim"
+
+[node name="BileBulb" parent="Entities" instance=ExtResource("4_item")]
+position = Vector2(992, 3200)
+item_id = &"bile_bulb"
+
+[node name="BoneShard" parent="Entities" instance=ExtResource("4_item")]
+position = Vector2(736, 3104)
+item_id = &"bone_shard"

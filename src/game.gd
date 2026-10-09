@@ -12,12 +12,14 @@ var _toast_tween: Tween
 @onready var _player: Player = $Player
 @onready var _chunks: ChunkManager = $ChunkManager
 @onready var _world: Node2D = $World
+@onready var _items: ItemLayer = $Items
 @onready var _toast: Label = $UI/Toast
 
 
 func _ready() -> void:
 	EventBus.world_loaded.connect(_on_world_loaded)
 	(_world.get_node("Entities") as EntityLayer).attach(_chunks)
+	_items.attach(_chunks)
 	# randi() is fine here: picking a seed is not generation.
 	var seed_value := new_world_seed if new_world_seed != 0 else randi()
 	var data := WorldData.create(seed_value)

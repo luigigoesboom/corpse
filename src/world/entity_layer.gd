@@ -7,7 +7,8 @@ extends Node2D
 ## is loaded. Outside that it is detached: it keeps its state but costs no
 ## processing or drawing. That keeps a huge world with thousands of things cheap.
 ##
-## Keep this node at position (0, 0), unrotated and unscaled.
+## Keep this node at position (0, 0), unrotated and unscaled. Child names must
+## stay unique and stable: saves refer to placed entities by name.
 
 var _chunks: ChunkManager
 var _buckets := {}  # Vector2i chunk coord -> Array of Node2D
@@ -47,7 +48,8 @@ func count_total() -> int:
 
 func _on_chunk_loaded(coord: Vector2i) -> void:
 	for entity in _buckets.get(coord, []):
-		if entity.get_parent() == null:
+		# Entities gone for good (e.g. a picked-up item) stay detached.
+		if entity.get_parent() == null and not WorldState.data.removed_entities.has(String(entity.name)):
 			add_child(entity)
 
 

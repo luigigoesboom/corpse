@@ -6,6 +6,8 @@
 [ext_resource type="Script" path="res://src/debug/debug_overlay.gd" id="3_overlay"]
 [ext_resource type="Script" path="res://src/debug/debug_map.gd" id="4_map"]
 [ext_resource type="PackedScene" path="res://scenes/world.tscn" id="5_world"]
+[ext_resource type="Script" path="res://src/items/item_layer.gd" id="6_items"]
+[ext_resource type="Script" path="res://src/ui/inventory_label.gd" id="7_inventory"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("0_game")
@@ -15,6 +17,9 @@ script = ExtResource("1_chunks")
 target = NodePath("../Player")
 
 [node name="World" parent="." instance=ExtResource("5_world")]
+
+[node name="Items" type="Node2D" parent="."]
+script = ExtResource("6_items")
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 
@@ -36,6 +41,20 @@ grow_vertical = 2
 script = ExtResource("4_map")
 player = NodePath("../../Player")
 chunks = NodePath("../../ChunkManager")
+
+[node name="Inventory" type="Label" parent="UI"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -616.0
+offset_top = 12.0
+offset_right = -16.0
+offset_bottom = 38.0
+grow_horizontal = 0
+horizontal_alignment = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+script = ExtResource("7_inventory")
 
 [node name="Toast" type="Label" parent="UI"]
 anchors_preset = 2

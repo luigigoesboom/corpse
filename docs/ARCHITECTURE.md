@@ -26,6 +26,7 @@ corpse/
   data/
     maps/            world.png, the hand-painted world (1 px = 1 tile)
     factions/        faction definitions (.tres)
+    items/           ItemDef resources (.tres), one per item kind
     mutations/       MutationData resources (.tres)
     names/           word lists for name generation
   assets/
@@ -55,6 +56,7 @@ corpse/
       player/
       creatures/
       npcs/
+    items/           ItemDef, ItemDb, WorldItem, ItemLayer
     mutations/
     ui/
     debug/           overlays, debug map, cheat console
@@ -167,7 +169,15 @@ Anything random that must be repeatable (history events, loot rolls tied to a pl
 
 ### Diffs, not snapshots
 
-The painted map is never saved, it ships with the game. Only changes to it are:
+Current format (D-013), in `WorldData.chunk_diffs[chunk]`:
+
+```gdscript
+{ "items": [ { "id": 12, "item": &"bile_bulb", "pos": Vector2(1624, 3200) } ] }
+```
+
+Runtime things are created in `WorldData` first (`add_dropped_item()`), and the matching node is only a view, spawned by `ItemLayer` when the chunk loads and freed when it unloads. Permanent changes to hand-placed things in world.tscn go into `WorldData.removed_entities` (node name -> true). Empty chunk entries are erased so saves stay small.
+
+Original plan, kept for reference. The painted map is never saved, it ships with the game. Only changes to it are:
 
 ```gdscript
 class_name ChunkDiff

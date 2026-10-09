@@ -57,6 +57,7 @@ var _wall_normal_x := 0.0
 var _clinging := false
 
 @onready var _visual: Node2D = $Visual
+@onready var _reach: Area2D = $Reach
 
 
 func _ready() -> void:
@@ -79,9 +80,26 @@ func _physics_process(delta: float) -> void:
 	if not is_zero_approx(velocity.x) and not _clinging:
 		_visual.scale.x = signf(velocity.x)
 
+	_handle_items()
+
 
 func is_clinging() -> bool:
 	return _clinging
+
+
+## The player only asks; ItemLayer decides and changes the world data.
+func _handle_items() -> void:
+	if Input.is_action_just_pressed("interact"):
+		var nearest: Area2D = null
+		for area in _reach.get_overlapping_areas():
+			if area is WorldItem and (nearest == null
+					or area.global_position.distance_to(global_position) < nearest.global_position.distance_to(global_position)):
+				nearest = area
+		if nearest:
+			EventBus.pickup_requested.emit(nearest)
+	if Input.is_action_just_pressed("drop") and is_on_floor():
+		# Drop at the feet, a little in front.
+		EventBus.drop_requested.emit(global_position + Vector2(_visual.scale.x * 24.0, 22.0))
 
 
 ## From the classic formulas: g = 2h / t^2, v0 = 2h / t.

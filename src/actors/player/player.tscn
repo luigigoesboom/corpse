@@ -6,6 +6,9 @@
 radius = 10.0
 height = 44.0
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_reach"]
+size = Vector2(72, 56)
+
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_player")
 
@@ -21,6 +24,14 @@ polygon = PackedVector2Array(-4, -22, 4, -22, 9, -17, 10, -12, 10, 12, 9, 17, 4,
 [node name="Eye" type="Polygon2D" parent="Visual"]
 color = Color(0.15, 0.1, 0.1, 1)
 polygon = PackedVector2Array(3, -14, 7, -14, 7, -10, 3, -10)
+
+[node name="Reach" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Reach"]
+shape = SubResource("RectangleShape2D_reach")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position_smoothing_enabled = true

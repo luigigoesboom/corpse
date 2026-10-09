@@ -14,7 +14,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 1
+const SAVE_VERSION := 2
 
 
 func slot_path(slot: int) -> String:
@@ -68,8 +68,10 @@ func load_game(slot: int) -> Error:
 ## Upgrades an old save one version at a time until it matches SAVE_VERSION.
 ## Never delete a step: someone may still have a version 1 save.
 func _migrate(save: Dictionary) -> Dictionary:
-	# Example for when version 2 arrives:
-	# if save.save_version == 1:
-	#     save.world["new_field"] = some_default
-	#     save.save_version = 2
+	if save.save_version == 1:
+		# v2 (week 9): inventory, dropped items, picked-up placed entities.
+		save.world["inventory"] = []
+		save.world["removed_entities"] = {}
+		save.world["next_id"] = 1
+		save.save_version = 2
 	return save

@@ -54,6 +54,16 @@ Format: ID, date, decision, why, what it rules out.
 - Why: painting is great for terrain, bad for placing and configuring things. Godot's editor is the right tool for that.
 - Rules out: encoding NPCs or items as pixel colors.
 
+**D-012 Pixel art** (2026-10-09, replaces the art style part of D-002)
+- What: all game art is pixel art. Project default texture filter is Nearest (crisp pixels).
+- Why: developer's choice. Pixel art suits drawing on a tablet at small sizes, fits the Isaac / Noita side of the inspirations, and placeholder-to-final is a smooth path.
+- Consequences: cutout rigs (Skeleton2D) look bad on pixel art when parts rotate, because pixels shear. Animation approach is reopened (Q-007). Mutations-as-body-parts still works: parts can be sprite layers drawn per animation frame, attached at socket positions. Base resolution and tile size are reopened (Q-008).
+- Rules out: smooth hand-painted sprites, linear texture filtering.
+
+**D-013 Sim data is the truth, nodes are views** (2026-10-09)
+- What: runtime things (dropped items now, corpses later) live in `WorldData` from the moment they exist. Chunk loads spawn view nodes from the data; unloads free them. Hand-placed things live in world.tscn; their permanent changes (picked up, killed) go into `WorldData.removed_entities` by node name.
+- Why: nothing to write back on unload, saves are always complete, and the history sim can act on things nobody is looking at.
+
 ---
 
 ## Open questions
@@ -65,4 +75,6 @@ Format: ID, date, decision, why, what it rules out.
 | Q-003 | Do any mutations carry over between lives without reclaiming the corpse? | Week 25 |
 | Q-004 | Outlines or no outlines in the art style? | Week 15 |
 | Q-005 | Final name of the game. | Before the Steam page, week 45 |
+| Q-007 | Pixel art animation: frame-by-frame sprites, or a pixel-friendly rig (no rotation, parts only move)? Decides how mutations attach. | Week 15 |
+| Q-008 | Base resolution and tile size for pixel art (e.g. 640 x 360 with 16 px tiles, or 32 px tiles). Changes TILE_PX and movement numbers. | Before art week 11 |
 | Q-006 | Breakable terrain at all? Developer doubts it. If not, week 8 becomes "chunk diffs for entity state only" (dead NPCs, taken items, corpses). | Week 8 |
