@@ -1,0 +1,86 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/actors/creatures/gut_leech.gd" id="1_leech"]
+[ext_resource type="Script" path="res://src/actors/components/health.gd" id="2_health"]
+[ext_resource type="Script" path="res://src/actors/components/hurtbox.gd" id="3_hurtbox"]
+[ext_resource type="Script" path="res://src/actors/components/hitbox.gd" id="4_hitbox"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(36, 18)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hurt"]
+size = Vector2(40, 22)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_contact"]
+size = Vector2(30, 14)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bite"]
+size = Vector2(28, 20)
+
+[node name="GutLeech" type="CharacterBody2D"]
+collision_layer = 8
+collision_mask = 1
+script = ExtResource("1_leech")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -9)
+shape = SubResource("RectangleShape2D_body")
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="Body" type="Polygon2D" parent="Visual"]
+color = Color(0.55, 0.62, 0.3, 1)
+polygon = PackedVector2Array(-20, 0, -22, -6, -16, -14, -4, -18, 8, -18, 18, -12, 22, -4, 20, 0)
+
+[node name="Mouth" type="Polygon2D" parent="Visual"]
+color = Color(0.3, 0.08, 0.1, 1)
+polygon = PackedVector2Array(16, -10, 22, -6, 21, -2, 15, -4)
+
+[node name="Eye" type="Polygon2D" parent="Visual"]
+color = Color(0.95, 0.85, 0.4, 1)
+polygon = PackedVector2Array(8, -14, 12, -14, 12, -10, 8, -10)
+
+[node name="BiteHitbox" type="Area2D" parent="Visual"]
+position = Vector2(26, -9)
+collision_layer = 32
+collision_mask = 0
+script = ExtResource("4_hitbox")
+knockback = 320.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Visual/BiteHitbox"]
+shape = SubResource("RectangleShape2D_bite")
+
+[node name="LedgeCheck" type="RayCast2D" parent="Visual"]
+position = Vector2(22, -4)
+target_position = Vector2(0, 20)
+
+[node name="Sight" type="RayCast2D" parent="."]
+position = Vector2(0, -10)
+target_position = Vector2(100, 0)
+enabled = false
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("2_health")
+max_health = 3
+invulnerable_time = 0.05
+
+[node name="Hurtbox" type="Area2D" parent="." node_paths=PackedStringArray("health")]
+collision_layer = 0
+collision_mask = 16
+script = ExtResource("3_hurtbox")
+health = NodePath("../Health")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, -10)
+shape = SubResource("RectangleShape2D_hurt")
+
+[node name="ContactHitbox" type="Area2D" parent="."]
+collision_layer = 32
+collision_mask = 0
+script = ExtResource("4_hitbox")
+knockback = 260.0
+once_per_activation = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ContactHitbox"]
+position = Vector2(0, -9)
+shape = SubResource("RectangleShape2D_contact")

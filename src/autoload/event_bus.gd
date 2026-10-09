@@ -21,5 +21,9 @@ signal drop_requested(slot: int)
 signal inventory_changed
 ## Show a short message to the player (pickups, saves, warnings).
 signal notify(text: String)
+## The player's host died.
+signal player_died
+## A hand-placed entity (child of Entities in world.tscn) died for good.
+signal entity_killed(entity: Node)
 
 @warning_ignore_restore("unused_signal")

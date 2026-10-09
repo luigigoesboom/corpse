@@ -1,6 +1,6 @@
 class_name Player
 extends CharacterBody2D
-## Player movement: run, jump, wall cling.
+## The player's host: movement (run, jump, wall cling), melee attack, getting hurt.
 ##
 ## CharacterBody2D is Godot's node for things you move yourself in code.
 ## You set `velocity`, call move_and_slide(), and it handles sliding along
@@ -47,6 +47,13 @@ extends CharacterBody2D
 ## immediately steer back into the same wall.
 @export var wall_jump_lock_time := 0.14
 
+@export_group("Combat")
+## How long the attack hitbox stays on, and the time between attacks.
+@export var attack_active_time := 0.1
+@export var attack_cooldown := 0.32
+## Seconds of lost control after being hit (knockback plays out).
+@export var hurt_stun := 0.25
+
 var _gravity := 0.0
 var _jump_velocity := 0.0
 var _coyote_timer := 0.0
@@ -55,17 +62,30 @@ var _jump_buffer_timer := 0.0
 var _wall_lock_timer := 0.0
 var _wall_normal_x := 0.0
 var _clinging := false
+var _attack_timer := 0.0
+var _attack_cooldown_timer := 0.0
+var _hurt_timer := 0.0
+var _dead := false
 
+@onready var health: Health = $Health
 @onready var _visual: Node2D = $Visual
 @onready var _reach: Area2D = $Reach
+@onready var _attack_hitbox: Hitbox = $Visual/AttackHitbox
+@onready var _slash: Node2D = $Visual/Slash
 
 
 func _ready() -> void:
 	_recalculate_jump()
+	add_to_group("player")
+	health.hurt.connect(_on_hurt)
+	health.died.connect(_on_died)
+	_attack_hitbox.deactivate()
+	_slash.visible = false
 
 
 func _physics_process(delta: float) -> void:
-	var input_dir := Input.get_axis("move_left", "move_right")
+	var has_control := not _dead and _hurt_timer <= 0.0
+	var input_dir := Input.get_axis("move_left", "move_right") if has_control else 0.0
 	if _wall_lock_timer > 0.0:
 		input_dir = 0.0
 
@@ -73,14 +93,64 @@ func _physics_process(delta: float) -> void:
 	_update_wall_state(input_dir)
 	_apply_gravity(delta)
 	_apply_run(input_dir, delta)
-	_apply_jump()
+	if has_control:
+		_apply_jump()
 
 	move_and_slide()
 
-	if not is_zero_approx(velocity.x) and not _clinging:
+	if not is_zero_approx(velocity.x) and not _clinging and has_control:
 		_visual.scale.x = signf(velocity.x)
 
-	_handle_items()
+	if has_control:
+		_handle_attack()
+		_handle_items()
+
+
+func _process(_delta: float) -> void:
+	# Flicker while invulnerable after a hit.
+	_visual.visible = _dead or not health.is_invulnerable() or int(Time.get_ticks_msec() / 60) % 2 == 0
+
+
+func is_dead() -> bool:
+	return _dead
+
+
+## Brings the host back (placeholder until death and rebirth, roadmap week 21).
+func respawn(at: Vector2) -> void:
+	_dead = false
+	_hurt_timer = 0.0
+	global_position = at
+	velocity = Vector2.ZERO
+	health.heal_full()
+	_visual.rotation = 0.0
+
+
+func _handle_attack() -> void:
+	if _attack_timer <= 0.0 and _attack_hitbox.active:
+		_attack_hitbox.deactivate()
+		_slash.visible = false
+	if Input.is_action_just_pressed("attack") and _attack_cooldown_timer <= 0.0 and not _clinging:
+		_attack_hitbox.activate()
+		_slash.visible = true
+		_attack_timer = attack_active_time
+		_attack_cooldown_timer = attack_cooldown
+
+
+func _on_hurt(amount: int, from: Vector2, knockback: float) -> void:
+	var away := signf(global_position.x - from.x)
+	if away == 0.0:
+		away = -facing()
+	velocity = Vector2(away * knockback, -knockback * 0.6)
+	_hurt_timer = hurt_stun
+	_attack_hitbox.deactivate()
+	_slash.visible = false
+	DamageNumber.spawn(get_parent(), global_position, amount, Color(1, 0.4, 0.4))
+
+
+func _on_died() -> void:
+	_dead = true
+	_visual.rotation = PI / 2.0  # Placeholder "fallen over".
+	EventBus.player_died.emit()
 
 
 func is_clinging() -> bool:
@@ -117,6 +187,9 @@ func _tick_timers(delta: float) -> void:
 	_wall_coyote_timer -= delta
 	_jump_buffer_timer -= delta
 	_wall_lock_timer -= delta
+	_attack_timer -= delta
+	_attack_cooldown_timer -= delta
+	_hurt_timer -= delta
 	if Input.is_action_just_pressed("jump"):
 		_jump_buffer_timer = jump_buffer_time
 
@@ -143,8 +216,8 @@ func _apply_gravity(delta: float) -> void:
 
 
 func _apply_run(input_dir: float, delta: float) -> void:
-	if _wall_lock_timer > 0.0:
-		return
+	if _wall_lock_timer > 0.0 or _hurt_timer > 0.0:
+		return  # Keep the wall jump or knockback momentum.
 	var turning := input_dir != 0.0 and signf(input_dir) != signf(velocity.x)
 	var rate: float
 	if is_on_floor():

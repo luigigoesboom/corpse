@@ -19,6 +19,8 @@ var world_seed: int
 var year: int = 0
 ## Where the current host is. Written by the game right before saving.
 var player_position := Vector2.ZERO
+## Current host's health. -1 = full.
+var player_health := -1
 ## Item id per pocket (INVENTORY_SIZE entries, &"" = empty). Moves into
 ## LifeRecord in week 21.
 var inventory: Array = []
@@ -91,6 +93,7 @@ func to_dict() -> Dictionary:
 		"world_seed": world_seed,
 		"year": year,
 		"player_position": player_position,
+		"player_health": player_health,
 		"inventory": inventory.duplicate(),
 		"chunk_diffs": chunk_diffs.duplicate(true),
 		"removed_entities": removed_entities.duplicate(),
@@ -103,6 +106,7 @@ static func from_dict(d: Dictionary) -> WorldData:
 	data.world_seed = int(d.get("world_seed", 0))
 	data.year = int(d.get("year", 0))
 	data.player_position = d.get("player_position", Vector2.ZERO)
+	data.player_health = int(d.get("player_health", -1))
 	data.inventory = d.get("inventory", [])
 	data.chunk_diffs = d.get("chunk_diffs", {})
 	data.removed_entities = d.get("removed_entities", {})

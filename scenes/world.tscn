@@ -4,6 +4,8 @@
 [ext_resource type="Script" path="res://src/world/entity_layer.gd" id="2_entities"]
 [ext_resource type="PackedScene" path="res://src/actors/npcs/placeholder_npc.tscn" id="3_npc"]
 [ext_resource type="PackedScene" path="res://src/items/world_item.tscn" id="4_item"]
+[ext_resource type="PackedScene" path="res://src/actors/creatures/training_dummy.tscn" id="5_dummy"]
+[ext_resource type="PackedScene" path="res://src/actors/creatures/gut_leech.tscn" id="6_leech"]
 
 [node name="World" type="Node2D"]
 
@@ -40,3 +42,15 @@ item_id = &"bile_bulb"
 [node name="BoneShard" parent="Entities" instance=ExtResource("4_item")]
 position = Vector2(736, 3104)
 item_id = &"bone_shard"
+
+[node name="TrainingDummy" parent="Entities" instance=ExtResource("5_dummy")]
+position = Vector2(1760, 3200)
+
+[node name="LeechChamber" parent="Entities" instance=ExtResource("6_leech")]
+position = Vector2(2600, 3200)
+
+[node name="LeechCorridor" parent="Entities" instance=ExtResource("6_leech")]
+position = Vector2(6000, 832)
+
+[node name="LeechCavern" parent="Entities" instance=ExtResource("6_leech")]
+position = Vector2(7100, 3872)

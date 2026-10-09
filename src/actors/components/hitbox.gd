@@ -1,0 +1,42 @@
+class_name Hitbox
+extends Area2D
+## The dangerous part of an attack or body. Hurtboxes that overlap it take damage.
+##
+## Which side it hurts is decided by physics layers: put player attacks on the
+## "player_attacks" layer and enemy attacks on "enemy_attacks"; each Hurtbox
+## only looks at the other side's layer.
+
+@export var damage := 1
+@export var knockback := 250.0
+## Attacks: hit each target once per activate(). Leave off for contact damage
+## (always on, e.g. touching an enemy); the target's invulnerability time then
+## spaces the hits out.
+@export var once_per_activation := true
+@export var active := true
+
+var _already_hit: Array[int] = []
+
+
+func _ready() -> void:
+	monitoring = false  # Hurtboxes do the looking.
+
+
+func activate() -> void:
+	active = true
+	_already_hit.clear()
+
+
+func deactivate() -> void:
+	active = false
+
+
+## Asked by a Hurtbox. Returns true (and remembers it) if this may hit it now.
+func try_hit(hurtbox: Node) -> bool:
+	if not active:
+		return false
+	if once_per_activation:
+		var id := hurtbox.get_instance_id()
+		if id in _already_hit:
+			return false
+		_already_hit.append(id)
+	return true

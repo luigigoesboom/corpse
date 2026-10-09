@@ -11,12 +11,16 @@ extends Node2D
 @onready var _chunks: ChunkManager = $ChunkManager
 @onready var _world: Node2D = $World
 @onready var _items: ItemLayer = $Items
+@onready var _entities: EntityLayer = $World/Entities
 
 
 func _ready() -> void:
 	EventBus.world_loaded.connect(_on_world_loaded)
-	(_world.get_node("Entities") as EntityLayer).attach(_chunks)
+	EventBus.player_died.connect(_on_player_died)
+	_entities.attach(_chunks)
 	_items.attach(_chunks, _player)
+	$UI/HUD.bind_health(_player.health)
+	_player.health.changed.connect(_on_player_health_changed)
 	$UI/PauseMenu.save_pressed.connect(quick_save)
 	$UI/PauseMenu.load_pressed.connect(quick_load)
 	if WorldState.data:
@@ -45,6 +49,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func quick_save() -> void:
+	if _player.is_dead():
+		EventBus.notify.emit("Cannot save now")
+		return
 	# The sim never reads nodes, so the game copies node state into the data first.
 	WorldState.data.player_position = _player.global_position
 	var err := SaveSystem.save_game(0)
@@ -57,9 +64,24 @@ func quick_load() -> void:
 
 
 func _on_world_loaded() -> void:
-	_player.global_position = WorldState.data.player_position
-	_player.velocity = Vector2.ZERO
+	var data := WorldState.data
+	var saved_health := data.player_health  # respawn() heals, which overwrites it.
+	_player.respawn(data.player_position)
+	if saved_health >= 0:
+		_player.health.set_current(saved_health)
+	_entities.rebuild()
 	_chunks.reset()
 	# Jump the camera straight there instead of smoothly panning across the map.
 	_player.get_node("Camera2D").reset_smoothing()
 
+
+func _on_player_health_changed(current: int, max_value: int) -> void:
+	WorldState.data.player_health = -1 if current == max_value else current
+
+
+## Placeholder until death and rebirth (roadmap week 21): wake up at the spawn.
+func _on_player_died() -> void:
+	EventBus.notify.emit("Your host has died")
+	await get_tree().create_timer(2.0).timeout
+	_player.respawn(_world.get_node("PlayerSpawn").global_position)
+	_player.get_node("Camera2D").reset_smoothing()
