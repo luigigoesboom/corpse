@@ -94,6 +94,11 @@ Format: ID, date, decision, why, what it rules out.
 - Why: the developer wanted the view slightly zoomed in, and 960 x 540 scales by exactly 2 on 1080p (and 4 on 4K), so pixels stay even. 1280 x 720 scaled by 1.5 on 1080p, which made pixels uneven and camera motion steppy. A Camera2D zoom would have brought uneven pixels back.
 - Trade-off: less of the world visible at once. 1440p scales by 2.67 (uneven), acceptable.
 
+**D-020 Nothing carries over between hosts except through the body** (2026-10-10, answers Q-003)
+- What: on death every item and mutation stays on the corpse. The next host starts with nothing; the only way back to them is reclaiming the body.
+- Why: makes the corpse the point of the loop and keeps each host a fresh start. Cross-life progression, if any, belongs to the fragment (legend), not to inherited mutations.
+- Rules out: mutations surviving death in weakened form (the VISION idea), for now.
+
 ---
 
 ## Open questions
@@ -101,7 +106,6 @@ Format: ID, date, decision, why, what it rules out.
 | ID | Question | Decide by |
 |---|---|---|
 | Q-002 | How many years pass on death, fixed or variable? | Week 23 |
-| Q-003 | Do any mutations carry over between lives without reclaiming the corpse? | Week 25 |
 | Q-004 | Outlines or no outlines in the art style? | Week 15 |
 | Q-005 | Final name of the game. | Before the Steam page, week 45 |
 | Q-006 | Breakable terrain at all? Developer doubts it. If not, week 8 becomes "chunk diffs for entity state only" (dead NPCs, taken items, corpses). | Week 8 |
