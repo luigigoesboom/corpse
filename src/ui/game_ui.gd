@@ -22,6 +22,8 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if death_screen.visible:
 		return  # Only its own button moves on.
+	if _pause.visible and _pause.is_busy():
+		return  # The settings screen handles its own keys.
 	if event.is_action_pressed("pause"):
 		# Escape closes whatever is open first, and only pauses from gameplay.
 		if _inventory.visible or _pause.visible:

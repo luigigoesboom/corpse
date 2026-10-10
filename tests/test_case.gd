@@ -44,6 +44,8 @@ func autoload(autoload_name: String) -> Node:
 
 
 func start_scene(path: String) -> void:
+	# Autosaves (each new life) must never touch the player's own slots.
+	autoload("WorldState").slot = 97
 	game = load(path).instantiate()
 	if game.has_node("CombatFeel"):
 		game.get_node("CombatFeel").hitstop_enabled = false  # Frame-counting tests.

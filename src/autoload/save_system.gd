@@ -5,7 +5,10 @@ extends Node
 ## %APPDATA%\Godot\app_userdata\Corpse\.
 ##
 ## File layout: one Variant (store_var) holding
-##   { "save_version": int, "saved_at": float, "world": WorldData.to_dict() }
+##   { "save_version": int, "saved_at": float, "summary": {...}, "world": WorldData.to_dict() }
+## "summary" (week 41) is what the slot list shows: host name, lives, year,
+## time played. Slots 1..3 are the player's (SLOTS); 0 is the old quick
+## slot, still read; tests use 98 and 99.
 ##
 ## Rules (docs/ARCHITECTURE.md, "Saving"):
 ## - Never store_var/get_var with full_objects / allow_objects. A save file that
@@ -15,6 +18,7 @@ extends Node
 
 const SAVE_DIR := "user://saves"
 const SAVE_VERSION := 21
+const SLOTS := [1, 2, 3]
 
 
 func slot_path(slot: int) -> String:
@@ -38,11 +42,51 @@ func save_game(slot: int) -> Error:
 	file.store_var({
 		"save_version": SAVE_VERSION,
 		"saved_at": Time.get_unix_time_from_system(),
+		"summary": summary_of(WorldState.data),
 		"world": WorldState.data.to_dict(),
 	})
 	file.close()
 
 	return DirAccess.rename_absolute(tmp_path, path)
+
+
+## What a slot holds, for the slot list: {} if empty or unreadable, else
+## {"host", "lives", "year", "seconds", "saved_at", "version"}.
+func summary(slot: int) -> Dictionary:
+	var file := FileAccess.open(slot_path(slot), FileAccess.READ)
+	if file == null:
+		return {}
+	var save: Variant = file.get_var()
+	file.close()
+	if typeof(save) != TYPE_DICTIONARY or typeof(save.get("world")) != TYPE_DICTIONARY:
+		return {}
+	var out: Dictionary = save.get("summary", {})
+	if out.is_empty():  # Saves from before week 41: read it from the world.
+		out = summary_of(WorldData.from_dict(save.world))
+	out["saved_at"] = float(save.get("saved_at", 0.0))
+	out["version"] = int(save.get("save_version", 0))
+	return out
+
+
+static func summary_of(world: WorldData) -> Dictionary:
+	var seconds := 0.0
+	for life in world.lives:
+		seconds += life.seconds_alive
+	var life := world.current_life()
+	return {"host": life.host_name if life else "", "lives": world.lives.size(), "year": world.year, "seconds": seconds}
+
+
+## The slot saved to most recently (player slots and the old quick slot),
+## or -1 if there is none.
+func latest_slot() -> int:
+	var best := -1
+	var best_time := -1.0
+	for slot in [0] + SLOTS:
+		var s := summary(slot)
+		if not s.is_empty() and s.saved_at > best_time:
+			best = slot
+			best_time = s.saved_at
+	return best
 
 
 ## On success, replaces WorldState.data (which emits EventBus.world_loaded).
@@ -61,6 +105,8 @@ func load_game(slot: int) -> Error:
 		return ERR_FILE_UNRECOGNIZED  # Made by a newer build of the game.
 
 	save = _migrate(save)
+	if slot == 0 or slot in SLOTS:
+		WorldState.slot = slot  # Later saves go back where this came from.
 	WorldState.set_data(WorldData.from_dict(save.world))
 	return OK
 

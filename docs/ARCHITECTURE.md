@@ -76,6 +76,14 @@ Buses (res://default_bus_layout.tres): Master <- Music, Ambience (-6 dB), SFX (a
 
 **Our own sounds**: `tools/sound/synth.gd` (tones, noise, squelches, bubbles, drips, heartbeats, filters, seamless loops, WAV writer) and `tools/sound/sounds.gd` (every recipe; run it with `--script res://tools/sound/sounds.gd`).
 
+## Menus, settings and saves (week 41)
+
+**Settings** (autoload, src/autoload/settings.gd): volume per bus, fullscreen, screen shake (GameCamera multiplies by it), and key bindings for `REBINDABLE` actions (a custom key or mouse button replaces the keyboard/mouse default; gamepad buttons stay). Kept in `user://settings.cfg` (`path`; tests use their own), applied at start and on every change.
+
+**Screens** (src/ui, built in code): `SettingsScreen` (Sound / Display / Controls; click an action and press a key to rebind), `SlotScreen` (three slots with "host, life, year, time played"; NEW asks twice before overwriting, LOAD only offers used slots). The main menu (src/ui/main_menu.gd; the backdrop drifting behind the drawn title, Continue = `SaveSystem.latest_slot()`, New game, Load, Settings, Quit, controls along the bottom; test arenas only in debug builds) and the pause menu (Resume, Save, Load last save, Settings, Controls, Main menu, Quit) use them. Look: assets/ui (panel, buttons, slider, check box, title) drawn by tools/pixel/recipes/ui.gd, which also writes assets/ui/theme.tres (run it twice when images are new: they must be imported before the theme can use them).
+
+**Slots**: `WorldState.slot` is where this world saves (1..3 from the menus; 0 = the old quick slot; tests use 97..99). Saves carry a `summary` (`SaveSystem.summary(slot)`); F9 / Save, the start of every life (`Game.autosave()`) and leaving to the menu or quitting all save to it.
+
 ## Autoloads
 
 | Name | Job |

@@ -112,5 +112,8 @@ func snap() -> void:
 
 ## A short screen shake. `strength` is roughly the peak offset in px.
 func shake(strength: float) -> void:
+	strength *= Settings.screen_shake  # Settings: some players want none (week 41).
+	if strength <= 0.0:
+		return
 	_shake.noise.amplitude = strength
 	_shake.emit()

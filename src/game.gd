@@ -25,6 +25,7 @@ func _ready() -> void:
 	_player.health.changed.connect(_on_player_health_changed)
 	$UI/PauseMenu.save_pressed.connect(quick_save)
 	$UI/PauseMenu.load_pressed.connect(quick_load)
+	$UI/PauseMenu.leaving.connect(autosave)
 	$UI.death_screen.continue_pressed.connect(_pass_time)
 	$UI.death_screen.wake_pressed.connect(_start_next_life)
 	EventBus.entity_killed.connect(_on_entity_killed)
@@ -64,14 +65,22 @@ func quick_save() -> void:
 	if _player.is_dead():
 		EventBus.notify.emit("Cannot save now")
 		return
-	# The sim never reads nodes, so the game copies node state into the data first.
-	WorldState.data.player_position = _player.global_position
-	var err := SaveSystem.save_game(0)
+	var err := autosave()
 	EventBus.notify.emit("Saved" if err == OK else "Save failed: %s" % error_string(err))
 
 
+## Saves the world to its slot (WorldState.slot) without a message: at the
+## start of every life and when leaving to the menu or quitting (week 41).
+func autosave() -> Error:
+	if _player.is_dead() or WorldState.data == null:
+		return ERR_BUSY
+	# The sim never reads nodes, so the game copies node state into the data first.
+	WorldState.data.player_position = _player.global_position
+	return SaveSystem.save_game(WorldState.slot)
+
+
 func quick_load() -> void:
-	var err := SaveSystem.load_game(0)
+	var err := SaveSystem.load_game(WorldState.slot)
 	EventBus.notify.emit("Loaded" if err == OK else "Load failed: %s" % error_string(err))
 
 
@@ -193,6 +202,7 @@ func _start_next_life(option: Dictionary = {}) -> void:
 	EventBus.mutations_changed.emit()
 	var life := data.current_life()
 	Sfx.play(&"rebirth")
+	autosave.call_deferred()  # A new life is a good moment to keep (week 41).
 	EventBus.notify.emit("You wake as %s, a %s, at %s." % [life.host_name, host.display_name, life.origin])
 
 
