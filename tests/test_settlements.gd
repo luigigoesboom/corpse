@@ -13,18 +13,18 @@ func run() -> void:
 	bus.notify.connect(func(text): messages.append(text))
 	var data = state.data
 
-	# Sites from faction data.
-	var camp_site = data.sites["TenderCamp"]
-	var chapel_site = data.sites["ChoirChapel"]
+	# Slots are filled with settlements from history.
+	var camp_site = data.site_in_slot("TenderCamp")
+	var chapel_site = data.site_in_slot("ChoirChapel")
 	check(camp_site.faction == &"flesh_tenders" and chapel_site.faction == &"choir_of_waking", "each slot is settled by its faction")
-	check(camp_site.population == 6 and chapel_site.population == 4, "residents scale with strength, up to capacity (6 and 4)")
-	check(camp_site.name != "" and camp_site.name == Names.place_name(data.world_seed, "TenderCamp"), "sites get repeatable generated names (%s)" % camp_site.name)
+	check(camp_site.founded_year < data.year and camp_site.name != "", "with a settlement from history (%s, founded in year %d)" % [camp_site.name, camp_site.founded_year])
 
 	# Built from the kit.
 	await goto(Vector2(1220, 3170), 30)
 	var camp = entity("TenderCamp")
 	var props := camp.get_children().filter(func(c): return c.has_meta(&"built") and c.get(&"work_spot") != null)
-	check(camp.residents.size() == 6 and props.size() >= 5 and camp.work_spot_count() >= 3, "the camp builds 6 residents and its props (%d props, %d work spots)" % [props.size(), camp.work_spot_count()])
+	check(camp.residents.size() == camp_site.residents_shown(6) and camp.residents.size() >= 1 and props.size() >= 5 and camp.work_spot_count() >= 3,
+		"the camp builds residents for its %d people and its props (%d residents, %d props, %d work spots)" % [camp_site.population, camp.residents.size(), props.size(), camp.work_spot_count()])
 	check(camp.residents.all(func(npc): return npc.sprite.body_frames_dir.ends_with("npcs/tender")), "residents wear their faction's look")
 	var layout: Array = props.map(func(p): return [p.scene_file_path, p.position])
 	camp.build()
@@ -54,13 +54,13 @@ func run() -> void:
 		"a resident near you says one of its faction's lines")
 
 	# History owns the sites: changes are saved and show when rebuilt.
-	camp_site.population = 2
+	camp_site.population = 2 * 25
 	data.player_position = player.global_position
 	saves.save_game(98)
 	saves.load_game(98)
 	await wait_frames(30)
-	check(state.data.sites["TenderCamp"].population == 2 and entity("TenderCamp").residents.size() == 2, "a smaller population survives a save and shows")
-	state.data.sites["TenderCamp"].faction = &""
+	check(state.data.site_in_slot("TenderCamp").population == 50 and entity("TenderCamp").residents.size() == 2, "a smaller population survives a save and shows (50 people, 2 residents)")
+	state.data.site_in_slot("TenderCamp").faction = &""
 	entity("TenderCamp").build()
 	check(entity("TenderCamp").residents.is_empty(), "an abandoned site has nobody in it")
 
@@ -70,4 +70,6 @@ func run() -> void:
 	file.close()
 	check(saves.load_game(99) == OK, "a version 10 save loads")
 	await wait_frames(30)
-	check(state.data.sites.size() == 2 and entity("TenderCamp").residents.size() == 6, "and gets its settlements")
+	var old_camp = state.data.site_in_slot("TenderCamp")
+	check(old_camp != null and state.data.site_in_slot("ChoirChapel") != null and entity("TenderCamp").residents.size() == old_camp.residents_shown(6),
+		"and gets a history and its settlements")

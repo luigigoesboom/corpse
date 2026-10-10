@@ -5,9 +5,9 @@ extends Node2D
 ## scenes/world.tscn on a FLAT floor (origin on the floor line: tile top +
 ## ChunkData.FLOOR_SINK) and set its width.
 ##
-## What lives here is not placed by hand: it comes from WorldData.sites under
-## this node's name (filled from faction territory when a world starts,
-## changed by history later). At runtime the settlement builds itself from its
+## What lives here is not placed by hand: it is the site in WorldData.sites
+## whose `slot` is this node's name (SiteSeeder fills slots from history when
+## a world starts). Residents shown scale with the site's population. At runtime the settlement builds itself from its
 ## owners' FactionDef: their props laid out along the floor, and residents
 ## who idle, stroll, work at the props, chat, and talk to you.
 
@@ -54,7 +54,7 @@ func build() -> void:
 	_work_spots.clear()
 	if WorldState.data == null:
 		return
-	site = WorldState.data.sites.get(EntityLayer.key_of(self))
+	site = WorldState.data.site_in_slot(EntityLayer.key_of(self))
 	if site == null or not site.is_lived_in():
 		return
 	var def := FactionDb.get_def(site.faction)
@@ -63,7 +63,7 @@ func build() -> void:
 	var rng := SeededRng.make([WorldState.data.world_seed, "settlement", site.id])
 	_lay_out_props(def, rng)
 	var bounds := walk_bounds()
-	for i in site.population:
+	for i in site.residents_shown(capacity):
 		var npc: ColonyNpc = RESIDENT.instantiate()
 		npc.setup(self, Names.resident_name(WorldState.data.world_seed, site.id, i), def.npc_frames_dir, rng.randi())
 		npc.position = Vector2(rng.randf_range(bounds.x, bounds.y), 0)

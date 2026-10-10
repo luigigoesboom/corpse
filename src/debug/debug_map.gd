@@ -76,39 +76,43 @@ func _draw_factions(origin: Vector2, chunk_px: float) -> void:
 		return
 	var font := get_theme_default_font()
 	for faction: FactionData in WorldState.data.factions.values():
-		var def := FactionDb.get_def(faction.id)
-		if def == null or not faction.is_alive() or faction.territory.is_empty():
+		if not faction.is_alive() or faction.territory.is_empty():
 			continue
 		var middle := Vector2.ZERO
 		for chunk in faction.territory:
 			var rect := Rect2(origin + Vector2(chunk) * chunk_px, Vector2.ONE * chunk_px)
-			draw_rect(rect, Color(def.color, 0.35))
-			draw_rect(rect.grow(-2.0), def.color, false, 2.0)
+			draw_rect(rect, Color(faction.color, 0.35))
+			draw_rect(rect.grow(-2.0), faction.color, false, 2.0)
 			middle += rect.get_center()
 		middle /= faction.territory.size()
-		var width := font.get_string_size(def.display_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
-		draw_string_outline(font, middle - Vector2(width / 2.0, 0), def.display_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, 4, Color.BLACK)
-		draw_string(font, middle - Vector2(width / 2.0, 0), def.display_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, def.color.lightened(0.4))
+		var width := font.get_string_size(faction.display_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
+		draw_string_outline(font, middle - Vector2(width / 2.0, 0), faction.display_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, 4, Color.BLACK)
+		draw_string(font, middle - Vector2(width / 2.0, 0), faction.display_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, faction.color.lightened(0.4))
 
 
-## The legend, one line per faction: name, strength, chunks held, relations.
+## The legend, one line per living faction (hand-made ones first): name,
+## strength, chunks held (or "elsewhere"), feelings about the hand-made ones.
 func legend_lines() -> Array:
 	var lines := []
 	if WorldState.data == null:
 		return lines
 	var factions: Dictionary = WorldState.data.factions
-	for id in FactionDb.all_ids():
-		if not factions.has(id):
-			continue
+	var order: Array = FactionDb.all_ids().filter(func(id): return factions.has(id))
+	for faction: FactionData in factions.values():
+		if not faction.defined and faction.is_alive():
+			order.append(faction.id)
+	for id in order:
 		var faction: FactionData = factions[id]
-		var def := FactionDb.get_def(id)
+		if not faction.is_alive():
+			continue
 		var feelings := PackedStringArray()
-		for other in faction.relations:
-			var other_def := FactionDb.get_def(other)
-			feelings.append("%s %+d" % [other_def.display_name if other_def else String(other), faction.relations[other]])
+		for other in FactionDb.all_ids():
+			if other != id and faction.relations.has(other):
+				feelings.append("%s %+d" % [factions[other].display_name if factions.has(other) else String(other), faction.relations[other]])
+		var land := "%d chunks" % faction.territory.size() if not faction.territory.is_empty() else ("elsewhere" if not faction.defined else "0 chunks")
 		lines.append({
-			"text": "%s: strength %d, %d chunks%s" % [def.display_name, faction.strength, faction.territory.size(),
+			"text": "%s: %d people, %s%s" % [faction.display_name, faction.strength, land,
 				("; " + ", ".join(feelings)) if not feelings.is_empty() else ""],
-			"color": def.color.lightened(0.3),
+			"color": faction.color.lightened(0.3),
 		})
 	return lines

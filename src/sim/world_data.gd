@@ -45,7 +45,8 @@ var events: Array[EventRecord] = []
 ## Faction id -> FactionData (week 26). Filled when a world starts, from
 ## data/factions and the painted territory map (FactionTerritory).
 var factions: Dictionary = {}
-## Site id (the slot's node name in world.tscn) -> SiteData (week 27).
+## Site id -> SiteData (weeks 27, 28): every place history founded, lived
+## in or ruined. Some sit in a hand-made slot (SiteData.slot).
 var sites: Dictionary = {}
 
 
@@ -54,6 +55,14 @@ static func create(seed_value: int) -> WorldData:
 	data.world_seed = seed_value
 	data._fit_inventory()
 	return data
+
+
+## The site in a hand-made slot (a Settlement node's name), or null.
+func site_in_slot(slot: String) -> SiteData:
+	for site: SiteData in sites.values():
+		if site.slot == slot:
+			return site
+	return null
 
 
 ## The faction holding a chunk, or &"" if nobody does.

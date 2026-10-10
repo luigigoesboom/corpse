@@ -6,8 +6,9 @@ extends RefCounted
 ## can be painted as a layer over the world in Krita. Paint each faction's land
 ## in its FactionDef.color; leave the rest transparent. A chunk belongs to the
 ## faction with the most paint in it, if that is at least MIN_SHARE of the chunk.
-## Only used when a world starts: after that, territory is WorldData's and
-## history may change it.
+## Applied once when a world starts, after its history (HistorySim) made the
+## factions: the painted map is the present day. Only factions that exist and
+## are alive get land; peoples the history invented live elsewhere.
 
 const PATH := "res://data/maps/territory.png"
 const MIN_SHARE := 0.1
@@ -15,16 +16,14 @@ const MIN_SHARE := 0.1
 const COLOR_TOLERANCE := 0.25
 
 
-## Fills data.factions from data/factions and the territory map.
-static func seed_factions(data: WorldData) -> void:
-	data.factions.clear()
-	for id in FactionDb.all_ids():
-		data.factions[id] = FactionData.from_def(FactionDb.get_def(id), data.year)
-	_make_relations_mutual(data)
+## Gives the painted territory to the factions in data.factions.
+static func apply_territory(data: WorldData) -> void:
+	for faction in data.factions.values():
+		faction.territory.clear()
 	var claims := read_claims()
 	for chunk in claims:
 		var faction: FactionData = data.factions.get(claims[chunk])
-		if faction:
+		if faction and faction.is_alive():
 			faction.territory.append(chunk)
 	for faction in data.factions.values():
 		faction.territory.sort()
@@ -72,17 +71,3 @@ static func _match(pixel: Color, colors: Dictionary) -> StringName:
 			best_distance = distance
 			best = id
 	return best
-
-
-## Defs may list a relation on one side only, or disagree: both sides start
-## from the average of what each says (missing = 0).
-static func _make_relations_mutual(data: WorldData) -> void:
-	var ids := data.factions.keys()
-	for i in ids.size():
-		for j in range(i + 1, ids.size()):
-			var a: StringName = ids[i]
-			var b: StringName = ids[j]
-			var ab: int = FactionDb.get_def(a).relations.get(b, 0)
-			var ba: int = FactionDb.get_def(b).relations.get(a, 0)
-			var has_both := FactionDb.get_def(a).relations.has(b) and FactionDb.get_def(b).relations.has(a)
-			data.set_relation(a, b, (ab + ba) / 2 if has_both else ab + ba)

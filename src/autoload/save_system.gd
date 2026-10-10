@@ -14,7 +14,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 11
+const SAVE_VERSION := 12
 
 
 func slot_path(slot: int) -> String:
@@ -122,4 +122,12 @@ func _migrate(save: Dictionary) -> Dictionary:
 		# slots from faction territory when the world loads.
 		save.world["sites"] = []
 		save.save_version = 11
+	if save.save_version == 11:
+		# v12 (week 28, D-025): history. Factions carry their own identity
+		# (filled from their FactionDef when loaded); a site's population is
+		# people, not residents shown, and sites say which slot they are in.
+		for site in save.world.get("sites", []):
+			site["population"] = int(site.get("population", 0)) * SiteData.PEOPLE_PER_RESIDENT
+			site["slot"] = site.get("id", "")
+		save.save_version = 12
 	return save

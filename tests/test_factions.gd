@@ -25,16 +25,17 @@ func run() -> void:
 	# A new world gets them.
 	await start_scene("res://game.tscn")
 	var data = state.data
-	check(data.factions.size() == 2, "a new world has both factions")
+	check(data.factions.has(&"flesh_tenders") and data.factions.has(&"choir_of_waking") and data.factions[&"flesh_tenders"].is_alive()
+		and data.factions[&"choir_of_waking"].is_alive(), "a new world has both hand-made factions, alive")
 	check(data.faction_at(Vector2i(0, 1)) == &"flesh_tenders" and data.faction_at(Vector2i(1, 1)) == &"choir_of_waking",
 		"faction_at() knows who holds a chunk")
-	check(data.relation(&"flesh_tenders", &"choir_of_waking") == data.relation(&"choir_of_waking", &"flesh_tenders")
-		and data.relation(&"flesh_tenders", &"choir_of_waking") == -25, "relations start mutual: the average of both views (-25)")
+	check(data.relation(&"flesh_tenders", &"choir_of_waking") == data.relation(&"choir_of_waking", &"flesh_tenders"),
+		"relations are mutual (history set them: %d)" % data.relation(&"flesh_tenders", &"choir_of_waking"))
 	data.set_relation(&"flesh_tenders", &"choir_of_waking", -150)
 	check(data.relation(&"choir_of_waking", &"flesh_tenders") == -100, "set_relation() is mutual and clamped")
 
 	# Settlements belong to factions (week 27 builds them, see test_settlements).
-	check(data.sites["TenderCamp"].faction == &"flesh_tenders" and data.sites["ChoirChapel"].faction == &"choir_of_waking",
+	check(data.site_in_slot("TenderCamp").faction == &"flesh_tenders" and data.site_in_slot("ChoirChapel").faction == &"choir_of_waking",
 		"each settlement slot is settled by a faction")
 
 	# Saved and loaded.
@@ -55,10 +56,10 @@ func run() -> void:
 	file.close()
 	check(saves.load_game(99) == OK, "a version 9 save still loads")
 	await wait_frames(3)
-	check(state.data.factions.size() == 2 and state.data.faction_at(Vector2i(0, 1)) == &"flesh_tenders",
-		"and gets the starting factions")
+	check(state.data.factions.has(&"choir_of_waking") and state.data.faction_at(Vector2i(0, 1)) == &"flesh_tenders",
+		"and gets a history and the present-day factions")
 
 	# The debug map lists them.
 	var lines: Array = game.get_node("UI/DebugMap").legend_lines()
-	check(lines.size() == 2 and lines[0].text.begins_with("Choir of Waking:") and lines[1].text.begins_with("Flesh-Tenders:") and "chunks" in lines[0].text,
+	check(lines.size() >= 2 and lines[0].text.begins_with("Choir of Waking:") and lines[1].text.begins_with("Flesh-Tenders:") and "chunks" in lines[0].text,
 		"the debug map's legend lists each faction")

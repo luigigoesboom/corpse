@@ -39,6 +39,7 @@ func _start_new_world() -> void:
 	# randi() is fine here: picking a seed is not generation.
 	var seed_value := new_world_seed if new_world_seed != 0 else randi()
 	var data := WorldData.create(seed_value)
+	data.year = HistorySim.YEARS  # The past is simulated when the world loads.
 	data.player_position = _world.get_node("PlayerSpawn").global_position
 	data.start_life(&"colonist", "", "the Flesh-Tender camp")
 	WorldState.set_data(data)
@@ -79,9 +80,10 @@ func _process(delta: float) -> void:
 func _on_world_loaded() -> void:
 	var data := WorldState.data
 	if data.factions.is_empty():
-		FactionTerritory.seed_factions(data)  # A new world, or a save from before week 26.
-	if data.sites.is_empty():
-		SiteSeeder.seed_sites(data, _entities.templates().filter(func(t): return t is Settlement))
+		# A new world, or a save from before week 26: give it a past (D-025).
+		HistorySim.run(data)
+		FactionTerritory.apply_territory(data)
+	SiteSeeder.fill_slots(data, _entities.templates().filter(func(t): return t is Settlement))
 	if data.current_life() == null:
 		data.start_life(&"colonist")  # Saves from before week 21 have no lives.
 	$UI.close_all()

@@ -219,34 +219,23 @@ Places are hand-made slots; what fills them is data. A `Settlement` node (src/wo
 
 At runtime the Settlement builds itself from the owner's FactionDef: `settlement_props` (SettlementProp scenes: width, work spot, worker offset) shuffled with a SeededRng per site and spread along the floor, and `population` `ColonyNpc` residents (src/actors/npcs) in the faction's `npc_frames_dir` look. Residents walk along the floor without physics, idle, stroll, claim and work at work spots, chat with an idle neighbour, look at a nearby player; the settlement shows its name when you walk in and makes the resident nearest you say one of the faction's `barks` every few seconds. Residents are not saved individually; changing a SiteData (population, faction) and calling `build()` changes what is shown.
 
-## History sim
+## History sim (week 28, D-025)
 
-Two speeds, same code:
+`HistorySim.run(data)` (src/sim/history) simulates the Gut's past, year by year, when a world is created: 2000 years ending in the year the game starts (new worlds start in year 2000 after the Fall). It runs once; between lives time still passes as rolled aftermath (D-021). Everything comes from one `SeededRng` for the world seed, so the same seed gives the same history, word for word; it takes about half a second.
 
-| Mode | When | Span | Detail |
-|---|---|---|---|
-| Worldgen | New world | ~2000 years | Coarse: factions found sites, war, decline. |
-| Between lives | On death | 5 to 50 years | Finer: specific NPCs, your corpse, reactions to your deeds. |
+| Thing | How |
+|---|---|
+| Peoples | 2-3 arrive in year 1, more later when few are left (`people_arrived`). Invented ones get a name, archetype and temperament from `HistoryNames` (farmers, diggers, hunters, cult, scavengers) and live only in `FactionData` (saved). |
+| Destined factions | The Flesh-Tenders are founded early (year 5-220). The Choir of Waking is born in year 700-1500 as a prophet's schism from the most devout people of the day (or from pilgrims if nobody is devout). Neither can lose its last settlement or fall; if one ends small, pilgrims join it in the present (`pilgrims_joined`). |
+| Population | Lives on sites (`SiteData.population`, people); a faction's strength is the sum. Settlements grow (faster with expansion, slower at war), crowd and send settlers out (`site_founded`). `GUT_CAPACITY` is how many people the Gut can feed: the fuller it is, the slower everyone grows and the more neighbours sour on each other. |
+| Relations | Drift each year toward a target from shared values, piety gap, aggression and Gut pressure. Low enough and an aggressive side declares war (`war_declared`, with a cause); wars have battles (`site_taken`, `site_razed`, `raid_repelled`, `last_stand`; a repeated siege is told once) until `peace`. Friendly traders make one `trade_pact` per pair. |
+| Splits and wonders | Big factions split (`schism`, the splinter takes a settlement); devout ones have prophets (`prophet`); rarely something wonderful happens (`wonder`: relics, veins, hunts, salvage, harvests). |
+| Disasters | Bile floods, rot plague, spasms, famine (`disaster`); a settlement left with almost nobody is abandoned (`site_abandoned`, becomes a ruin). |
+| Endings | A faction with no settlements or almost nobody left is gone (`faction_fell`); its settlements are ruins (kind `&"ruin"`, `ended_year`). |
 
-Each tick:
+After history: `FactionTerritory.apply_territory()` gives the painted present-day territory to the factions that exist, and `SiteSeeder.fill_slots()` puts each hand-made Settlement slot's faction's biggest free settlement into it (`SiteData.slot`). Surviving invented peoples live "elsewhere" in the body: future regions can give them land.
 
-1. Each faction acts based on its traits and situation (grow, expand, trade, attack, schism, worship).
-2. Body systems tick (rot spread, spasms).
-3. Every meaningful change becomes an `EventRecord`:
-
-```gdscript
-class_name EventRecord
-extends RefCounted
-
-var id: int
-var year: int
-var type: StringName                 # founded_site, war_declared, site_ruined, corpse_enshrined...
-var actors: Array = []               # faction_ids or figure_ids
-var site_id: int = -1
-var data: Dictionary = {}            # type-specific details
-```
-
-Text is generated from events when shown (murals, rumors, artifact descriptions), not stored. That way you can improve the writing later and old saves get better text too.
+Events are `EventRecord`s (id, year, type, actors = faction ids, data = site id, cause, dead, names...). `EventText.describe()` / `line()` turn them into sentences when shown, with a few phrasings per type picked by event id; nothing is stored as text, so better writing improves old saves. F2 in game shows the whole log (`HistoryLog`, a debug tool; players will learn history from murals and rumors).
 
 ## Death and rebirth flow
 

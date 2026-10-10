@@ -119,6 +119,11 @@ Format: ID, date, decision, why, what it rules out.
 - Why: the developer found movement stiff and wanted a dodge; it is also the systemic answer to a hit you can see coming, which fits loose combat (D-018).
 - Consequences: every host needs a `dodge` animation (placeholders generated); mutation overlays too.
 
+**D-025 The past is simulated at world creation; destined factions** (2026-10-10, week 28)
+- What: a new world gets 2000 years of history, simulated year by year from its seed before play starts (the game starts in year 2000 after the Fall). Invented peoples arrive, settle, trade, war, split and die out; the hand-made factions are destined: the Flesh-Tenders appear early, the Choir of Waking is born mid-history as a schism from the most devout people of the time, and neither can vanish. Surviving invented peoples live elsewhere in the body. History is saved (factions, sites, events), not regenerated, so improving the sim never rewrites an existing world's past.
+- Why: VISION's "generated history" pillar, while keeping the hand-made world (D-010) and the hand-written present-day factions the game is built around. Year-by-year simulation is fine here because it happens once, before play; D-021 still keeps death-to-death time cheap.
+- Consequences: settlement slots take their sites from history (names, founding years, populations); SiteData.population is people (residents shown = people / 25); FactionData carries its own identity. Save version 12.
+
 ---
 
 ## Open questions
