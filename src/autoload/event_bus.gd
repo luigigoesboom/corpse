@@ -38,6 +38,13 @@ signal entity_killed(entity: Node)
 
 @warning_ignore_restore("unused_signal")
 
+## The current host's ichor changed (week 34).
+signal ichor_changed
+## A host gained ichor at a place in the world (orbs fly from there).
+signal ichor_gained(amount: int, position: Vector2)
+## The fragment bought a boon at a heart-root.
+signal boon_bought(id: StringName)
+
 ## A boss noticed the player: show its health bar.
 signal boss_engaged(boss: Node)
 ## A boss died.

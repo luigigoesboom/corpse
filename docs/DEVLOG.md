@@ -13,6 +13,11 @@ Next:
 
 ---
 
+## Week 34: ichor (2026-10-10)
+Done: D-027 after the developer said lives felt a bit pointless. Ichor, the god's dried blood: killing gives it (deeper creatures more), clots lie in the ruins and down in the deep tunnel, and the host carries it, shown under the hearts with drops flying in. At death it stays in the body (the epitaph says how much); go back for it, or lose some to drying, eating and looting between lives. Heart-roots drink it and bank it for good: the Choir's altar in its chapel (refuses you if they hate you, pleased by every offering) and a wild root in the deep tunnel. Banked ichor buys four boons that last across lives: sense your old body (a mark on screen), one more heart, four hosts to pick from, one graft that survives death. Save version 17. tests/test_ichor.gd covers the rules and the done-when (die carrying ichor, go back, bank it, buy a heart, the next host has it). Roadmap reshuffled (D-027).
+Not done: placeholder art for the roots and clots; no ichor from the boss in the world yet (week 37 places her); boons are single purchases with no levels.
+Next: week 35, murals and lore objects.
+
 ## Week 33: corpse fate driven by factions (2026-10-10)
 Done: between lives, the people whose land your body lies in decide what to do with it. The Choir mostly carries it to the shrine at its chapel and keeps it whole (sometimes cuts it open to see what grew in it); the Flesh-Tenders mostly eat what grew on it or empty its pockets. The Choir senses the fragment, so now and then it fetches a body from someone else's land, but never honours one if it hates the fragment. The rebirth screen hint says who took it and where, the Lives tab too, the Choir gossips about it, and the body shows it ("the enshrined body of ..."). Taking your things back from their shrine is robbing it: the Choir turns on you and remembers it next life, unless they count you a friend. Save version 16. tests/test_corpse_fate.gd: 40 deaths each in Choir and Tender land, spite, the full find-it-in-the-shrine-and-take-it-back loop, save and load.
 Not done: no shrine art around the body (it lies at the settlement's left end); studied bodies leave no notes or research yet; the Flesh-Tenders do not use what they took.

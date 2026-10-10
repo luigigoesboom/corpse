@@ -12,6 +12,8 @@
 [ext_resource type="Script" path="res://src/world/spawn_point.gd" id="11_spawn"]
 [ext_resource type="Script" path="res://src/world/settlement.gd" id="12_settlement"]
 [ext_resource type="Script" path="res://src/world/ruin_site.gd" id="13_ruin"]
+[ext_resource type="PackedScene" path="res://src/world/heart_root.tscn" id="14_root"]
+[ext_resource type="PackedScene" path="res://src/world/ichor_clot.tscn" id="15_clot"]
 
 [node name="World" type="Node2D"]
 
@@ -165,3 +167,38 @@ width = 360.0
 position = Vector2(7296, 3206)
 script = ExtResource("13_ruin")
 width = 420.0
+
+[node name="ChoirAltar" parent="Entities" instance=ExtResource("14_root")]
+position = Vector2(3760, 3206)
+keeper = &"choir_of_waking"
+
+[node name="WildRoot" parent="Entities" instance=ExtResource("14_root")]
+position = Vector2(5600, 3878)
+
+[node name="ClotChamberRuin" parent="Entities" instance=ExtResource("15_clot")]
+position = Vector2(3200, 3206)
+amount = 15
+
+[node name="ClotCavernRuin" parent="Entities" instance=ExtResource("15_clot")]
+position = Vector2(7460, 3206)
+amount = 15
+
+[node name="ClotDeepWest" parent="Entities" instance=ExtResource("15_clot")]
+position = Vector2(4400, 3878)
+amount = 25
+
+[node name="ClotDeepEast" parent="Entities" instance=ExtResource("15_clot")]
+position = Vector2(7700, 3878)
+amount = 30
+
+[node name="ClotLowLedge" parent="Entities" instance=ExtResource("15_clot")]
+position = Vector2(6700, 3526)
+amount = 20
+
+[node name="ClotHeights" parent="Entities" instance=ExtResource("15_clot")]
+position = Vector2(7450, 1606)
+amount = 12
+
+[node name="ClotUpperTunnel" parent="Entities" instance=ExtResource("15_clot")]
+position = Vector2(5300, 838)
+amount = 10

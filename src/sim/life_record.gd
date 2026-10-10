@@ -42,6 +42,9 @@ var corpse_position := Vector2.ZERO
 ## What is still on the body. Starts as everything the host had; shrinks as
 ## a later host (or someone else) takes things.
 var corpse_items: Array = []
+## Ichor the host carried at death, and what is still on the body (week 34).
+var carried_ichor := 0
+var corpse_ichor := 0
 var corpse_mutations: Dictionary = {}
 
 
@@ -58,7 +61,7 @@ func to_dict() -> Dictionary:
 		"kills": kills.duplicate(), "deed_event_ids": deed_event_ids.duplicate(),
 		"corpse_state": corpse_state, "corpse_position": corpse_position,
 		"corpse_faction": corpse_faction, "corpse_site": corpse_site,
-		"corpse_items": corpse_items.duplicate(), "corpse_mutations": corpse_mutations.duplicate(),
+		"corpse_items": corpse_items.duplicate(), "carried_ichor": carried_ichor, "corpse_ichor": corpse_ichor, "corpse_mutations": corpse_mutations.duplicate(),
 	}
 
 
@@ -82,9 +85,11 @@ static func from_dict(d: Dictionary) -> LifeRecord:
 	life.corpse_faction = d.get("corpse_faction", &"")
 	life.corpse_site = str(d.get("corpse_site", ""))
 	life.corpse_items = d.get("corpse_items", [])
+	life.carried_ichor = int(d.get("carried_ichor", 0))
+	life.corpse_ichor = int(d.get("corpse_ichor", 0))
 	life.corpse_mutations = d.get("corpse_mutations", {})
 	return life
 
 
 func has_corpse_loot() -> bool:
-	return not corpse_items.is_empty() or not corpse_mutations.is_empty()
+	return not corpse_items.is_empty() or not corpse_mutations.is_empty() or corpse_ichor > 0

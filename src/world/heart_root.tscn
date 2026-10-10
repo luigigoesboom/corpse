@@ -1,0 +1,52 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/world/heart_root.gd" id="1_root"]
+[ext_resource type="Texture2D" path="res://assets/lights/light_banded.tres" id="2_light"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="3_unshaded"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_reach"]
+size = Vector2(70, 60)
+
+[node name="HeartRoot" type="Area2D"]
+z_index = -1
+collision_layer = 2
+collision_mask = 4
+script = ExtResource("1_root")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -30)
+shape = SubResource("RectangleShape2D_reach")
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="Roots" type="Polygon2D" parent="Visual"]
+color = Color(0.42, 0.13, 0.16, 1)
+polygon = PackedVector2Array(-40, 0, -30, -6, -18, -4, -12, -14, -6, -40, 2, -62, 8, -38, 14, -12, 22, -4, 34, -6, 42, 0)
+
+[node name="Vein" type="Polygon2D" parent="Visual"]
+material = ExtResource("3_unshaded")
+color = Color(0.86, 0.2, 0.24, 1)
+polygon = PackedVector2Array(-2, -6, 0, -30, 2, -50, 5, -30, 4, -6)
+
+[node name="Bulb" type="Polygon2D" parent="Visual"]
+material = ExtResource("3_unshaded")
+color = Color(1, 0.36, 0.33, 1)
+polygon = PackedVector2Array(10, -30, 8.7, -25, 5, -21.3, 0, -20, -5, -21.3, -8.7, -25, -10, -30, -8.7, -35, -5, -38.7, 0, -40, 5, -38.7, 8.7, -35)
+
+[node name="Light" type="PointLight2D" parent="."]
+position = Vector2(0, -30)
+color = Color(1, 0.35, 0.3, 1)
+energy = 0.8
+shadow_enabled = true
+texture = ExtResource("2_light")
+
+[node name="Prompt" type="Label" parent="."]
+material = ExtResource("3_unshaded")
+offset_left = -110.0
+offset_top = -92.0
+offset_right = 110.0
+offset_bottom = -70.0
+horizontal_alignment = 1
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+text = "E: a heart-root"

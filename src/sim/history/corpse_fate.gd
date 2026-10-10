@@ -57,13 +57,19 @@ static func claim(data: WorldData, index: int, faction: StringName, fate: String
 			details["site"] = site.id
 			if fate == &"studied":
 				details["mutations"] = life.corpse_mutations.values()
+				details["ichor"] = life.corpse_ichor
 				life.corpse_mutations.clear()
+				life.corpse_ichor = 0  # They bled it to study it.
 		&"eaten":
 			details["mutations"] = life.corpse_mutations.values()
+			details["ichor"] = life.corpse_ichor
 			life.corpse_mutations.clear()
+			life.corpse_ichor = 0
 		&"looted":
 			details["items"] = life.corpse_items.duplicate()
+			details["ichor"] = life.corpse_ichor / 2
 			life.corpse_items.clear()
+			life.corpse_ichor -= life.corpse_ichor / 2
 	data.log_event(&"corpse_claimed", [life.host_name, faction], details)
 	var hint := ""
 	match fate:

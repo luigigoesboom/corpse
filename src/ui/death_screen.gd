@@ -44,7 +44,7 @@ func show_time(report: Dictionary, options: Array = []) -> void:
 	for option in options:
 		var host := HostDb.get_def(option.host_type)
 		var button := Button.new()
-		button.text = "%s, a %s, wakes at %s  (%d hearts)" % [option.host_name, host.display_name, option.place, host.max_health]
+		button.text = "%s, a %s, wakes at %s  (%d hearts)" % [option.host_name, host.display_name, option.place, host.max_health + (1 if WorldState.data.has_boon(&"hardy") else 0)]
 		button.tooltip_text = host.description
 		button.pressed.connect(wake_pressed.emit.bind(option))
 		%Options.add_child(button)
@@ -75,6 +75,8 @@ func show_life(life: LifeRecord, life_number: int) -> void:
 			var mutation := MutationDb.get_def(life.carried_mutations[slot])
 			parts.append(mutation.display_name if mutation else String(life.carried_mutations[slot]))
 		lines.append("Grew: %s." % ", ".join(parts))
+	if life.carried_ichor > 0:
+		lines.append("%d ichor stays in the body." % life.carried_ichor)
 	if not life.carried_items.is_empty():
 		lines.append("Carried: %s." % ", ".join(life.carried_items.map(func(id): return ItemDb.display_name(id))))
 	if life.has_corpse_loot():

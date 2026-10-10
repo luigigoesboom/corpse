@@ -18,7 +18,13 @@ static func start(speaker: Node, speaker_name: String, faction_id: StringName, r
 		Sfx.play(&"pickup")
 		if talk.standing_message != "":
 			EventBus.notify.emit(talk.standing_message))
+	open(speaker, RESIDENT, talk)
+	return talk
+
+
+## Opens any .dialogue with `state` as the object it reads names from
+## (heart-roots use RootTalk, week 34).
+static func open(speaker: Node, dialogue: Resource, state: Object) -> void:
 	var balloon: DialogueBalloon = BALLOON.instantiate()
 	speaker.get_tree().root.add_child(balloon)
-	balloon.start(RESIDENT, "start", [talk])
-	return talk
+	balloon.start(dialogue, "start", [state])

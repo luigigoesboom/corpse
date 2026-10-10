@@ -257,6 +257,19 @@ Uses the Dialogue Manager addon (Nathan Hoad, v4; plugin and its `DialogueManage
 
 `GulletMatron` (src/actors/bosses) is a CharacterBody2D with one state machine: DORMANT -> INTRO -> STALK <-> WINDUP -> ACTIVE -> RECOVER, plus STAGGER, PHASE_SHIFT (once, at half health: faster windups and rests, brood unlocked, bigger volleys) and DEAD. Attacks are a data table (`ATTACKS`: windup / active / recover seconds, distance band, phase, weight); she picks by distance and weight, never the same attack three times running, and reacts faster to a player hugging her (favouring the tail sweep). Spawned hazards (bile_glob -> bile_puddle, shockwave) live beside her and exclude her Hurtbox; with friendly fire on they hurt her brood. `telegraph_left()` exposes the windup for bots and tests. EventBus: `boss_engaged` (shows `BossBar` in the HUD), `boss_defeated`, `shake_requested` (GameCamera shakes). On death she drops loot through `item_drop_requested`, logs `boss_slain`, and emits `entity_killed`. Tests may opt into fixed frames with a `## run-with: --fixed-fps 60` line (tests/run_tests.sh), so long fights run faster than real time.
 
+## Ichor and boons (week 34, D-027)
+
+Ichor is what each life is after. `Ichor.for_kill(kind, position)` (src/sim/fragment): creature value (`CREATURE_VALUES`) x depth factor (+25% per chunk row down). The game adds it when the player kills something (`Game._on_entity_killed`), and `IchorClot` pickups (hand-placed under Entities, gone for good once taken) hold fixed amounts in ruins and deep places. `WorldData.ichor` is what the host carries; `end_life()` moves it onto the body (`LifeRecord.corpse_ichor`), `reclaim_corpse()` gives it back. Between lives up to 40% dries out of a body (x tier strength); CorpseFate: eaten and studied bodies lose all of it, looted half, enshrined none.
+
+A `HeartRoot` (src/world) banks it: interact opens data/dialogue/heart_root.dialogue with a `RootTalk` (plain, like Talk): pour in everything carried (`bank_ichor()` -> `ichor_banked`, never lost), then buy `Boons` (`buy_boon()`, `WorldData.boons`). Unaffordable boons show greyed out. A root with a `keeper` faction (the Choir's altar in its chapel) refuses hostile hosts and turns offerings into a deed for its keepers (+1 per 5 ichor, at most +15).
+
+| Boon | Cost | Where it acts |
+|---|---|---|
+| sense_bodies | 15 | HUD draws a mark toward the newest old body with anything on it |
+| hardy | 30 | `Game._apply_host()`: +1 max heart |
+| wider_choice | 40 | `Game.rebirth_options()`: 4 hosts |
+| lasting_graft | 60 | `end_life()` keeps the first mutation slot in `kept_graft`; the next host is born with it |
+
 ## Death and rebirth flow
 
 Week 33: before scavengers, `CorpseFate.apply()` lets factions claim bodies nobody has claimed yet. The claimant is the faction holding the body's chunk (chance 0.9 x tier strength), else a fragment-sensing faction (strength x senses x 0.6). It picks a fate from its FactionDef `corpse_fates` weights (Choir: enshrined 6, studied 2, looted 1; Flesh-Tenders: eaten 5, looted 3, studied 1); a faction whose legend is below -30 loots instead of enshrining. Enshrined and studied bodies move to the faction's biggest lived-in settlement (`places`: slot -> `Settlement.body_spot()`, built by Game, so the sim stays node-free), 40 px apart. Enshrined: kept whole, scavengers skip it; taking from it is a `shrine_robbed` deed (-40) unless the keepers count you a friend. Studied: mutations cut out. Eaten: mutations gone, things left. Looted: pockets emptied. Each claim is a `corpse_claimed` event (rumors weigh it like a host death) and a hint for the newest body.

@@ -28,6 +28,8 @@ func _ready() -> void:
 	$UI.death_screen.continue_pressed.connect(_pass_time)
 	$UI.death_screen.wake_pressed.connect(_start_next_life)
 	EventBus.entity_killed.connect(_on_entity_killed)
+	EventBus.ichor_gained.connect(_on_ichor_gained)
+	EventBus.boon_bought.connect(_on_boon_bought)
 	if WorldState.data:
 		# "Continue" in the main menu already loaded a save.
 		_on_world_loaded()
@@ -90,7 +92,7 @@ func _on_world_loaded() -> void:
 		data.start_life(&"colonist")  # Saves from before week 21 have no lives.
 	$UI.close_all()
 	var saved_health := data.player_health  # respawn() heals, which overwrites it.
-	_player.apply_host(HostDb.get_def(data.current_life().host_type))
+	_apply_host(HostDb.get_def(data.current_life().host_type))
 	_player.respawn(data.player_position)
 	if saved_health >= 0:
 		_player.health.set_current(saved_health)
@@ -143,8 +145,9 @@ func rebirth_options() -> Array:
 	var rng := SeededRng.make([data.world_seed, "rebirth", data.lives.size()])
 	var points: Array = _world.get_node("SpawnPoints").get_children()
 	var last_origin: String = data.lives[-1].origin if not data.lives.is_empty() else ""
+	var count := 4 if data.has_boon(&"wider_choice") else 3  # Boons (week 34).
 	var elsewhere := points.filter(func(point): return point.place_name != last_origin)
-	if elsewhere.size() >= 3:
+	if elsewhere.size() >= count:
 		points = elsewhere
 	for i in range(points.size() - 1, 0, -1):  # Shuffle with the seeded generator.
 		var j := rng.randi_range(0, i)
@@ -152,7 +155,7 @@ func rebirth_options() -> Array:
 		points[i] = points[j]
 		points[j] = swap
 	var options := []
-	for i in mini(3, points.size()):
+	for i in mini(count, points.size()):
 		var point: SpawnPoint = points[i]
 		var types: Array = point.host_types if not point.host_types.is_empty() else HostDb.all_ids()
 		options.append({
@@ -176,7 +179,10 @@ func _start_next_life(option: Dictionary = {}) -> void:
 		data.add_to_inventory(item)
 	for slot in host.start_mutations:
 		data.graft(slot, host.start_mutations[slot])
-	_player.apply_host(host)
+	for slot in data.kept_graft:  # Boons: a graft that stays (week 34).
+		data.graft(slot, data.kept_graft[slot])
+	data.kept_graft.clear()
+	_apply_host(host)
 	_player.respawn(option.get("position", _world.get_node("PlayerSpawn").global_position))
 	$UI.close_all()
 	EventBus.inventory_changed.emit()
@@ -185,11 +191,23 @@ func _start_next_life(option: Dictionary = {}) -> void:
 	EventBus.notify.emit("You wake as %s, a %s, at %s." % [life.host_name, host.display_name, life.origin])
 
 
-## Kills by the player count toward the current life's deeds.
+## The host's body from its HostDef, plus what the fragment's boons add.
+func _apply_host(host: HostDef) -> void:
+	_player.apply_host(host)
+	if WorldState.data.has_boon(&"hardy"):
+		_player.health.max_health += 1
+
+
+## Kills by the player count toward the current life's deeds, and give ichor.
 func _on_entity_killed(entity: Node) -> void:
 	var health := entity.get_node_or_null("Health") as Health
 	if health and health.last_hit_source == &"player":
-		WorldState.data.record_kill(CombatRules.kind_of(entity))
+		var kind := CombatRules.kind_of(entity)
+		WorldState.data.record_kill(kind)
+		var ichor := Ichor.for_kill(kind, entity.global_position)
+		if ichor > 0:
+			WorldState.data.add_ichor(ichor)
+			EventBus.ichor_gained.emit(ichor, entity.global_position)
 		# Clearing creatures out of a faction's land wins it over, a little.
 		var holder := WorldState.data.faction_at(ChunkData.world_to_chunk(entity.global_position))
 		if holder != &"":
@@ -197,3 +215,20 @@ func _on_entity_killed(entity: Node) -> void:
 				WorldState.data.change_standing(holder, 2))
 			if message != "":
 				EventBus.notify.emit(message)
+
+
+## Ichor gained somewhere: drops fly from there to the host (only a view).
+func _on_ichor_gained(amount: int, from: Vector2) -> void:
+	var rng := RandomNumberGenerator.new()  # Looks only; not saved, not repeatable.
+	for i in clampi(amount, 1, 12):
+		var orb := IchorOrb.new()
+		add_child(orb)
+		orb.launch(from + Vector2(0, -16), _player, rng.randf_range(-PI, 0.0))
+	EventBus.ichor_changed.emit()
+
+
+func _on_boon_bought(id: StringName) -> void:
+	if id == &"hardy":
+		_player.health.max_health += 1
+		_player.health.set_current(_player.health.current + 1)
+	EventBus.notify.emit("The fragment grows: %s" % Boons.display_name(id))

@@ -1,0 +1,35 @@
+# A heart-root (week 34, D-027): bank ichor, buy boons.
+# Everything in {{ }}, "do ..." and "[if ... /]" comes from RootTalk
+# (src/dialogue/root_talk.gd).
+
+~ start
+{{root}}: {{intro}}
+if refused
+	{{root}}: {{refusal}}
+	=> END
+=> menu
+
+~ menu
+{{root}}: {{status}}
+- Pour in your ichor. [if carried > 0 /]
+	do bank()
+	{{root}}: {{bank_text}}
+	=> menu
+- {{offer("sense_bodies")}} [if can_buy("sense_bodies") /]
+	do buy("sense_bodies")
+	{{root}}: {{bought_text}}
+	=> menu
+- {{offer("hardy")}} [if can_buy("hardy") /]
+	do buy("hardy")
+	{{root}}: {{bought_text}}
+	=> menu
+- {{offer("wider_choice")}} [if can_buy("wider_choice") /]
+	do buy("wider_choice")
+	{{root}}: {{bought_text}}
+	=> menu
+- {{offer("lasting_graft")}} [if can_buy("lasting_graft") /]
+	do buy("lasting_graft")
+	{{root}}: {{bought_text}}
+	=> menu
+- Leave it.
+	=> END

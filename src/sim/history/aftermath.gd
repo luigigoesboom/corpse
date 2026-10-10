@@ -58,6 +58,9 @@ static func _scavenge_bodies(data: WorldData, strength: float, rng: RandomNumber
 		if life.is_alive() or not life.has_corpse_loot() or life.corpse_state == &"enshrined":
 			continue
 		var protect := i == newest
+		# Ichor dries out of a body (week 34): up to 40% over decades.
+		var dried := floori(life.corpse_ichor * strength * 0.4)
+		life.corpse_ichor -= dried
 		var taken: Array = []
 		for item in life.corpse_items.duplicate():
 			if rng.randf() < strength * 0.7 and not (protect and _loot_count(life) <= 1):

@@ -130,6 +130,12 @@ Format: ID, date, decision, why, what it rules out.
 - How "feels good" is checked: tests/test_boss.gd plays seeded fights with a bot that reads telegraphs like a decent player (tests/boss_bot.gd): it must win most fights in 40-120 s, while walking up and mashing and standing still must lose.
 - Why now: the developer asked for a boss interlude between weeks 31 and 32.
 
+**D-027 Ichor: a reason for each life** (2026-10-10, after week 33)
+- What: ichor, the god's dried blood, is what each life is after. Creatures, ruins, deep places and bosses give it (deeper gives more); the host carries it and it stays on the corpse at death, like everything else. Pouring it into a heart-root (a Choir altar, or a wild vein of living god-tissue) banks it for good, and banked ichor buys boons for the fragment that last across lives (more host choices, a graft that survives death, sensing old bodies, a sturdier host).
+- Why: playtesting weeks 21-33 felt a bit pointless: a life had no goal, death cost little, and nothing found mattered later. Ichor gives a go in, gather, risk, bank-or-die loop that every later system can plug into (bribes, shrine robbing, valve keys).
+- Rejected for now: a burn-out timer per host and per-life "whisper" goals. Both may come back once there is more content.
+- Roadmap: ichor is a new week 34; murals, non-combat options, the milestone and the valve key move down one week; the mini-boss week is gone (built early, D-026), so the art pass stays at week 39.
+
 ---
 
 ## Open questions

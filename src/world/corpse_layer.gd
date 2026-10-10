@@ -64,9 +64,11 @@ func _on_search_requested(index: int) -> void:
 		EventBus.notify.emit("Nothing left on %s" % life.host_name)
 		return
 	var taken := data.reclaim_corpse(index)
-	if life.corpse_state == &"enshrined" and not (taken.items.is_empty() and taken.mutations.is_empty()):
+	if life.corpse_state == &"enshrined" and not (taken.items.is_empty() and taken.mutations.is_empty() and taken.ichor == 0):
 		_rob_shrine(life)
 	var names := PackedStringArray()
+	if taken.ichor > 0:
+		names.append("%d ichor" % taken.ichor)
 	for item in taken.items:
 		names.append(ItemDb.display_name(item))
 	for mutation in taken.mutations:
@@ -86,6 +88,7 @@ func _on_search_requested(index: int) -> void:
 				corpse.refresh(life)
 	EventBus.inventory_changed.emit()
 	EventBus.mutations_changed.emit()
+	EventBus.ichor_changed.emit()
 
 
 ## Taking back what lies in someone's shrine is a deed against its keepers,

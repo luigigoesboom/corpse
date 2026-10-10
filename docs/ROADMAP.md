@@ -23,8 +23,8 @@
 | 1. The world | 5 to 12 | A streamed, persistent, hand-painted Gut region with lighting and set pieces |
 | 2. Combat and creatures | 13 to 20 | Fighting rigged creatures, grafting the first mutations |
 | 3. Death and rebirth | 21 to 25 | The core loop: die, time passes, corpse persists, new host |
-| 4. Factions and history | 26 to 36 | Generated history, two factions, reputation, dialogue, ruins |
-| 5. Vertical slice | 37 to 44 | One complete, polished region you can show people |
+| 4. Factions and history | 26 to 37 | Generated history, two factions, reputation, dialogue, ruins |
+| 5. Vertical slice | 38 to 44 | One complete, polished region you can show people |
 | 6. Expansion | 45 to 76 | Lungs, Bones, Nerves, Wound, body systems |
 | 7. The heart | 77 to 86 | Valve keys, heart region, final boss, endings |
 | 8. Polish and release | 87 to 104 | Balance, performance, demo, launch |
@@ -78,7 +78,7 @@ This is the heart of the game. It comes before factions so everything after is b
 | 24 | Host choice. Rebirth screen offering 3 hosts at different spawn points, with different starting bodies. | You pick a host and start in a different colony. |
 | 25 | **Milestone 3.** Play 5 lives in a row. Note what feels good and what feels like busywork. | Write a one-page DEVLOG entry about how the loop feels. |
 
-## Phase 4: Factions and history (weeks 26 to 36)
+## Phase 4: Factions and history (weeks 26 to 37)
 
 | Week | Goal | Done when |
 |---|---|---|
@@ -90,18 +90,18 @@ This is the heart of the game. It comes before factions so everything after is b
 | 31 | Host standing. Per-faction standing for the current host. Visible consequences: prices, hostility, guards refusing entry. | Attacking a Flesh-Tender makes their colony hostile. |
 | 32 | Legend standing. Deeds from LifeRecords add to the fragment's legend. Fragment-sensing NPCs (Choir priests) recognize you across lives. | A priest reacts to something you did two lives ago. |
 | 33 | Corpse fate driven by factions. Instead of random rolls, nearby factions decide: loot, eat, enshrine, study. | You find your old body in a Choir shrine. |
-| 34 | Murals and lore objects. Readable history pieces generated from the event log, placed in ruins and settlements. | You can piece together a faction's past from what you find. |
-| 35 | Non-combat options. Sneaking (light and noise), bribing, eating corpses or matter to gain small things. | You can get past a guarded area without fighting, two different ways. |
-| 36 | **Milestone 4.** Bug fixing. Run the between-lives sim at higher detail (fewer years, more events). | The world after 5 lives feels shaped by what you did. |
+| 34 | Ichor (D-027). Creatures, ruins, deep places and bosses give ichor (deeper gives more). Carried by the host, left on the corpse at death. Bank it at heart-roots (Choir altar, wild vein) to buy lasting boons for the fragment. | Die carrying ichor, go back for it, bank it, and the next life starts stronger. |
+| 35 | Murals and lore objects. Readable history pieces generated from the event log, placed in ruins and settlements. | You can piece together a faction's past from what you find. |
+| 36 | Non-combat options. Sneaking (light and noise), bribing (with ichor), eating corpses or matter to gain small things. | You can get past a guarded area without fighting, two different ways. |
+| 37 | **Milestone 4.** Place the Gullet Matron in world.png. Bug fixing. Run the between-lives sim at higher detail (fewer years, more events). | The world after 5 lives feels shaped by what you did. |
 
-## Phase 5: Vertical slice (weeks 37 to 44)
+## Phase 5: Vertical slice (weeks 38 to 44)
 
 Goal: one region, complete and polished enough to show strangers.
 
 | Week | Goal | Done when |
 |---|---|---|
-| 37 | Gut valve key. The first heart key, guarded by a mini-boss or held by a faction depending on history. | The key can be earned in at least two different ways. |
-| 38 | Mini-boss. One rigged boss with 2 phases. | The boss is beatable and readable. |
+| 38 | Gut valve key. The first heart key, guarded by a mini-boss or held by a faction depending on history. | The key can be earned in at least two different ways. |
 | 39 | Art pass 1. Replace all remaining placeholders in the Gut. Consistent palette. | No grey boxes anywhere in the Gut. |
 | 40 | Audio pass. Ambience per area, creature sounds, UI sounds. Free libraries or self-recorded. | The Gut sounds alive and gross. |
 | 41 | UI and menus. Main menu, pause, settings (volume, keybinds, fullscreen), save slots. | A stranger can start, play and quit without help. |

@@ -53,6 +53,15 @@ var artifacts: Dictionary = {}
 ## The fragment's legend (week 32): faction id -> -100..100, from deeds in
 ## every life. Only factions that sense the fragment act on it directly.
 var legend: Dictionary = {}
+## Ichor (week 34, D-027): what the current host carries (lost to the corpse
+## at death), what the fragment has banked at heart-roots (kept forever, spent
+## on Boons), and the boons it owns (id -> true).
+var ichor := 0
+var ichor_banked := 0
+var boons: Dictionary = {}
+## Slot -> mutation id the fragment keeps through death (Boons lasting_graft);
+## the next host is born with it.
+var kept_graft: Dictionary = {}
 
 
 static func create(seed_value: int) -> WorldData:
@@ -127,6 +136,15 @@ func end_life(position: Vector2, corpse_position: Vector2, killed_by: StringName
 	life.carried_mutations = mutations.duplicate()
 	life.corpse_items = life.carried_items.duplicate()
 	life.corpse_mutations = life.carried_mutations.duplicate()
+	life.carried_ichor = ichor
+	life.corpse_ichor = ichor
+	ichor = 0
+	kept_graft.clear()
+	if has_boon(&"lasting_graft") and not mutations.is_empty():
+		var slots := mutations.keys()
+		slots.sort()
+		kept_graft[slots[0]] = mutations[slots[0]]
+		life.corpse_mutations.erase(slots[0])
 	for i in inventory.size():
 		inventory[i] = &""
 	mutations.clear()
@@ -136,10 +154,14 @@ func end_life(position: Vector2, corpse_position: Vector2, killed_by: StringName
 
 ## The current host searches an old body (lives[index]): items go into free
 ## pockets, mutations into empty body slots. What does not fit stays.
-## Returns what was taken: {"items": [...], "mutations": [...]}.
+## Ichor always fits. Returns what was taken:
+## {"items": [...], "mutations": [...], "ichor": int}.
 func reclaim_corpse(index: int) -> Dictionary:
-	var taken := {"items": [], "mutations": []}
+	var taken := {"items": [], "mutations": [], "ichor": 0}
 	var life: LifeRecord = lives[index]
+	taken.ichor = life.corpse_ichor
+	ichor += life.corpse_ichor
+	life.corpse_ichor = 0
 	for item in life.corpse_items.duplicate():
 		if add_to_inventory(item) >= 0:
 			life.corpse_items.erase(item)
@@ -235,6 +257,31 @@ func log_deed(type: StringName, actors: Array, details: Dictionary) -> EventReco
 	return event
 
 
+func add_ichor(amount: int) -> void:
+	ichor = maxi(0, ichor + amount)
+
+
+## Pours everything the host carries into the fragment's bank. Returns how much.
+func bank_ichor() -> int:
+	var amount := ichor
+	ichor_banked += amount
+	ichor = 0
+	return amount
+
+
+func has_boon(id: StringName) -> bool:
+	return boons.has(id)
+
+
+## Buys a boon with banked ichor. False if owned, unknown or too dear.
+func buy_boon(id: StringName) -> bool:
+	if has_boon(id) or not Boons.ALL.has(id) or ichor_banked < Boons.cost(id):
+		return false
+	ichor_banked -= Boons.cost(id)
+	boons[id] = true
+	return true
+
+
 func record_kill(creature_kind: StringName) -> void:
 	var life := current_life()
 	if life:
@@ -310,6 +357,7 @@ func to_dict() -> Dictionary:
 		"sites": sites.values().map(func(site): return site.to_dict()),
 		"artifacts": artifacts.values().map(func(artifact): return artifact.to_dict()),
 		"legend": legend.duplicate(),
+		"ichor": ichor, "ichor_banked": ichor_banked, "boons": boons.duplicate(), "kept_graft": kept_graft.duplicate(),
 	}
 
 
@@ -338,6 +386,10 @@ static func from_dict(d: Dictionary) -> WorldData:
 		var artifact := ArtifactData.from_dict(artifact_dict)
 		data.artifacts[artifact.id] = artifact
 	data.legend = d.get("legend", {}).duplicate()
+	data.ichor = int(d.get("ichor", 0))
+	data.ichor_banked = int(d.get("ichor_banked", 0))
+	data.boons = d.get("boons", {}).duplicate()
+	data.kept_graft = d.get("kept_graft", {}).duplicate()
 	data._fit_inventory()
 	return data
 

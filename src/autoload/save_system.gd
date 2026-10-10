@@ -14,7 +14,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 16
+const SAVE_VERSION := 17
 
 
 func slot_path(slot: int) -> String:
@@ -146,4 +146,8 @@ func _migrate(save: Dictionary) -> Dictionary:
 		# v16 (week 33): who claimed each body and where it was taken. Nothing
 		# to convert: missing means nobody, and the body stays where it lay.
 		save.save_version = 16
+	if save.save_version == 16:
+		# v17 (week 34): ichor carried, banked, on bodies; boons. Nothing to
+		# convert: everything starts at none.
+		save.save_version = 17
 	return save

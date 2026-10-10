@@ -175,6 +175,12 @@ func _refresh_lives() -> void:
 	var data := WorldState.data
 	for child in _lives_list.get_children():
 		child.queue_free()
+	# The fragment itself (week 34): what it has banked and become.
+	var owned := Boons.ORDER.filter(func(id): return data.has_boon(id)).map(func(id): return Boons.display_name(id))
+	var fragment := _label("The fragment: %d ichor banked. %s" % [data.ichor_banked,
+		("Boons: %s." % ", ".join(owned)) if not owned.is_empty() else "No boons yet."], 16, Color(1, 0.55, 0.5))
+	fragment.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_lives_list.add_child(fragment)
 	for i in range(data.lives.size() - 1, -1, -1):
 		var life: LifeRecord = data.lives[i]
 		var host := HostDb.get_def(life.host_type)
@@ -213,6 +219,8 @@ func _refresh_lives() -> void:
 
 func _corpse_things(life: LifeRecord) -> PackedStringArray:
 	var things := PackedStringArray()
+	if life.corpse_ichor > 0:
+		things.append("%d ichor" % life.corpse_ichor)
 	for item in life.corpse_items:
 		things.append(ItemDb.display_name(item))
 	for slot in life.corpse_mutations:
