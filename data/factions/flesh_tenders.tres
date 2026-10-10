@@ -21,6 +21,11 @@ expansion = 0.45
 piety = 0.3
 trade = 0.7
 senses_fragment = 0.0
+corpse_fates = {
+&"eaten": 5,
+&"looted": 3,
+&"studied": 1
+}
 npc_frames_dir = "res://assets/art/npcs/tender"
 settlement_props = Array[PackedScene]([ExtResource("2_tent"), ExtResource("3_plot"), ExtResource("4_cistern"), ExtResource("5_rack"), ExtResource("6_lamp")])
 barks = Array[String](["Mind the bile, it eats boots.", "The lining is soft this season.", "Whatever falls here feeds the walls.", "Don't waste it. Nothing grows back twice.", "You smell of the Choir's candles.", "Pull the bulbs gently, they bruise.", "Bury me in the east wall, where it's warm."])

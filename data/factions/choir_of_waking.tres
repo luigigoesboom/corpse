@@ -21,6 +21,11 @@ expansion = 0.55
 piety = 0.95
 trade = 0.3
 senses_fragment = 0.9
+corpse_fates = {
+&"enshrined": 6,
+&"studied": 2,
+&"looted": 1
+}
 npc_frames_dir = "res://assets/art/npcs/chorister"
 settlement_props = Array[PackedScene]([ExtResource("2_shrine"), ExtResource("3_candles"), ExtResource("4_banner"), ExtResource("5_bell"), ExtResource("6_reliquary")])
 barks = Array[String](["Hush. Can you hear it breathing?", "Sing with us. It listens to the loud ones.", "The heart skipped again last night.", "Every spasm is a word. We are learning the language.", "You walk like something is watching from inside you.", "Light a candle. It costs you nothing.", "When it wakes, it will remember who sang."])

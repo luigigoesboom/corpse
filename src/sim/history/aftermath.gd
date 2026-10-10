@@ -17,7 +17,8 @@ const TIERS := [
 
 
 ## Rolls the gap for this death and applies it. Deterministic per world and death.
-static func run(data: WorldData) -> Dictionary:
+## `places`: settlement slot -> floor point, so factions can carry bodies home.
+static func run(data: WorldData, places: Dictionary = {}) -> Dictionary:
 	var rng := SeededRng.make([data.world_seed, "aftermath", data.lives.size()])
 	var total := 0
 	for tier in TIERS:
@@ -26,18 +27,19 @@ static func run(data: WorldData) -> Dictionary:
 	for i in TIERS.size():
 		pick -= TIERS[i].weight
 		if pick <= 0:
-			return apply(data, i, rng)
-	return apply(data, 0, rng)
+			return apply(data, i, rng, places)
+	return apply(data, 0, rng, places)
 
 
 ## Applies tier `tier_index`. Returns a report:
 ##   {"tier", "years", "strength", "hints": [short vague lines for the player]}
-static func apply(data: WorldData, tier_index: int, rng: RandomNumberGenerator) -> Dictionary:
+static func apply(data: WorldData, tier_index: int, rng: RandomNumberGenerator, places: Dictionary = {}) -> Dictionary:
 	var tier: Dictionary = TIERS[tier_index]
 	var years := rng.randi_range(tier.years[0], tier.years[1])
 	var strength: float = tier.strength
 	data.year += years
 	var report := {"tier": tier.name, "years": years, "strength": strength, "hints": []}
+	CorpseFate.apply(data, strength, rng, places, report)  # Factions first (week 33).
 	_scavenge_bodies(data, strength, rng, report)
 	_creatures_return(data, strength, rng, report)
 	_dropped_items_vanish(data, strength, rng, report)
@@ -46,13 +48,14 @@ static func apply(data: WorldData, tier_index: int, rng: RandomNumberGenerator) 
 
 ## Old bodies lose things to scavengers and rot. The newest body always
 ## keeps at least one thing, so going back for it is never pointless.
+## Enshrined bodies are guarded: nothing gets at them.
 static func _scavenge_bodies(data: WorldData, strength: float, rng: RandomNumberGenerator, report: Dictionary) -> void:
 	var newest := data.lives.size() - 1
 	while newest >= 0 and data.lives[newest].is_alive():
 		newest -= 1
 	for i in data.lives.size():
 		var life: LifeRecord = data.lives[i]
-		if life.is_alive() or not life.has_corpse_loot():
+		if life.is_alive() or not life.has_corpse_loot() or life.corpse_state == &"enshrined":
 			continue
 		var protect := i == newest
 		var taken: Array = []
@@ -66,7 +69,8 @@ static func _scavenge_bodies(data: WorldData, strength: float, rng: RandomNumber
 				rotted.append(life.corpse_mutations[slot])
 				life.corpse_mutations.erase(slot)
 		if not taken.is_empty():
-			life.corpse_state = &"scavenged"
+			if life.corpse_state == &"intact":
+				life.corpse_state = &"scavenged"
 			data.log_event(&"corpse_scavenged", [life.host_name], {"items": taken})
 		if not rotted.is_empty():
 			data.log_event(&"corpse_rotted", [life.host_name], {"mutations": rotted})

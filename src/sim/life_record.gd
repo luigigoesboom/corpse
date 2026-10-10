@@ -25,13 +25,18 @@ var carried_mutations: Dictionary = {}
 var kills: Dictionary = {}
 ## Links into WorldData.events, once the history sim exists (phase 4).
 var deed_event_ids: Array = []
-## What became of the body: intact, looted, eaten, enshrined, studied (week 22+).
 ## Host standing (week 31): faction id -> -100..100, how that faction feels
 ## about this body. Missing = the faction's attitude to this host type
 ## (WorldData.standing()). Fresh for every host; the fragment's legend is
 ## separate (week 32).
 var standing: Dictionary = {}
+## What became of the body: intact, scavenged (Aftermath), or claimed by a
+## faction (week 33, CorpseFate): enshrined, studied, eaten, looted.
 var corpse_state: StringName = &"intact"
+## Who claimed the body (week 33), &"" if nobody.
+var corpse_faction: StringName = &""
+## The site it was carried to (enshrined, studied), "" if none.
+var corpse_site := ""
 ## Where the body lies (on the ground under where the host died).
 var corpse_position := Vector2.ZERO
 ## What is still on the body. Starts as everything the host had; shrinks as
@@ -52,6 +57,7 @@ func to_dict() -> Dictionary:
 		"carried_items": carried_items.duplicate(), "carried_mutations": carried_mutations.duplicate(),
 		"kills": kills.duplicate(), "deed_event_ids": deed_event_ids.duplicate(),
 		"corpse_state": corpse_state, "corpse_position": corpse_position,
+		"corpse_faction": corpse_faction, "corpse_site": corpse_site,
 		"corpse_items": corpse_items.duplicate(), "corpse_mutations": corpse_mutations.duplicate(),
 	}
 
@@ -73,6 +79,8 @@ static func from_dict(d: Dictionary) -> LifeRecord:
 	life.deed_event_ids = d.get("deed_event_ids", [])
 	life.corpse_state = d.get("corpse_state", &"intact")
 	life.corpse_position = d.get("corpse_position", life.death_position)
+	life.corpse_faction = d.get("corpse_faction", &"")
+	life.corpse_site = str(d.get("corpse_site", ""))
 	life.corpse_items = d.get("corpse_items", [])
 	life.corpse_mutations = d.get("corpse_mutations", {})
 	return life

@@ -13,6 +13,11 @@ Next:
 
 ---
 
+## Week 33: corpse fate driven by factions (2026-10-10)
+Done: between lives, the people whose land your body lies in decide what to do with it. The Choir mostly carries it to the shrine at its chapel and keeps it whole (sometimes cuts it open to see what grew in it); the Flesh-Tenders mostly eat what grew on it or empty its pockets. The Choir senses the fragment, so now and then it fetches a body from someone else's land, but never honours one if it hates the fragment. The rebirth screen hint says who took it and where, the Lives tab too, the Choir gossips about it, and the body shows it ("the enshrined body of ..."). Taking your things back from their shrine is robbing it: the Choir turns on you and remembers it next life, unless they count you a friend. Save version 16. tests/test_corpse_fate.gd: 40 deaths each in Choir and Tender land, spite, the full find-it-in-the-shrine-and-take-it-back loop, save and load.
+Not done: no shrine art around the body (it lies at the settlement's left end); studied bodies leave no notes or research yet; the Flesh-Tenders do not use what they took.
+Next: week 34, murals and lore objects.
+
 ## Week 32: legend standing (2026-10-10)
 Done: the fragment has a legend with every faction (saved, version 15) that deeds move by half as much as they move the body's standing. Factions that sense the fragment add it to how they see any body you wear: kill a chorister and the Choir distrusts your next colonist too (-72), while the Flesh-Tenders (who cannot sense it) only see the body. Remembered deeds are events linked to the life that did them; a Choir priest finds the latest one from an earlier body and says so after greeting you: "Two bodies ago, you killed Belet at Sinewhearth. We have not forgiven it." Slaying the Gullet Matron is famous and remembered gladly by everyone. Your own deaths and killings now outweigh other gossip. tests/test_legend.gd: kill, two more lives, priest remembers; Flesh-Tender does not; survives save and load.
 Not done: the legend never fades, so one murder keeps the Choir hostile to every later body (about -72 with a colonist). Needs a way back (penance, deeds for the Choir, slow fading over years) once there is more to do for them; no graffiti, shrines or bounties yet (week 71).

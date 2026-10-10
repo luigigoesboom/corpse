@@ -125,7 +125,11 @@ func _ground_below(point: Vector2) -> Vector2:
 ## Time passes (D-021): roll the gap, apply the aftermath, then rebuild what
 ## is shown from the changed data (respawned creatures, scavenged bodies).
 func _pass_time() -> void:
-	var report := Aftermath.run(WorldState.data)
+	var places := {}  # Where factions lay the bodies they carry home (week 33).
+	for template in _entities.templates():
+		if template is Settlement:
+			places[EntityLayer.key_of(template)] = template.body_spot()
+	var report := Aftermath.run(WorldState.data, places)
 	_entities.rebuild()
 	_chunks.reset()
 	$UI.death_screen.show_time(report, rebirth_options())

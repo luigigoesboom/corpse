@@ -189,7 +189,17 @@ func _refresh_lives() -> void:
 			if life.killed_by != &"":
 				cause = "killed by %s" % _a(CREATURE_NAMES.get(life.killed_by, [String(life.killed_by).capitalize()])[0])
 			lines.append("Woke at %s, died in year %d, %s." % [life.origin, life.death_year, cause])
-			lines.append("The body lies %s." % _where(life.corpse_position))
+			var site: SiteData = WorldState.data.sites.get(life.corpse_site)
+			var keepers := EventText._faction(WorldState.data, life.corpse_faction)
+			match life.corpse_state:
+				&"enshrined":
+					lines.append("%s keep it in their shrine at %s." % [keepers.substr(0, 1).to_upper() + keepers.substr(1), site.name if site else "their home"])
+				&"studied":
+					lines.append("%s took it to %s and cut it open." % [keepers.substr(0, 1).to_upper() + keepers.substr(1), site.name if site else "their home"])
+				&"eaten":
+					lines.append("%s fed on it. It lies %s." % [keepers.substr(0, 1).to_upper() + keepers.substr(1), _where(life.corpse_position)])
+				_:
+					lines.append("The body lies %s." % _where(life.corpse_position))
 			if life.corpse_state == &"scavenged" and not life.has_corpse_loot():
 				lines.append("Something has picked it clean.")
 			elif life.has_corpse_loot():

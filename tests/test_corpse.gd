@@ -49,7 +49,7 @@ func run() -> void:
 	check(data.inventory[0] == &"bile_bulb" and data.mutations.get("arm") == &"bone_spur", "searching the body takes back the bulb and regrows the spur")
 	check(player.get_node("Mutations").get_child_count() == 1, "the reclaimed spur works again")
 	check(not data.lives[0].has_corpse_loot(), "the body is empty now")
-	check("empty body" in corpses.get_child(0).get_node("Prompt").text, "and says so")
+	check("Nothing left on" in corpses.get_child(0).get_node("Prompt").text, "and says so")
 
 	# What does not fit stays on the body.
 	data.lives[0].corpse_items = [&"bone_shard"]

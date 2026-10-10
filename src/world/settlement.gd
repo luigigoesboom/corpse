@@ -178,6 +178,12 @@ func bark_near(where: Vector2) -> ColonyNpc:
 	return closest
 
 
+## Where bodies this faction claims are laid (week 33, CorpseFate): on the
+## floor at the left end, in world coordinates.
+func body_spot() -> Vector2:
+	return position + Vector2(-width / 2.0 + EDGE + 24.0, 0)
+
+
 ## Local x range residents may walk in.
 func walk_bounds() -> Vector2:
 	return Vector2(-width / 2.0 + EDGE, width / 2.0 - EDGE)

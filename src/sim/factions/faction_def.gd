@@ -29,6 +29,10 @@ extends Resource
 ## VISION.md): priests near 1, farmers near 0.
 @export_range(0.0, 1.0) var senses_fragment := 0.0
 
+## What they do with a dead host's body they find (week 33, CorpseFate):
+## fate (enshrined, studied, eaten, looted) -> weight.
+@export var corpse_fates: Dictionary = {}
+
 @export_group("Settlements", "")
 ## Strips for the residents of its settlements (idle, run, work).
 @export_dir var npc_frames_dir: String

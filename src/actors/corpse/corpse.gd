@@ -36,10 +36,20 @@ func refresh(life: LifeRecord) -> void:
 			_sprite.add_layer(def.id, SpriteSheets.load_dir(def.part_frames_dir), def.part_behind)
 			_layer_ids.append(def.id)
 	_sprite.hold_last_frame(&"die")
+	# What a faction did to it (week 33) shows a little.
+	$Visual.modulate = Color(0.55, 0.42, 0.4) if life.corpse_state == &"eaten" else Color.WHITE
+	var whose := "the body of %s" % life.host_name
+	match life.corpse_state:
+		&"enshrined":
+			whose = "the enshrined body of %s" % life.host_name
+		&"studied":
+			whose = "the cut-open body of %s" % life.host_name
+		&"eaten":
+			whose = "the gnawed body of %s" % life.host_name
 	if life.has_corpse_loot():
-		_prompt.text = "E: search the body of %s" % life.host_name
+		_prompt.text = "E: search %s" % whose
 	else:
-		_prompt.text = "The empty body of %s" % life.host_name
+		_prompt.text = "Nothing left on %s" % whose
 
 
 func interact() -> void:

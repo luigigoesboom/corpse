@@ -42,6 +42,8 @@ static func recognition(data: WorldData, faction: StringName) -> String:
 			what = "you killed %s at %s" % [event.data.get("victim", "one of us"), place]
 		&"resident_attacked":
 			what = "you drew our blood at %s" % place
+		&"shrine_robbed":
+			what = "you robbed the body we laid in our shrine at %s" % place
 		&"boss_slain":
 			what = "you slew %s" % event.data.get("boss", "a great beast")
 	var how := "The heart was glad of it." if event.type in GOOD else "We have not forgiven it."

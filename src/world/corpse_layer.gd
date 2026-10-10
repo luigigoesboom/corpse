@@ -64,6 +64,8 @@ func _on_search_requested(index: int) -> void:
 		EventBus.notify.emit("Nothing left on %s" % life.host_name)
 		return
 	var taken := data.reclaim_corpse(index)
+	if life.corpse_state == &"enshrined" and not (taken.items.is_empty() and taken.mutations.is_empty()):
+		_rob_shrine(life)
 	var names := PackedStringArray()
 	for item in taken.items:
 		names.append(ItemDb.display_name(item))
@@ -84,3 +86,18 @@ func _on_search_requested(index: int) -> void:
 				corpse.refresh(life)
 	EventBus.inventory_changed.emit()
 	EventBus.mutations_changed.emit()
+
+
+## Taking back what lies in someone's shrine is a deed against its keepers,
+## unless they are your friends (week 33).
+func _rob_shrine(life: LifeRecord) -> void:
+	var data := WorldState.data
+	var keepers := life.corpse_faction
+	if keepers == &"" or Standing.tier(data.standing(keepers)) == Standing.FRIENDLY:
+		return
+	var changes := data.record_deed(keepers, CorpseFate.ROB_DEED)
+	data.log_deed(&"shrine_robbed", [keepers, data.current_life().host_name], {"site": life.corpse_site, "host": life.host_name})
+	for faction in changes:
+		var message := Standing.change_message(EventText._faction(data, faction), changes[faction])
+		if message != "":
+			EventBus.notify.emit(message)

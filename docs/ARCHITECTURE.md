@@ -259,6 +259,8 @@ Uses the Dialogue Manager addon (Nathan Hoad, v4; plugin and its `DialogueManage
 
 ## Death and rebirth flow
 
+Week 33: before scavengers, `CorpseFate.apply()` lets factions claim bodies nobody has claimed yet. The claimant is the faction holding the body's chunk (chance 0.9 x tier strength), else a fragment-sensing faction (strength x senses x 0.6). It picks a fate from its FactionDef `corpse_fates` weights (Choir: enshrined 6, studied 2, looted 1; Flesh-Tenders: eaten 5, looted 3, studied 1); a faction whose legend is below -30 loots instead of enshrining. Enshrined and studied bodies move to the faction's biggest lived-in settlement (`places`: slot -> `Settlement.body_spot()`, built by Game, so the sim stays node-free), 40 px apart. Enshrined: kept whole, scavengers skip it; taking from it is a `shrine_robbed` deed (-40) unless the keepers count you a friend. Studied: mutations cut out. Eaten: mutations gone, things left. Looted: pockets emptied. Each claim is a `corpse_claimed` event (rumors weigh it like a host death) and a hint for the newest body.
+
 Current version (weeks 21-23, D-021): `end_life()` closes the LifeRecord and moves pockets and mutations onto the body; the epitaph shows; `Aftermath.run()` rolls a time gap tier and applies its rules to WorldData at that strength (no year-by-year simulation); EntityLayer rebuilds and chunks reload so the changes show; "N years later" with a hint; the next host starts. Factions will add their own aftermath rules in phase 4.
 
 Original plan:
