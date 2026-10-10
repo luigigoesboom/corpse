@@ -67,6 +67,18 @@ The level is a PNG: `data/maps/world.png`, **one pixel = one tile** (32 x 32 px 
 
 **Tips:** sketch the big shapes with a large brush first (chambers, main routes), then carve details. Rooms that need precise layout or many props (colonies, boss arenas) will be Godot scenes placed on the map (roadmap week 10); paint just their outline.
 
+## Shaping the painted world
+
+`tools/map/shape_world.gd` turns the painted rooms into caves: it reads `data/maps/_source/world_painted.png` (the hand-painted original, kept as is) and writes `data/maps/world.png`:
+
+```
+Godot --headless --path . --script res://tools/map/shape_world.gd
+```
+
+It erodes walls and ceilings with noise, hollows tall ceilings and hangs lumps from them (each lump kept only if it blocks nothing), cleans stray tiles, digs the two extra caves (above the Tender camp up a ledged shaft; the hollow off the tall corridor) and a few alcoves, and writes their floor points to tools/map/alcoves.json (ichor clots sit there in world.tscn). Floors never change: every rock tile with air above, the tile under it and the air above it stay, and so does a box around everything placed in world.tscn. It refuses to write if any open tile that was reachable would be cut off or a new cave cannot be reached. tests/test_map.gd climbs the shaft with the real player physics.
+
+To change the world's shape: paint `_source/world_painted.png` (or world.png directly, if you do not want the shaping) and run the script again.
+
 ## Painting faction territory
 
 `data/maps/territory.png` is the same size as world.png. In Krita, open world.png, add territory.png as a layer on top (File > Import as layer, or drag it in), lower its opacity, and paint each faction's land in its exact color (from its .tres in data/factions: Flesh-Tenders green 112 176 74, Choir of Waking gold 224 184 74). Leave unclaimed land transparent. Export that layer alone to territory.png. Territory is decided per chunk (64 x 64 tiles, the grid squares), so rough blobs are fine. It only applies to new worlds: history owns territory after that.

@@ -223,3 +223,15 @@ position = Vector2(3450, 3206)
 script = ExtResource("18_cache")
 place = "choir_reliquary"
 keeper = &"choir_of_waking"
+
+[node name="ClotAboveCamp" parent="Entities" instance=ExtResource("15_clot")]
+position = Vector2(1168, 1862)
+amount = 22
+
+[node name="ClotHollow" parent="Entities" instance=ExtResource("15_clot")]
+position = Vector2(5840, 1670)
+amount = 28
+
+[node name="ClotAlcove" parent="Entities" instance=ExtResource("15_clot")]
+position = Vector2(5136, 2150)
+amount = 14

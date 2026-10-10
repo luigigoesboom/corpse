@@ -13,6 +13,11 @@ Next:
 
 ---
 
+## The map, shaped (2026-10-11)
+Done: at the developer's request the world got better shapes. The painted original is kept (data/maps/_source/world_painted.png); tools/map/shape_world.gd erodes its box rooms into caves (large and small noise, walls and ceilings only; floors and everything placed are never touched), hollows tall ceilings and hangs lumps (each kept only if it blocks nothing), and adds two caves in unused rock: one above the Tender camp, up a shaft of ledges 3 rows apart, and the hollow, through a tunnel from the tall corridor's ledge. Three ichor clots wait in them and an alcove. The script refuses to write if anything reachable would be cut off or a new cave cannot be reached.
+How it went: the safety check caught lumps sealing a passage; the first shaft started 21 tiles above the floor (unclimbable); then its ledges were too far apart sideways, then the next ledge up was right above the player's head (bonk); the cave's rounded bottom did not meet the shaft. tests/test_map.gd now climbs it with the player's real physics, 10 ledges and into the cave.
+Next: a minimap.
+
 ## Week 41: UI and menus (2026-10-11)
 Done: a title screen with the body drifting behind a fleshy CORPSE drawn by the art program; Continue (most recent save, with the host's name), New game and Load over three save slots ("Vexol, life 4, year 2031, 1 h 12 min"; overwriting asks twice), Settings, Quit, and the controls along the bottom (they follow rebinding). Settings: a volume per bus (everything, music, the body, sounds, menus), fullscreen, screen-shake strength, and every action rebindable (click, press a key or mouse button; gamepad buttons stay; reset). The pause menu gained Settings and Controls; leaving or quitting saves, and so does every new life. Buttons, panels, sliders and check boxes are drawn in the same bone-and-flesh style (tools/pixel/recipes/ui.gd writes the theme). Tests save into slot 97 and their own settings file, never the player's. tests/test_menus.gd.
 Found on the way: overlays made in code sat in a corner (set_anchors_preset alone does not size them; set_anchors_and_offsets_preset does).
