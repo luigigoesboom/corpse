@@ -39,6 +39,17 @@ extends Resource
 ## Things residents say when you come close.
 @export var barks: Array[String] = []
 
+@export_group("Talk", "")
+## Greetings by how they feel about you: keys "hostile" (< -30), "wary"
+## (< 0), "neutral" (< 30), "friendly". Each a list; one is picked.
+@export var greetings: Dictionary = {}
+## Goodbyes, one picked.
+@export var farewells: Array[String] = []
+## What they trade away (item ids), and what they want for it. A want of
+## &"artifact" means any artifact.
+@export var wares: Array[StringName] = []
+@export var wants: Array[StringName] = []
+
 @export_group("Starting attitudes", "")
 ## Starting strength (members, roughly).
 @export var strength := 100

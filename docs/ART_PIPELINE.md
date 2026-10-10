@@ -78,6 +78,10 @@ To add one: in scenes/world.tscn select Entities, add a Node2D, attach src/world
 - **Residents**: strips in `npc_frames_dir` (assets/art/npcs/tender, chorister), 64 x 64 like hosts: `idle`, `run` (played slowed down as a walk), `work` (bent over a task, loops).
 - **Lines**: the faction's `barks`.
 
+## Ruins
+
+Like settlements: add a Node2D under Entities in scenes/world.tscn, attach src/world/ruin_site.gd, put it on flat floor (tile top + 6) and set `width`. History decides which dead settlement it is and leaves that place's artifact in it. Ruin props are in src/props/ruin (SettlementProp script; a Polygon2D named `Cloth` gets the dead people's color).
+
 ## Light and glow
 
 The world is dark (CanvasModulate on `Darkness` in game.tscn) and lit by PointLight2D nodes using `assets/lights/light_banded.tres` (hard steps, pixel-art friendly). Tiles block light (occluders in gut_tileset.tres).

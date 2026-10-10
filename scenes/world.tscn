@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" path="res://src/actors/creatures/rot_fly.tscn" id="10_fly"]
 [ext_resource type="Script" path="res://src/world/spawn_point.gd" id="11_spawn"]
 [ext_resource type="Script" path="res://src/world/settlement.gd" id="12_settlement"]
+[ext_resource type="Script" path="res://src/world/ruin_site.gd" id="13_ruin"]
 
 [node name="World" type="Node2D"]
 
@@ -154,3 +155,13 @@ script = ExtResource("12_settlement")
 width = 480.0
 capacity = 5
 preferred_faction = &"choir_of_waking"
+
+[node name="ChamberRuin" type="Node2D" parent="Entities"]
+position = Vector2(3056, 3206)
+script = ExtResource("13_ruin")
+width = 360.0
+
+[node name="CavernRuin" type="Node2D" parent="Entities"]
+position = Vector2(7296, 3206)
+script = ExtResource("13_ruin")
+width = 420.0

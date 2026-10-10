@@ -4,6 +4,19 @@
 [ext_resource type="Script" path="res://src/actors/components/ground_shadow.gd" id="2_shadow"]
 [ext_resource type="Script" path="res://src/actors/components/layered_sprite.gd" id="3_sprite"]
 [ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="4_unshaded"]
+[ext_resource type="Script" path="res://src/actors/npcs/talk_area.gd" id="9_talk"]
+[ext_resource type="Script" path="res://src/actors/components/health.gd" id="10_health"]
+[ext_resource type="Script" path="res://src/actors/components/hurtbox.gd" id="11_hurtbox"]
+[ext_resource type="Script" path="res://src/actors/components/hitbox.gd" id="12_hitbox"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(22, 50)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_swing"]
+size = Vector2(30, 30)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_talk"]
+size = Vector2(30, 56)
 
 [node name="ColonyNpc" type="Node2D"]
 script = ExtResource("1_npc")
@@ -19,6 +32,17 @@ material = ExtResource("4_unshaded")
 script = ExtResource("3_sprite")
 body_frames_dir = "res://assets/art/npcs/tender"
 frame_offset = Vector2(0, -32)
+
+[node name="Hitbox" type="Area2D" parent="Visual"]
+position = Vector2(22, -26)
+collision_layer = 32
+collision_mask = 0
+script = ExtResource("12_hitbox")
+knockback = 220.0
+active = false
+
+[node name="Shape" type="CollisionShape2D" parent="Visual/Hitbox"]
+shape = SubResource("RectangleShape2D_swing")
 
 [node name="Name" type="Label" parent="."]
 offset_left = -70.0
@@ -39,3 +63,25 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
 horizontal_alignment = 1
 autowrap_mode = 0
+
+[node name="TalkArea" type="Area2D" parent="."]
+script = ExtResource("9_talk")
+
+[node name="Shape" type="CollisionShape2D" parent="TalkArea"]
+position = Vector2(0, -28)
+shape = SubResource("RectangleShape2D_talk")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("10_health")
+max_health = 3
+invulnerable_time = 0.35
+
+[node name="Hurtbox" type="Area2D" parent="." node_paths=PackedStringArray("health")]
+collision_layer = 0
+collision_mask = 16
+script = ExtResource("11_hurtbox")
+health = NodePath("../Health")
+
+[node name="Shape" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, -25)
+shape = SubResource("RectangleShape2D_body")

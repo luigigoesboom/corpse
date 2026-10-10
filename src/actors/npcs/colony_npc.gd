@@ -6,17 +6,34 @@ extends Node2D
 ##
 ## Walks along the floor without physics: settlements sit on flat ground, and
 ## residents are children of their Settlement, at y = 0 (the floor line).
+##
+## When its people are hostile to the host (week 31), guards come at the
+## player with a telegraphed swing and the rest flee to the far end; hitting
+## or killing a resident is a deed its Settlement reports.
 
-enum State { IDLE, WALK, WORK, CHAT }
+enum State { IDLE, WALK, WORK, CHAT, FLEE, GUARD }
 
 const WALK_SPEED := 36.0
 ## Closer than this, an idle resident turns to look at the player.
 const LOOK_RANGE := 70.0
 const BARK_SECONDS := 3.5
+## Closer than this, its name tag offers a talk.
+const TALK_RANGE := 50.0
+const FLEE_SPEED := 70.0
+const GUARD_SPEED := 75.0
+## A guard swings when the player is this close...
+const SWING_RANGE := 30.0
+## ...after a wind-up you can see (and dodge), then rests.
+const WINDUP := 0.4
+const SWING_COOLDOWN := 1.1
+## Guards do not chase further than this past the settlement's edge.
+const GUARD_LEASH := 90.0
 
 var npc_name := ""
 var state := State.IDLE
 var settlement: Settlement
+## Guards fight when their people are hostile; the others flee.
+var is_guard := false
 
 var _timer := 0.0
 var _target_x := 0.0
@@ -24,11 +41,16 @@ var _facing := 1.0
 var _work_spot := -1
 var _bark_timer := 0.0
 var _rng := RandomNumberGenerator.new()
+var _windup := 0.0
+var _swing_cooldown := 0.0
+var _flinch := 0.0
 
 @onready var sprite: LayeredSprite = $Visual/Sprite
 @onready var _visual: Node2D = $Visual
 @onready var _name: Label = $Name
 @onready var _bark: Label = $Bark
+@onready var health: Health = $Health
+@onready var _hitbox: Hitbox = $Visual/Hitbox
 
 
 ## Call before adding it to the tree.
@@ -44,10 +66,58 @@ func _ready() -> void:
 	_name.text = npc_name
 	_bark.visible = false
 	_timer = _rng.randf_range(0.5, 3.0)  # Neighbours do not all start in step.
+	_hitbox.deactivate()
+	health.hurt.connect(_on_hurt)
+	health.died.connect(_on_died)
 
 
 func _process(delta: float) -> void:
 	_timer -= delta
+	var player := get_tree().get_first_node_in_group(&"player") as Node2D
+	var distance := player.global_position.distance_to(global_position) if player else INF
+	var hostile := settlement != null and settlement.is_hostile() and player != null
+	if _flinch > 0.0:
+		_flinch -= delta
+		_visual.modulate = Color(1, 0.5, 0.5) if _flinch > 0.0 else Color.WHITE
+	elif hostile:
+		if is_guard:
+			_guard(delta, player)
+		else:
+			_flee(delta, player)
+	else:
+		if state == State.FLEE or state == State.GUARD:
+			_end_alarm()
+		_daily(delta, player, distance)
+
+	var named := settlement == null or settlement.nearest_to_player == self  # One name at a time.
+	_name.modulate.a = clampf(1.0 - (distance - 60.0) / 60.0, 0.0, 1.0) if named else 0.0
+	_name.text = ("E: talk to %s" % npc_name) if named and distance < TALK_RANGE and not hostile else npc_name
+	_name.add_theme_color_override("font_color", Color(1, 0.45, 0.4) if hostile else Color.WHITE)
+	if _bark_timer > 0.0:
+		_bark_timer -= delta
+		_bark.visible = _bark_timer > 0.0
+
+	_visual.scale.x = _facing
+	match state:
+		State.WALK:
+			sprite.play(&"run")
+			sprite.speed_scale = 0.5  # The run cycle, slowed to a stroll.
+		State.FLEE:
+			sprite.play(&"run")
+			sprite.speed_scale = 1.0
+		State.GUARD:
+			sprite.play(&"work" if _windup > 0.0 or _hitbox.active else &"run")
+			sprite.speed_scale = 1.6 if _windup > 0.0 else 0.9
+		State.WORK:
+			sprite.play(&"work")
+			sprite.speed_scale = 1.0
+		_:
+			sprite.play(&"idle")
+			sprite.speed_scale = 1.0
+
+
+## Ordinary life: work, stroll, chat, look at whoever comes close.
+func _daily(delta: float, player: Node2D, distance: float) -> void:
 	match state:
 		State.WALK:
 			var dx := _target_x - position.x
@@ -60,28 +130,84 @@ func _process(delta: float) -> void:
 		_:
 			if _timer <= 0.0:
 				_choose_next()
-
-	var player := get_tree().get_first_node_in_group(&"player") as Node2D
-	var distance := player.global_position.distance_to(global_position) if player else INF
 	if state == State.IDLE and distance < LOOK_RANGE:
 		_facing = signf(player.global_position.x - global_position.x) if player.global_position.x != global_position.x else _facing
-	var named := settlement == null or settlement.nearest_to_player == self  # One name at a time.
-	_name.modulate.a = clampf(1.0 - (distance - 60.0) / 60.0, 0.0, 1.0) if named else 0.0
-	if _bark_timer > 0.0:
-		_bark_timer -= delta
-		_bark.visible = _bark_timer > 0.0
 
-	_visual.scale.x = _facing
-	match state:
-		State.WALK:
-			sprite.play(&"run")
-			sprite.speed_scale = 0.5  # The run cycle, slowed to a stroll.
-		State.WORK:
-			sprite.play(&"work")
-			sprite.speed_scale = 1.0
-		_:
-			sprite.play(&"idle")
-			sprite.speed_scale = 1.0
+
+## Run to the end of the settlement away from the player.
+func _flee(delta: float, player: Node2D) -> void:
+	if state != State.FLEE:
+		_release_work_spot()
+		state = State.FLEE
+	var away := -signf(player.global_position.x - global_position.x)
+	if away == 0.0:
+		away = 1.0
+	var bounds := settlement.walk_bounds()
+	var target := bounds.y if away > 0.0 else bounds.x
+	_facing = away
+	position.x = move_toward(position.x, target, FLEE_SPEED * delta)
+
+
+## Close in, wind up, swing; never far from home.
+func _guard(delta: float, player: Node2D) -> void:
+	if state != State.GUARD:
+		_release_work_spot()
+		state = State.GUARD
+	_swing_cooldown -= delta
+	var local_player := settlement.to_local(player.global_position)
+	var bounds := settlement.walk_bounds()
+	var home_x := clampf(local_player.x, bounds.x - GUARD_LEASH, bounds.y + GUARD_LEASH)
+	var dx := local_player.x - position.x
+	if _windup > 0.0:
+		_windup -= delta
+		if _windup <= 0.0:
+			_hitbox.activate()
+			_swing_cooldown = SWING_COOLDOWN
+			Sfx.play(&"swing", global_position)
+		return
+	if _hitbox.active and _swing_cooldown < SWING_COOLDOWN - 0.15:
+		_hitbox.deactivate()
+	_facing = signf(dx) if dx != 0.0 else _facing
+	if absf(dx) < SWING_RANGE and absf(local_player.y) < 60.0:
+		if _swing_cooldown <= 0.0:
+			_windup = WINDUP
+	else:
+		position.x = move_toward(position.x, home_x, GUARD_SPEED * delta)
+
+
+func _end_alarm() -> void:
+	_hitbox.deactivate()
+	_windup = 0.0
+	state = State.IDLE
+	_timer = _rng.randf_range(1.0, 3.0)
+
+
+func _on_hurt(amount: int, from: Vector2, _knockback: float) -> void:
+	_flinch = 0.25
+	_windup = 0.0
+	_hitbox.deactivate()
+	position.x += signf(global_position.x - from.x) * 8.0
+	DamageNumber.spawn(get_parent(), global_position + Vector2(0, -40), amount, Color(1, 0.8, 0.6))
+	if settlement:
+		settlement.resident_hurt(self)
+
+
+func _on_died() -> void:
+	if settlement:
+		settlement.resident_died(self)
+	queue_free()
+
+
+## E on its TalkArea: stop, face the player, talk (week 30).
+func talk() -> Talk:
+	var player := get_tree().get_first_node_in_group(&"player") as Node2D
+	if player:
+		_facing = signf(player.global_position.x - global_position.x) if player.global_position.x != global_position.x else _facing
+	_release_work_spot()
+	state = State.IDLE
+	_timer = 3.0
+	var faction: StringName = settlement.site.faction if settlement and settlement.site else &""
+	return Conversation.start(self, npc_name, faction, _rng.randi())
 
 
 ## Shows a line over its head for a few seconds.

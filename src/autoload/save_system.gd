@@ -14,7 +14,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 12
+const SAVE_VERSION := 14
 
 
 func slot_path(slot: int) -> String:
@@ -130,4 +130,12 @@ func _migrate(save: Dictionary) -> Dictionary:
 			site["population"] = int(site.get("population", 0)) * SiteData.PEOPLE_PER_RESIDENT
 			site["slot"] = site.get("id", "")
 		save.save_version = 12
+	if save.save_version == 12:
+		# v13 (week 29): artifacts made from history.
+		save.world["artifacts"] = []
+		save.save_version = 13
+	if save.save_version == 13:
+		# v14 (week 31): host standing per life. Nothing to convert: a life
+		# without standing uses its factions' attitudes to its host type.
+		save.save_version = 14
 	return save

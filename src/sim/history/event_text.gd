@@ -76,6 +76,10 @@ static func describe(event: EventRecord, data: WorldData) -> String:
 		&"faction_fell":
 			text = _one(pick, ["%s were no more. %s was the last of them to fall silent." % [a, site] if d.get("site", "") != "" else "%s were no more." % a,
 				"Nobody was left who called themselves %s." % a])
+		&"resident_killed":
+			text = "%s, a host, killed %s of %s at %s." % [event.actors[1] if event.actors.size() > 1 else "Someone", d.get("victim", "someone"), a, site]
+		&"boss_slain":
+			text = "%s, a host, killed %s." % [event.actors[0] if event.actors.size() > 0 else "Someone", d.get("boss", "a great beast")]
 		&"host_died":
 			text = "%s, a host, died." % (event.actors[0] if event.actors.size() > 0 else "Someone")
 		&"corpse_scavenged":

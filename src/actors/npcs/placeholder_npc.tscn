@@ -3,6 +3,10 @@
 [ext_resource type="Script" path="res://src/actors/npcs/placeholder_npc.gd" id="1_npc"]
 [ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="9_unshaded"]
 [ext_resource type="Script" path="res://src/actors/components/ground_shadow.gd" id="91_shadow"]
+[ext_resource type="Script" path="res://src/actors/npcs/talk_area.gd" id="9_talk"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_talk"]
+size = Vector2(30, 56)
 
 [node name="PlaceholderNpc" type="Node2D"]
 script = ExtResource("1_npc")
@@ -31,3 +35,10 @@ horizontal_alignment = 1
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
 text = "Parasite"
+
+[node name="TalkArea" type="Area2D" parent="."]
+script = ExtResource("9_talk")
+
+[node name="Shape" type="CollisionShape2D" parent="TalkArea"]
+position = Vector2(0, -28)
+shape = SubResource("RectangleShape2D_talk")

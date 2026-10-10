@@ -19,6 +19,9 @@ const MAIN_MENU := "res://scenes/main_menu.tscn"
 var _start_ms := 0
 var _hits_taken := 0
 var _enemies_left := 0
+## What was placed under Enemies: only these count towards clearing the room
+## (a boss's brood does not).
+var _placed: Array[Node] = []
 var _done := false
 
 @onready var _player: Player = $Player
@@ -38,7 +41,8 @@ func _ready() -> void:
 	EventBus.entity_killed.connect(_on_enemy_killed)
 	EventBus.hit_landed.connect(_on_hit_landed)
 	EventBus.player_died.connect(_on_player_died)
-	_enemies_left = $Enemies.get_child_count()
+	_placed.assign($Enemies.get_children())
+	_enemies_left = _placed.size()
 	_start_ms = Time.get_ticks_msec()
 	EventBus.notify.emit("%s: clear the room. R restarts, Esc for the menu" % arena_name)
 
@@ -77,6 +81,8 @@ func _build_terrain() -> void:
 
 func _on_enemy_killed(enemy: Node) -> void:
 	enemy.queue_free()
+	if not enemy in _placed:
+		return
 	_enemies_left -= 1
 	if _enemies_left == 0 and not _done:
 		_done = true

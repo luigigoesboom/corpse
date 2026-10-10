@@ -23,6 +23,11 @@ func _ready() -> void:
 	_time = position.x  # So neighbors do not bob in sync.
 
 
+## E on its TalkArea (week 30).
+func talk() -> Talk:
+	return Conversation.start(self, npc_name, faction, hash([npc_name, Time.get_ticks_msec()]))
+
+
 func _process(delta: float) -> void:
 	_time += delta
 	$Visual.position.y = sin(_time * 3.0) * 2.0

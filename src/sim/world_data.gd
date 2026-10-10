@@ -48,6 +48,8 @@ var factions: Dictionary = {}
 ## Site id -> SiteData (weeks 27, 28): every place history founded, lived
 ## in or ruined. Some sit in a hand-made slot (SiteData.slot).
 var sites: Dictionary = {}
+## Artifact id (also its item id) -> ArtifactData (week 29).
+var artifacts: Dictionary = {}
 
 
 static func create(seed_value: int) -> WorldData:
@@ -158,6 +160,47 @@ func log_event(type: StringName, actors: Array, details: Dictionary) -> EventRec
 	return event
 
 
+## How a faction feels about the current host, -100..100 (week 31). Starts
+## at the faction's attitude to this host type; deeds move it.
+func standing(faction: StringName) -> int:
+	var life := current_life()
+	if life == null:
+		return 0
+	if life.standing.has(faction):
+		return int(life.standing[faction])
+	var def := FactionDb.get_def(faction)
+	return int(def.host_attitudes.get(life.host_type, 0)) if def else 0
+
+
+## Moves one faction's standing. Returns [tier before, tier after]
+## (see Standing.tier()).
+func change_standing(faction: StringName, amount: int) -> Array:
+	var life := current_life()
+	if life == null or faction == &"":
+		return [&"", &""]
+	var before := standing(faction)
+	var after := clampi(before + amount, -100, 100)
+	life.standing[faction] = after
+	return [Standing.tier(before), Standing.tier(after)]
+
+
+## A deed that matters to `faction` (week 31): moves its standing by
+## `amount`, and a little for the factions that love or hate it: its
+## friends feel a quarter of it, its enemies a tenth the other way.
+## Returns {faction id: [tier before, tier after]} for every faction moved.
+func record_deed(faction: StringName, amount: int) -> Dictionary:
+	var changes := {faction: change_standing(faction, amount)}
+	for other: FactionData in factions.values():
+		if other.id == faction or not other.is_alive():
+			continue
+		var feeling := relation(faction, other.id)
+		if feeling > 30:
+			changes[other.id] = change_standing(other.id, amount / 4)
+		elif feeling < -40:
+			changes[other.id] = change_standing(other.id, -amount / 10)
+	return changes
+
+
 func record_kill(creature_kind: StringName) -> void:
 	var life := current_life()
 	if life:
@@ -231,6 +274,7 @@ func to_dict() -> Dictionary:
 		"events": events.map(func(event): return event.to_dict()),
 		"factions": factions.values().map(func(faction): return faction.to_dict()),
 		"sites": sites.values().map(func(site): return site.to_dict()),
+		"artifacts": artifacts.values().map(func(artifact): return artifact.to_dict()),
 	}
 
 
@@ -255,6 +299,9 @@ static func from_dict(d: Dictionary) -> WorldData:
 	for site_dict in d.get("sites", []):
 		var site := SiteData.from_dict(site_dict)
 		data.sites[site.id] = site
+	for artifact_dict in d.get("artifacts", []):
+		var artifact := ArtifactData.from_dict(artifact_dict)
+		data.artifacts[artifact.id] = artifact
 	data._fit_inventory()
 	return data
 

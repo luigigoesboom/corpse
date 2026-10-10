@@ -26,6 +26,11 @@ var kills: Dictionary = {}
 ## Links into WorldData.events, once the history sim exists (phase 4).
 var deed_event_ids: Array = []
 ## What became of the body: intact, looted, eaten, enshrined, studied (week 22+).
+## Host standing (week 31): faction id -> -100..100, how that faction feels
+## about this body. Missing = the faction's attitude to this host type
+## (WorldData.standing()). Fresh for every host; the fragment's legend is
+## separate (week 32).
+var standing: Dictionary = {}
 var corpse_state: StringName = &"intact"
 ## Where the body lies (on the ground under where the host died).
 var corpse_position := Vector2.ZERO
@@ -41,7 +46,7 @@ func is_alive() -> bool:
 
 func to_dict() -> Dictionary:
 	return {
-		"host_type": host_type, "host_name": host_name, "origin": origin,
+		"host_type": host_type, "host_name": host_name, "origin": origin, "standing": standing.duplicate(),
 		"start_year": start_year, "death_year": death_year, "seconds_alive": seconds_alive,
 		"death_position": death_position, "killed_by": killed_by,
 		"carried_items": carried_items.duplicate(), "carried_mutations": carried_mutations.duplicate(),
@@ -54,6 +59,7 @@ func to_dict() -> Dictionary:
 static func from_dict(d: Dictionary) -> LifeRecord:
 	var life := LifeRecord.new()
 	life.host_type = d.get("host_type", &"colonist")
+	life.standing = d.get("standing", {}).duplicate()
 	life.host_name = d.get("host_name", "")
 	life.origin = d.get("origin", "")
 	life.start_year = int(d.get("start_year", 0))

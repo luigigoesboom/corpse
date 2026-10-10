@@ -17,7 +17,7 @@
 [ext_resource type="PackedScene" path="res://src/ui/death_screen.tscn" id="14_death"]
 [ext_resource type="Script" uid="uid://dk7xbvkru82dg" path="res://src/world/corpse_layer.gd" id="15_corpses"]
 [ext_resource type="PackedScene" path="res://src/camera/game_camera.tscn" id="90_camera"]
-[ext_resource type="Script" path="res://src/debug/history_log.gd" id="92_history"]
+[ext_resource type="Script" uid="uid://dm8pybbj7745o" path="res://src/debug/history_log.gd" id="92_history"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_vignette"]
 shader = ExtResource("12_vignette")
@@ -94,9 +94,11 @@ chunks = NodePath("../../ChunkManager")
 
 [node name="DeathScreen" parent="UI" unique_id=1012042764 instance=ExtResource("14_death")]
 
-[node name="HistoryLog" type="Control" parent="UI"]
+[node name="HistoryLog" type="Control" parent="UI" unique_id=382368740]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("92_history")

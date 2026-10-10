@@ -80,6 +80,7 @@ func _ready() -> void:
 	_shake.decay_time = 0.18
 	_shake.noise_emitter_layer = SHAKE_LAYER
 	add_child(_shake)
+	EventBus.shake_requested.connect(shake)
 
 
 func _physics_process(delta: float) -> void:

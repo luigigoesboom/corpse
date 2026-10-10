@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/actors/bosses/bile_puddle.gd" id="1_s"]
+[ext_resource type="Script" path="res://src/actors/components/hitbox.gd" id="2_hit"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="3_unshaded"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_puddle"]
+size = Vector2(36, 10)
+
+[node name="BilePuddle" type="Node2D"]
+z_index = -1
+script = ExtResource("1_s")
+
+[node name="Visual" type="Polygon2D" parent="."]
+material = ExtResource("3_unshaded")
+color = Color(0.6, 0.75, 0.18, 0.85)
+polygon = PackedVector2Array(-20, 0, -15, -4, -5, -5, 7, -4, 16, -3, 20, 0, 11, 2, -10, 2)
+
+[node name="Hitbox" type="Area2D" parent="."]
+position = Vector2(0, -4)
+collision_layer = 32
+collision_mask = 0
+script = ExtResource("2_hit")
+knockback = 120.0
+
+[node name="Shape" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("RectangleShape2D_puddle")

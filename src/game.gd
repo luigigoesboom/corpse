@@ -84,6 +84,8 @@ func _on_world_loaded() -> void:
 		HistorySim.run(data)
 		FactionTerritory.apply_territory(data)
 	SiteSeeder.fill_slots(data, _entities.templates().filter(func(t): return t is Settlement))
+	SiteSeeder.fill_ruin_slots(data, _entities.templates().filter(func(t): return t is RuinSite))
+	ItemDb.set_generated(ArtifactText.item_defs(data))  # Artifacts work like items.
 	if data.current_life() == null:
 		data.start_life(&"colonist")  # Saves from before week 21 have no lives.
 	$UI.close_all()
@@ -184,3 +186,10 @@ func _on_entity_killed(entity: Node) -> void:
 	var health := entity.get_node_or_null("Health") as Health
 	if health and health.last_hit_source == &"player":
 		WorldState.data.record_kill(CombatRules.kind_of(entity))
+		# Clearing creatures out of a faction's land wins it over, a little.
+		var holder := WorldState.data.faction_at(ChunkData.world_to_chunk(entity.global_position))
+		if holder != &"":
+			var message := Standing.change_message(EventText._faction(WorldState.data, holder),
+				WorldState.data.change_standing(holder, 2))
+			if message != "":
+				EventBus.notify.emit(message)

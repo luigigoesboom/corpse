@@ -124,6 +124,12 @@ Format: ID, date, decision, why, what it rules out.
 - Why: VISION's "generated history" pillar, while keeping the hand-made world (D-010) and the hand-written present-day factions the game is built around. Year-by-year simulation is fine here because it happens once, before play; D-021 still keeps death-to-death time cheap.
 - Consequences: settlement slots take their sites from history (names, founding years, populations); SiteData.population is people (residents shown = people / 25); FactionData carries its own identity. Save version 12.
 
+**D-026 First boss pulled forward: the Gullet Matron** (2026-10-10, roadmap week 38 done early)
+- What: a two-phase boss with an explicit state machine (DORMANT, INTRO, STALK, WINDUP, ACTIVE, RECOVER, STAGGER, PHASE_SHIFT, DEAD) and five attacks, tested in its own arena (main menu: "Boss: the Gullet Matron"). Not placed in the world yet.
+- Fairness rules it is built and tested on: every attack telegraphs (>= 0.35 s even in phase 2) and leaves a punish window (>= 0.5 s); every attack can be avoided by moving, jumping or rolling; her body only hurts while it moves into you or a slam comes down on you; her own attacks never hurt her (they do hurt her brood); a burning puddle burns once per step; staggers reward pressure but cannot be chained.
+- How "feels good" is checked: tests/test_boss.gd plays seeded fights with a bot that reads telegraphs like a decent player (tests/boss_bot.gd): it must win most fights in 40-120 s, while walking up and mashing and standing still must lose.
+- Why now: the developer asked for a boss interlude between weeks 31 and 32.
+
 ---
 
 ## Open questions

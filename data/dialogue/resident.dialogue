@@ -1,0 +1,29 @@
+# Talking to a resident or a wanderer (week 30).
+# Everything in {{ }} and every "do ..." / "[if ... /]" comes from the
+# conversation's Talk object (src/dialogue/talk.gd): the words that depend on
+# the world are made there, the shape of the conversation is here.
+
+~ start
+{{npc}}: {{greeting}}
+if hostile
+	=> END
+=> menu
+
+~ menu
+- What news?
+	{{npc}}: {{rumor()}}
+	=> menu
+- Tell me about your people.
+	{{npc}}: {{creed}}
+	=> menu
+- Trade? [if can_trade /]
+	{{npc}}: {{offer_text}}
+	if has_payment
+		- Deal.
+			do trade()
+			{{npc}}: {{trade_done_text}}
+		- Not now.
+	=> menu
+- Farewell.
+	{{npc}}: {{farewell}}
+	=> END

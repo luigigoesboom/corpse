@@ -10,8 +10,14 @@ extends Node2D
 ## a world starts). Residents shown scale with the site's population. At runtime the settlement builds itself from its
 ## owners' FactionDef: their props laid out along the floor, and residents
 ## who idle, stroll, work at the props, chat, and talk to you.
+##
+## Host standing (week 31): hurting a resident is a deed against its people;
+## when they turn hostile, guards attack and the rest flee.
 
 const RESIDENT := preload("res://src/actors/npcs/colony_npc.tscn")
+## Standing lost for hitting a resident, and for killing one.
+const HURT_DEED := -60
+const KILL_DEED := -100
 ## Room left at each end, in px.
 const EDGE := 12.0
 
@@ -67,41 +73,18 @@ func build() -> void:
 		var npc: ColonyNpc = RESIDENT.instantiate()
 		npc.setup(self, Names.resident_name(WorldState.data.world_seed, site.id, i), def.npc_frames_dir, rng.randi())
 		npc.position = Vector2(rng.randf_range(bounds.x, bounds.y), 0)
+		npc.is_guard = i < ceili(site.residents_shown(capacity) / 3.0)
 		_add_built(npc)
 		residents.append(npc)
 
 
-## The kit's props in a shuffled (but repeatable) order, repeated until the
-## floor is full, spread evenly.
+## The kit's props along the floor (PropLayout); work spots from the ones
+## marked as such.
 func _lay_out_props(def: FactionDef, rng: RandomNumberGenerator) -> void:
-	if def.settlement_props.is_empty():
-		return
-	var kit: Array[PackedScene] = def.settlement_props.duplicate()
-	for i in range(kit.size() - 1, 0, -1):
-		var j := rng.randi_range(0, i)
-		var swap := kit[i]
-		kit[i] = kit[j]
-		kit[j] = swap
-	var chosen: Array[SettlementProp] = []
-	var used := 0.0
-	var i := 0
-	while i < kit.size() * 3:
-		var prop: SettlementProp = kit[i % kit.size()].instantiate()
-		if used + prop.width > width - 2.0 * EDGE:
-			prop.free()
-			break
-		used += prop.width
-		chosen.append(prop)
-		i += 1
-	var gap := (width - 2.0 * EDGE - used) / (chosen.size() + 1)
-	var x := -width / 2.0 + EDGE + gap
-	for prop in chosen:
-		prop.position = Vector2(roundf(x + prop.width / 2.0), 0)
-		_add_built(prop)
+	for prop in PropLayout.lay_out(self, def.settlement_props, width, EDGE, rng):
 		if prop.work_spot:
 			var spot_x := prop.position.x + prop.work_offset
 			_work_spots.append({"x": spot_x, "facing": signf(prop.position.x - spot_x) if prop.work_offset != 0.0 else 1.0, "taken": false})
-		x += prop.width + gap
 
 
 func _add_built(node: Node) -> void:
@@ -133,7 +116,40 @@ func _process(delta: float) -> void:
 		bark_near(player.global_position)
 
 
-## The resident closest to `where` says one of its faction's lines.
+## Its people are hostile to the current host: guards fight, others flee.
+func is_hostile() -> bool:
+	return site != null and WorldState.data != null and Standing.tier(WorldState.data.standing(site.faction)) == Standing.HOSTILE
+
+
+## A resident was hit. By the player, that is a deed against its people.
+func resident_hurt(npc: ColonyNpc) -> void:
+	if npc.health.last_hit_source == &"player" and not npc.health.is_dead():
+		_deed(HURT_DEED)
+
+
+## A resident died: one fewer, and if the player did it, the world knows.
+func resident_died(npc: ColonyNpc) -> void:
+	residents.erase(npc)
+	if site == null:
+		return
+	site.population = maxi(0, site.population - SiteData.PEOPLE_PER_RESIDENT)
+	if npc.health.last_hit_source == &"player":
+		var life := WorldState.data.current_life()
+		WorldState.data.log_event(&"resident_killed", [site.faction, life.host_name if life else "someone"],
+			{"site": site.id, "victim": npc.npc_name})
+		_deed(KILL_DEED)
+
+
+func _deed(amount: int) -> void:
+	var changes := WorldState.data.record_deed(site.faction, amount)
+	for faction in changes:
+		var message := Standing.change_message(EventText._faction(WorldState.data, faction), changes[faction])
+		if message != "":
+			EventBus.notify.emit(message)
+
+
+## The resident closest to `where` says one of its faction's lines (hostile
+## lines when its people are hostile).
 func bark_near(where: Vector2) -> ColonyNpc:
 	var def := FactionDb.get_def(site.faction) if site else null
 	if def == null or def.barks.is_empty() or residents.is_empty():
@@ -142,7 +158,8 @@ func bark_near(where: Vector2) -> ColonyNpc:
 	for npc in residents:
 		if npc.global_position.distance_to(where) < closest.global_position.distance_to(where):
 			closest = npc
-	closest.say(def.barks[randi() % def.barks.size()])
+	var lines: Array = def.greetings.get("hostile", def.barks) if is_hostile() else def.barks
+	closest.say(lines[randi() % lines.size()])
 	return closest
 
 

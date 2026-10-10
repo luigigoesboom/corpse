@@ -10,6 +10,7 @@ func _ready() -> void:
 	%QuitButton.pressed.connect(get_tree().quit)
 	%ArenaTightButton.pressed.connect(get_tree().change_scene_to_file.bind("res://scenes/arenas/arena_tight.tscn"))
 	%ArenaLooseButton.pressed.connect(get_tree().change_scene_to_file.bind("res://scenes/arenas/arena_loose.tscn"))
+	%BossButton.pressed.connect(get_tree().change_scene_to_file.bind("res://scenes/arenas/boss_arena.tscn"))
 	%ContinueButton.disabled = not SaveSystem.has_save(0)
 	if %ContinueButton.disabled:
 		%NewButton.grab_focus()

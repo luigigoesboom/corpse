@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/actors/bosses/bile_glob.gd" id="1_s"]
+[ext_resource type="Script" path="res://src/actors/components/hitbox.gd" id="2_hit"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="3_unshaded"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_glob"]
+radius = 6.0
+
+[node name="BileGlob" type="Node2D"]
+script = ExtResource("1_s")
+
+[node name="Visual" type="Polygon2D" parent="."]
+material = ExtResource("3_unshaded")
+color = Color(0.72, 0.83, 0.23, 1)
+polygon = PackedVector2Array(-6, 0, -4, -4, 0, -6, 4, -4, 6, 0, 4, 4, 0, 6, -4, 4)
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 32
+collision_mask = 0
+script = ExtResource("2_hit")
+knockback = 200.0
+
+[node name="Shape" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("CircleShape2D_glob")

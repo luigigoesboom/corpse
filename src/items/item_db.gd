@@ -5,12 +5,19 @@ extends RefCounted
 const DIR := "res://data/items"
 
 static var _defs := {}
+## Items made by the world rather than by hand (artifacts, week 29): set by
+## the game whenever a world loads, from ArtifactText.item_defs().
+static var _generated := {}
 
 
 static func get_def(id: StringName) -> ItemDef:
 	if _defs.is_empty():
 		_load_all()
-	return _defs.get(id)
+	return _defs.get(id, _generated.get(id))
+
+
+static func set_generated(defs: Dictionary) -> void:
+	_generated = defs
 
 
 static func display_name(id: StringName) -> String:

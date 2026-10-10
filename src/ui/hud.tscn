@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://src/ui/hud.gd" id="1_hud"]
+[ext_resource type="Script" path="res://src/ui/boss_bar.gd" id="9_boss"]
 
 [node name="HUD" type="Control"]
 layout_mode = 3
@@ -42,3 +43,7 @@ grow_vertical = 0
 modulate = Color(1, 1, 1, 0.8)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
+
+[node name="BossBar" type="Control" parent="."]
+layout_mode = 3
+script = ExtResource("9_boss")

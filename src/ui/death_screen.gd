@@ -12,6 +12,7 @@ const CREATURE_NAMES := {
 	&"gut_leech": ["Gut Leech", "Gut Leeches"],
 	&"rot_fly": ["Rot Fly", "Rot Flies"],
 	&"bile_spitter": ["Bile Spitter", "Bile Spitters"],
+	&"colony_npc": ["settlement guard", "settlement guards"],
 }
 
 

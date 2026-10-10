@@ -237,6 +237,26 @@ After history: `FactionTerritory.apply_territory()` gives the painted present-da
 
 Events are `EventRecord`s (id, year, type, actors = faction ids, data = site id, cause, dead, names...). `EventText.describe()` / `line()` turn them into sentences when shown, with a few phrasings per type picked by event id; nothing is stored as text, so better writing improves old saves. F2 in game shows the whole log (`HistoryLog`, a debug tool; players will learn history from murals and rumors).
 
+## Ruins and artifacts (week 29)
+
+`RuinSite` slots (src/world/ruin_site.gd) under Entities mark flat floor for a ruin. After history, `SiteSeeder.fill_ruin_slots()` gives each one the ended settlement (`kind == &"ruin"`) with the most events behind it, forges that site's artifact with `ArtifactForge` (the most memorable event there, by priority: wonder, schism, razing, last stand, fall, abandonment, disaster, ...) and drops it as an item on the ruin's floor. A RuinSite builds broken props (`PropLayout`, shared with settlements; the torn banner takes its people's color) and, when you walk in, shows "The ruins of X" and how it ended (`EventText.line()` of its ending event).
+
+`ArtifactData` (src/sim/history) lives in `WorldData.artifacts`; its id is also its item id. Its name is stored; its description is made when shown by `ArtifactText.describe()`: a line about what it looks like, then the origin event and the site's ending event in the exact words of the log. The game registers every artifact as a generated `ItemDef` (`ItemDb.set_generated(ArtifactText.item_defs(data))`) whenever a world loads, so artifacts are picked up, carried, dropped and left on corpses like any item. Aftermath never rots artifacts lying in the world. Save version 13.
+
+## Dialogue (week 30)
+
+Uses the Dialogue Manager addon (Nathan Hoad, v4; plugin and its `DialogueManager` autoload are enabled). Residents (`ColonyNpc`) and wanderers (`placeholder_npc`) have a `TalkArea` (Area2D on layer 2, so the player's E finds it like an item) that calls their `talk()`. `Conversation.start()` (src/dialogue) makes a `Talk` and opens a `DialogueBalloon` (our restyled copy of the addon's example balloon) on the root; the balloon pauses the game until the conversation ends.
+
+- **Shape** of a conversation: data/dialogue/resident.dialogue (greeting, then news / their people / trade / farewell). Edit it in Godot's Dialogue tab.
+- **Words that depend on the world** come from the `Talk` object the dialogue reads by name: `{{greeting}}`, `{{creed}}`, `{{rumor()}}`, `{{offer_text}}`, `[if can_trade /]`, `do trade()`. `Talk` is plain (it changes WorldData and emits `traded`), so it can be tested without the UI.
+- **Greetings** come from the speaker's FactionDef `greetings` by standing tier (hostile < -30, wary < 0, neutral < 30, friendly); standing is the faction's `host_attitudes` for the current host type for now (week 31 adds deeds). Hostile speakers greet and end the conversation.
+- **Rumors**: `Rumors` (src/sim/history) weighs events (recent, about the speaker's people, at places you can walk to, and above all host deaths), picks one, and tells it with how long ago, the event's sentence from `EventText` (so it matches the log), and the speaker's stance (pride, grief, spite). Fragment-sensing speakers recognize the player in rumors of a host's death.
+- **Barter**: FactionDef `wares` (what they give) and `wants` (what they take; `&"artifact"` = any artifact), one for one.
+
+## Bosses (D-026)
+
+`GulletMatron` (src/actors/bosses) is a CharacterBody2D with one state machine: DORMANT -> INTRO -> STALK <-> WINDUP -> ACTIVE -> RECOVER, plus STAGGER, PHASE_SHIFT (once, at half health: faster windups and rests, brood unlocked, bigger volleys) and DEAD. Attacks are a data table (`ATTACKS`: windup / active / recover seconds, distance band, phase, weight); she picks by distance and weight, never the same attack three times running, and reacts faster to a player hugging her (favouring the tail sweep). Spawned hazards (bile_glob -> bile_puddle, shockwave) live beside her and exclude her Hurtbox; with friendly fire on they hurt her brood. `telegraph_left()` exposes the windup for bots and tests. EventBus: `boss_engaged` (shows `BossBar` in the HUD), `boss_defeated`, `shake_requested` (GameCamera shakes). On death she drops loot through `item_drop_requested`, logs `boss_slain`, and emits `entity_killed`. Tests may opt into fixed frames with a `## run-with: --fixed-fps 60` line (tests/run_tests.sh), so long fights run faster than real time.
+
 ## Death and rebirth flow
 
 Current version (weeks 21-23, D-021): `end_life()` closes the LifeRecord and moves pockets and mutations onto the body; the epitaph shows; `Aftermath.run()` rolls a time gap tier and applies its rules to WorldData at that strength (no year-by-year simulation); EntityLayer rebuilds and chunks reload so the changes show; "N years later" with a hint; the next host starts. Factions will add their own aftermath rules in phase 4.
@@ -252,6 +272,26 @@ Original plan:
 7. New `LifeRecord`, spawn, autosave.
 
 ## Reputation
+
+### Host standing (week 31)
+
+`LifeRecord.standing` (faction id -> -100..100) is how each faction feels about the current body; every host starts fresh. A faction missing from it uses its FactionDef `host_attitudes` for the host type. `WorldData.standing(f)`, `change_standing(f, n)` (returns tiers before/after), `record_deed(f, n)` (also moves friends of f, relation > 30, by a quarter, and enemies, relation < -40, a tenth the other way). Tiers (`Standing`): hostile < -30, wary < 0, neutral < 30, friendly. Numbers are never shown; a tier change shows a line ("The Flesh-Tenders will remember that.").
+
+| Deed | Standing |
+|---|---|
+| Hit a resident | -60 with its people (`Settlement.HURT_DEED`) |
+| Kill a resident | -100, one fewer resident (population -25), a `resident_killed` event (rumors) |
+| Trade | +3 |
+| Kill a creature in a faction's territory | +2 |
+
+| Tier | What you see |
+|---|---|
+| Hostile | Guards (a third of the residents) close in and swing (telegraphed, dodgeable, leashed to the settlement); the others flee; names turn red; barks become threats; talk ends at the greeting; no trade. |
+| Wary | Trades cost two of what they want. |
+| Neutral | One for one. |
+| Friendly | One for one, plus an extra ware if you have room. |
+
+### Legend standing (planned, week 32)
 
 ```
 standing(faction, player) =

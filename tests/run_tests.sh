@@ -31,7 +31,10 @@ run() {
 "$GODOT" --headless --path . --import > /dev/null 2>&1
 for test in tests/test_*.gd; do
 	[ "$test" = tests/test_case.gd ] && continue  # The shared base, not a test.
-	run "$(basename "$test")" --headless --script "res://$test"
+	# A test can ask for extra flags with a line like "## run-with: --fixed-fps 60"
+	# (fixed frames run faster than real time: long fights, soaks).
+	extra=$(grep -m1 '^## run-with:' "$test" | sed 's/^## run-with://')
+	run "$(basename "$test")" --headless $extra --script "res://$test"
 done
 [[ " $* " == *" --soak "* ]] && run soak.gd --headless --fixed-fps 60 --script res://tests/soak.gd
 [[ " $* " == *" --render "* ]] && run perf_render.gd --windowed --resolution 1280x720 --script res://tests/perf_render.gd

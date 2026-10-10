@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/props/settlement/settlement_prop.gd" id="1_prop"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="2_unshaded"]
+[ext_resource type="Texture2D" path="res://assets/lights/light_banded.tres" id="3_light"]
+
+[node name="TornBanner" type="Node2D"]
+z_index = -1
+script = ExtResource("1_prop")
+width = 26.0
+work_spot = false
+work_offset = 0.0
+
+[node name="Pole" type="Polygon2D" parent="."]
+color = Color(0.290, 0.227, 0.165, 1.00)
+polygon = PackedVector2Array(-1, -60, 2, -60, 5, 0, 2, 0)
+
+[node name="Cloth" type="Polygon2D" parent="."]
+color = Color(1.000, 1.000, 1.000, 1.00)
+polygon = PackedVector2Array(2, -58, 20, -56, 14, -44, 19, -36, 8, -38, 2, -30)

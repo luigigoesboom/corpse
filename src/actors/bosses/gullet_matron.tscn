@@ -1,0 +1,103 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/actors/bosses/gullet_matron.gd" id="1_boss"]
+[ext_resource type="Script" path="res://src/actors/components/health.gd" id="2_health"]
+[ext_resource type="Script" path="res://src/actors/components/hurtbox.gd" id="3_hurtbox"]
+[ext_resource type="Script" path="res://src/actors/components/hitbox.gd" id="4_hitbox"]
+[ext_resource type="Script" path="res://src/actors/components/layered_sprite.gd" id="5_sprite"]
+[ext_resource type="Script" path="res://src/actors/components/ground_shadow.gd" id="6_shadow"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="7_unshaded"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(100, 54)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mouth"]
+size = Vector2(42, 36)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tail"]
+size = Vector2(240, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_contact"]
+size = Vector2(92, 46)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hurt"]
+size = Vector2(108, 62)
+
+[node name="GulletMatron" type="CharacterBody2D"]
+collision_layer = 8
+collision_mask = 1
+script = ExtResource("1_boss")
+
+[node name="Shadow" type="Node2D" parent="."]
+script = ExtResource("6_shadow")
+width = 112.0
+opacity = 0.5
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -27)
+shape = SubResource("RectangleShape2D_body")
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="Sprite" type="Node2D" parent="Visual"]
+script = ExtResource("5_sprite")
+body_frames_dir = "res://assets/art/creatures/gullet_matron"
+glow_frames_dir = "res://assets/art/creatures/gullet_matron/glow"
+frame_offset = Vector2(0, -64)
+
+[node name="MouthHitbox" type="Area2D" parent="Visual"]
+position = Vector2(56, -30)
+collision_layer = 32
+collision_mask = 0
+script = ExtResource("4_hitbox")
+knockback = 380.0
+
+[node name="Shape" type="CollisionShape2D" parent="Visual/MouthHitbox"]
+shape = SubResource("RectangleShape2D_mouth")
+
+[node name="TailHitbox" type="Area2D" parent="."]
+position = Vector2(0, -10)
+collision_layer = 32
+collision_mask = 0
+script = ExtResource("4_hitbox")
+knockback = 300.0
+
+[node name="Shape" type="CollisionShape2D" parent="TailHitbox"]
+shape = SubResource("RectangleShape2D_tail")
+
+[node name="ContactHitbox" type="Area2D" parent="."]
+position = Vector2(0, -24)
+collision_layer = 32
+collision_mask = 0
+script = ExtResource("4_hitbox")
+knockback = 300.0
+once_per_activation = false
+
+[node name="Shape" type="CollisionShape2D" parent="ContactHitbox"]
+shape = SubResource("RectangleShape2D_contact")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("2_health")
+max_health = 48
+
+[node name="Hurtbox" type="Area2D" parent="." node_paths=PackedStringArray("health")]
+collision_layer = 0
+collision_mask = 16
+script = ExtResource("3_hurtbox")
+health = NodePath("../Health")
+
+[node name="Shape" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, -30)
+shape = SubResource("RectangleShape2D_hurt")
+
+[node name="SlamMarker" type="Node2D" parent="."]
+
+[node name="Line" type="Polygon2D" parent="SlamMarker"]
+material = ExtResource("7_unshaded")
+color = Color(1, 0.3, 0.25, 0.85)
+polygon = PackedVector2Array(-50, -3, 50, -3, 50, 1, -50, 1)
+
+[node name="Arrow" type="Polygon2D" parent="SlamMarker"]
+material = ExtResource("7_unshaded")
+color = Color(1, 0.3, 0.25, 0.6)
+polygon = PackedVector2Array(-8, -40, 8, -40, 0, -26)

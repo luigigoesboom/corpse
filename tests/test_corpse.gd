@@ -10,7 +10,7 @@ func run() -> void:
 	var data = state.data
 	var corpses = game.get_node("Corpses")
 
-	# Carry a Bile Bulb, grow a Bone Spur, then die in the chamber (mid-air).
+	# Carry a Bile Bulb, grow a Bone Spur, then die mid-air on open floor (x 2200: away from ruins, whose artifacts are also within reach).
 	await goto(Vector2(992, 3178))
 	await press("interact")
 	await goto(Vector2(736, 3082))
@@ -18,7 +18,7 @@ func run() -> void:
 	bus.eat_requested.emit(1)
 	await wait_frames(2)
 	check(data.inventory[0] == &"bile_bulb" and data.mutations.get("arm") == &"bone_spur", "before death: a bulb in the pocket, a spur on the arm")
-	await goto(Vector2(3000, 3100), 1)
+	await goto(Vector2(2200, 3100), 1)
 	player.health.take_damage(99, player.global_position + Vector2(10, 0), 0.0, &"rot_fly")
 	await create_timer(1.5).timeout
 	check(corpses.corpse_count() == 1, "the body appears where the host died")
@@ -39,7 +39,7 @@ func run() -> void:
 	saves.save_game(98)
 	saves.load_game(98)
 	data = state.data
-	await goto(Vector2(2950, 3178))
+	await goto(Vector2(2150, 3178))
 	check(corpses.corpse_count() == 1, "after a save and load, the body is back where it fell")
 
 	# Search it: everything comes back.

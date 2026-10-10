@@ -37,3 +37,10 @@ signal hit_landed(target: Node, amount: int)
 signal entity_killed(entity: Node)
 
 @warning_ignore_restore("unused_signal")
+
+## A boss noticed the player: show its health bar.
+signal boss_engaged(boss: Node)
+## A boss died.
+signal boss_defeated(boss: Node)
+## Something big happened (a slam, a roar): shake the camera, strength ~ px.
+signal shake_requested(strength: float)

@@ -1,0 +1,24 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/props/settlement/settlement_prop.gd" id="1_prop"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="2_unshaded"]
+[ext_resource type="Texture2D" path="res://assets/lights/light_banded.tres" id="3_light"]
+
+[node name="ToppledPillar" type="Node2D"]
+z_index = -1
+script = ExtResource("1_prop")
+width = 76.0
+work_spot = false
+work_offset = 0.0
+
+[node name="Base" type="Polygon2D" parent="."]
+color = Color(0.812, 0.773, 0.651, 1.00)
+polygon = PackedVector2Array(-34, -14, -22, -14, -22, 0, -34, 0)
+
+[node name="Shaft" type="Polygon2D" parent="."]
+color = Color(0.722, 0.682, 0.565, 1.00)
+polygon = PackedVector2Array(-20, -2, -18, -12, 30, -8, 32, 0)
+
+[node name="Cap" type="Polygon2D" parent="."]
+color = Color(0.659, 0.620, 0.502, 1.00)
+polygon = PackedVector2Array(30, -12, 38, -12, 38, 0, 30, 0)

@@ -24,6 +24,15 @@ senses_fragment = 0.0
 npc_frames_dir = "res://assets/art/npcs/tender"
 settlement_props = Array[PackedScene]([ExtResource("2_tent"), ExtResource("3_plot"), ExtResource("4_cistern"), ExtResource("5_rack"), ExtResource("6_lamp")])
 barks = Array[String](["Mind the bile, it eats boots.", "The lining is soft this season.", "Whatever falls here feeds the walls.", "Don't waste it. Nothing grows back twice.", "You smell of the Choir's candles.", "Pull the bulbs gently, they bruise.", "Bury me in the east wall, where it's warm."])
+greetings = {
+"friendly": ["Ah, one of ours. Sit, there's broth.", "Good to see a colony face. The lining's been kind.", "You look hungry. You always look hungry."],
+"hostile": ["Keep your hands where I can see them, antibody.", "We bury things like you in the walls. Walk on.", "Not one step closer. I mean it."],
+"neutral": ["Mind where you put your feet. Things grow here.", "Traveller. Don't take what you didn't plant.", "Well? Speak, the bulbs won't pull themselves."],
+"wary": ["You're not from here. What do you want?", "A pilgrim. The last one ate our seed-bulbs.", "Say your business and go."]
+}
+farewells = Array[String](["Waste nothing.", "Mind the bile.", "Go on, then.", "The walls remember the dead. Don't join them."])
+wares = Array[StringName]([&"bile_bulb"])
+wants = Array[StringName]([&"bone_shard", &"breath_sac"])
 strength = 120
 relations = {
 &"choir_of_waking": -20

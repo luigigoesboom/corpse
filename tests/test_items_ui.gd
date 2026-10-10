@@ -27,7 +27,7 @@ func run() -> void:
 	await process_frame
 	screen.get_node("%DropButton").pressed.emit()
 	await process_frame
-	check(items.get_child_count() == 1 and is_equal_approx(items.get_child(0).position.y, 3200.0 + ChunkData.FLOOR_SINK), "a dropped item lands on the floor")
+	check(_ordinary(items).size() == 1 and is_equal_approx(_ordinary(items)[0].position.y, 3200.0 + ChunkData.FLOOR_SINK), "a dropped item lands on the floor")
 	# Tabs (week 25 rework): E / Q (LB / RB) cycle Pockets, Body, Lives.
 	await ui_action("ui_tab_next")
 	check(screen.tab == 1, "E switches to the Body tab")
@@ -51,11 +51,14 @@ func run() -> void:
 	check(not pause_menu.visible and not paused, "Esc again resumes")
 
 	# A dropped item survives its chunk unloading.
-	var dropped_x: float = items.get_child(0).position.x
+	var dropped_x: float = _ordinary(items)[0].position.x
 	await goto(Vector2(7100, 3800))
-	check(items.get_child_count() == 0 and state.data.chunk_diffs.size() == 1, "far away: the item node is gone, its data is kept")
+	var kept := 0
+	for chunk in state.data.chunk_diffs:
+		kept += state.data.items_in_chunk(chunk).filter(func(r): return not String(r.item).begins_with("artifact_")).size()
+	check(_ordinary(items).size() == 0 and kept == 1, "far away: the item node is gone, its data is kept")
 	await goto(Vector2(1500, 3178))
-	check(items.get_child_count() == 1 and is_equal_approx(items.get_child(0).position.x, dropped_x), "back again: the item is where it was dropped")
+	check(_ordinary(items).size() == 1 and is_equal_approx(_ordinary(items)[0].position.x, dropped_x), "back again: the item is where it was dropped")
 
 	# Full pockets refuse a pickup.
 	for i in WorldData.INVENTORY_SIZE:
@@ -63,4 +66,9 @@ func run() -> void:
 	messages.clear()
 	await goto(Vector2(dropped_x, 3178))
 	await press("interact")
-	check(messages == ["Pockets are full"] and items.get_child_count() == 1, "full pockets refuse a pickup")
+	check(messages == ["Pockets are full"] and _ordinary(items).size() == 1, "full pockets refuse a pickup")
+
+
+## Item views except artifacts (week 29: ruins have one lying in them).
+func _ordinary(items: Node) -> Array:
+	return items.get_children().filter(func(item): return not String(item.item_id).begins_with("artifact_"))

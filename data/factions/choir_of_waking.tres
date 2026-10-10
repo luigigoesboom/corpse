@@ -24,6 +24,15 @@ senses_fragment = 0.9
 npc_frames_dir = "res://assets/art/npcs/chorister"
 settlement_props = Array[PackedScene]([ExtResource("2_shrine"), ExtResource("3_candles"), ExtResource("4_banner"), ExtResource("5_bell"), ExtResource("6_reliquary")])
 barks = Array[String](["Hush. Can you hear it breathing?", "Sing with us. It listens to the loud ones.", "The heart skipped again last night.", "Every spasm is a word. We are learning the language.", "You walk like something is watching from inside you.", "Light a candle. It costs you nothing.", "When it wakes, it will remember who sang."])
+greetings = {
+"friendly": ["The god's own hand. Kneel with us, if you like.", "Welcome, friend of the heart. It is louder today.", "You came. It told us you would."],
+"hostile": ["You smell of the Tenders' dirt. Leave.", "The heart has no song for you.", "Go back to your bulbs."],
+"neutral": ["Peace. Lower your voice, it is listening.", "Another who walks. Do you hear it too?", "Speak softly. We are counting heartbeats."],
+"wary": ["You should not be here unless you have come to sing.", "Hm. A colonist. Do you still pretend it is dead?", "State your purpose, and do not touch the candles."]
+}
+farewells = Array[String](["It will wake.", "Sing on the way.", "Go softly.", "Listen, out there. It is."])
+wares = Array[StringName]([&"breath_sac"])
+wants = Array[StringName]([&"artifact", &"bone_shard"])
 strength = 80
 relations = {
 &"flesh_tenders": -30

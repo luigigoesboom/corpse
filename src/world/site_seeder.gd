@@ -31,3 +31,29 @@ static func fill_slots(data: WorldData, settlements: Array) -> void:
 				site.population = SiteData.PEOPLE_PER_RESIDENT * 3
 			data.sites[site.id] = site
 		site.slot = key
+
+
+## Ruin slots (week 29) take the settlement history ended that has the most
+## story (events) behind it, and its artifact is left lying in the ruin.
+static func fill_ruin_slots(data: WorldData, ruins: Array) -> void:
+	for slot in ruins:
+		var key := EntityLayer.key_of(slot)
+		if data.site_in_slot(key):
+			continue
+		var best: SiteData = null
+		var best_score := -1
+		for candidate: SiteData in data.sites.values():
+			if candidate.kind != &"ruin" or candidate.slot != "":
+				continue
+			var score := ArtifactForge.events_at(data, candidate.id).size()
+			if score > best_score:
+				best = candidate
+				best_score = score
+		if best == null:
+			continue
+		best.slot = key
+		var artifact := ArtifactForge.forge_for_site(data, best)
+		if artifact:
+			var rng := SeededRng.make([data.world_seed, "artifact_spot", key])
+			var spot: Vector2 = slot.position + Vector2(roundf(rng.randf_range(-0.3, 0.3) * slot.width), 0)
+			data.add_dropped_item(ChunkData.world_to_chunk(spot), StringName(artifact.id), spot)
