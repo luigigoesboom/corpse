@@ -45,6 +45,8 @@ var events: Array[EventRecord] = []
 ## Faction id -> FactionData (week 26). Filled when a world starts, from
 ## data/factions and the painted territory map (FactionTerritory).
 var factions: Dictionary = {}
+## Site id (the slot's node name in world.tscn) -> SiteData (week 27).
+var sites: Dictionary = {}
 
 
 static func create(seed_value: int) -> WorldData:
@@ -219,6 +221,7 @@ func to_dict() -> Dictionary:
 		"lives": lives.map(func(life): return life.to_dict()),
 		"events": events.map(func(event): return event.to_dict()),
 		"factions": factions.values().map(func(faction): return faction.to_dict()),
+		"sites": sites.values().map(func(site): return site.to_dict()),
 	}
 
 
@@ -240,6 +243,9 @@ static func from_dict(d: Dictionary) -> WorldData:
 	for faction_dict in d.get("factions", []):
 		var faction := FactionData.from_dict(faction_dict)
 		data.factions[faction.id] = faction
+	for site_dict in d.get("sites", []):
+		var site := SiteData.from_dict(site_dict)
+		data.sites[site.id] = site
 	data._fit_inventory()
 	return data
 

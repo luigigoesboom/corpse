@@ -39,9 +39,9 @@ func run() -> void:
 	check(max_loaded <= 9, "never more than 3 x 3 chunks loaded (max %d)" % max_loaded)
 
 	await goto(game.get_node("World/PlayerSpawn").global_position, 10)
-	check(entity("FleshTender") != null and entity("LeechCavern") == null, "near spawn: nearby entities active, far ones detached")
+	check(entity("TenderCamp") != null and entity("LeechCavern") == null, "near spawn: nearby entities active, far ones detached")
 	await goto(Vector2(7100, 3800), 10)
-	check(entity("LeechCavern") != null and entity("FleshTender") == null, "in the cavern: the reverse")
+	check(entity("LeechCavern") != null and entity("TenderCamp") == null, "in the cavern: the reverse")
 
 	var cells_before := _cell_count(chunks)
 	var open := Image.create(chunks.map.size.x, chunks.map.size.y, false, Image.FORMAT_RGBA8)

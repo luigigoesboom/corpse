@@ -69,6 +69,11 @@ func _notification(what: int) -> void:
 				template.free()
 
 
+## What was placed in world.tscn (not live copies; never add these to the tree).
+func templates() -> Array[Node2D]:
+	return _templates
+
+
 func count_active() -> int:
 	return get_child_count()
 

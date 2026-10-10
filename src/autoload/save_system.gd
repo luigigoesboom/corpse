@@ -14,7 +14,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 10
+const SAVE_VERSION := 11
 
 
 func slot_path(slot: int) -> String:
@@ -117,4 +117,9 @@ func _migrate(save: Dictionary) -> Dictionary:
 		# data/factions and the territory map when the world loads.
 		save.world["factions"] = []
 		save.save_version = 10
+	if save.save_version == 10:
+		# v11 (week 27): sites. Empty here; the game fills the settlement
+		# slots from faction territory when the world loads.
+		save.world["sites"] = []
+		save.save_version = 11
 	return save

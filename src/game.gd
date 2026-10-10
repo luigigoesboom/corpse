@@ -80,6 +80,8 @@ func _on_world_loaded() -> void:
 	var data := WorldState.data
 	if data.factions.is_empty():
 		FactionTerritory.seed_factions(data)  # A new world, or a save from before week 26.
+	if data.sites.is_empty():
+		SiteSeeder.seed_sites(data, _entities.templates().filter(func(t): return t is Settlement))
 	if data.current_life() == null:
 		data.start_life(&"colonist")  # Saves from before week 21 have no lives.
 	$UI.close_all()

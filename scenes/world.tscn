@@ -7,10 +7,10 @@
 [ext_resource type="PackedScene" path="res://src/actors/creatures/training_dummy.tscn" id="5_dummy"]
 [ext_resource type="PackedScene" path="res://src/actors/creatures/gut_leech.tscn" id="6_leech"]
 [ext_resource type="PackedScene" path="res://src/props/glow_fungus.tscn" id="7_fungus"]
-[ext_resource type="PackedScene" path="res://scenes/setpieces/flesh_tender_camp.tscn" id="8_camp"]
 [ext_resource type="PackedScene" path="res://src/actors/creatures/bile_spitter.tscn" id="9_spitter"]
 [ext_resource type="PackedScene" path="res://src/actors/creatures/rot_fly.tscn" id="10_fly"]
 [ext_resource type="Script" path="res://src/world/spawn_point.gd" id="11_spawn"]
+[ext_resource type="Script" path="res://src/world/settlement.gd" id="12_settlement"]
 
 [node name="World" type="Node2D"]
 
@@ -50,16 +50,6 @@ host_types = Array[StringName]([&"antibody", &"pilgrim"])
 [node name="Entities" type="Node2D" parent="."]
 script = ExtResource("2_entities")
 
-[node name="FleshTender" parent="Entities" instance=ExtResource("3_npc")]
-position = Vector2(1280, 3206)
-npc_name = "Flesh-Tender"
-faction = &"flesh_tenders"
-
-[node name="ChoirAcolyte" parent="Entities" instance=ExtResource("3_npc")]
-position = Vector2(3200, 3206)
-npc_name = "Choir Acolyte"
-faction = &"choir_of_waking"
-
 [node name="ShaftHermit" parent="Entities" instance=ExtResource("3_npc")]
 position = Vector2(5280, 838)
 npc_name = "Shaft Hermit"
@@ -91,9 +81,6 @@ position = Vector2(6000, 832)
 
 [node name="LeechCavern" parent="Entities" instance=ExtResource("6_leech")]
 position = Vector2(7100, 3872)
-
-[node name="FleshTenderCamp" parent="Entities" instance=ExtResource("8_camp")]
-position = Vector2(1150, 3206)
 
 [node name="Fungus1" parent="Entities" instance=ExtResource("7_fungus")]
 position = Vector2(320, 3206)
@@ -143,7 +130,7 @@ position = Vector2(6500, 3878)
 position = Vector2(7700, 3878)
 
 [node name="SpitterChamber" parent="Entities" instance=ExtResource("9_spitter")]
-position = Vector2(3700, 3200)
+position = Vector2(4080, 3200)
 
 [node name="SpitterCavern" parent="Entities" instance=ExtResource("9_spitter")]
 position = Vector2(7500, 2400)
@@ -153,3 +140,17 @@ position = Vector2(3000, 2000)
 
 [node name="FlyCavern" parent="Entities" instance=ExtResource("10_fly")]
 position = Vector2(7000, 2000)
+
+[node name="TenderCamp" type="Node2D" parent="Entities"]
+position = Vector2(1220, 3206)
+script = ExtResource("12_settlement")
+width = 640.0
+capacity = 6
+preferred_faction = &"flesh_tenders"
+
+[node name="ChoirChapel" type="Node2D" parent="Entities"]
+position = Vector2(3560, 3206)
+script = ExtResource("12_settlement")
+width = 480.0
+capacity = 5
+preferred_faction = &"choir_of_waking"

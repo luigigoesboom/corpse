@@ -1,6 +1,11 @@
 [gd_resource type="Resource" script_class="FactionDef" format=3]
 
 [ext_resource type="Script" path="res://src/sim/factions/faction_def.gd" id="1_def"]
+[ext_resource type="PackedScene" path="res://src/props/settlement/shrine.tscn" id="2_shrine"]
+[ext_resource type="PackedScene" path="res://src/props/settlement/candles.tscn" id="3_candles"]
+[ext_resource type="PackedScene" path="res://src/props/settlement/banner.tscn" id="4_banner"]
+[ext_resource type="PackedScene" path="res://src/props/settlement/bell.tscn" id="5_bell"]
+[ext_resource type="PackedScene" path="res://src/props/settlement/reliquary.tscn" id="6_reliquary"]
 
 [resource]
 script = ExtResource("1_def")
@@ -16,6 +21,9 @@ expansion = 0.55
 piety = 0.95
 trade = 0.3
 senses_fragment = 0.9
+npc_frames_dir = "res://assets/art/npcs/chorister"
+settlement_props = Array[PackedScene]([ExtResource("2_shrine"), ExtResource("3_candles"), ExtResource("4_banner"), ExtResource("5_bell"), ExtResource("6_reliquary")])
+barks = Array[String](["Hush. Can you hear it breathing?", "Sing with us. It listens to the loud ones.", "The heart skipped again last night.", "Every spasm is a word. We are learning the language.", "You walk like something is watching from inside you.", "Light a candle. It costs you nothing.", "When it wakes, it will remember who sang."])
 strength = 80
 relations = {
 &"flesh_tenders": -30

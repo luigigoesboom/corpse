@@ -1,0 +1,36 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/props/settlement/settlement_prop.gd" id="1_prop"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="2_unshaded"]
+[ext_resource type="Texture2D" path="res://assets/lights/light_banded.tres" id="3_light"]
+
+[node name="BileCistern" type="Node2D"]
+z_index = -1
+script = ExtResource("1_prop")
+width = 44.0
+work_spot = true
+work_offset = 24.0
+
+[node name="Barrel" type="Polygon2D" parent="."]
+color = Color(0.420, 0.290, 0.180, 1.00)
+polygon = PackedVector2Array(-14, 0, -17, -32, 17, -32, 14, 0)
+
+[node name="Band1" type="Polygon2D" parent="."]
+color = Color(0.243, 0.165, 0.102, 1.00)
+polygon = PackedVector2Array(-16, -26, 16, -26, 16, -23, -16, -23)
+
+[node name="Band2" type="Polygon2D" parent="."]
+color = Color(0.243, 0.165, 0.102, 1.00)
+polygon = PackedVector2Array(-15, -9, 15, -9, 15, -6, -15, -6)
+
+[node name="Bile" type="Polygon2D" parent="."]
+material = ExtResource("2_unshaded")
+color = Color(0.722, 0.831, 0.227, 1.00)
+polygon = PackedVector2Array(15, -32, 13, -30.5, 7.5, -29.4, 0, -29, -7.5, -29.4, -13, -30.5, -15, -32, -13, -33.5, -7.5, -34.6, -0, -35, 7.5, -34.6, 13, -33.5)
+
+[node name="Light0" type="PointLight2D" parent="."]
+position = Vector2(0, -36)
+color = Color(0.722, 0.831, 0.227, 1.00)
+energy = 0.4
+texture = ExtResource("3_light")
+texture_scale = 0.5

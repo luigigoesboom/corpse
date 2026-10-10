@@ -213,6 +213,12 @@ Two halves, like items and mutations:
 
 Starting territory is painted: `data/maps/territory.png`, same size as world.png, each faction's land in its color. `FactionTerritory` (src/world) reads it when a world starts (or an old save without factions loads): a chunk goes to the faction with the most paint in it, if that is at least 10% of the chunk. Relations start mutual (the average of what both defs say). `WorldData.faction_at(chunk)`, `relation(a, b)`, `set_relation(a, b, v)` (mutual, clamped to -100..100). NPCs have a `faction` id. The debug map (M) tints territory and lists each faction. Loop over factions with `FactionDb.all_ids()` (alphabetical), never over Dictionary keys of defs, so history stays repeatable.
 
+## Sites and settlements (week 27)
+
+Places are hand-made slots; what fills them is data. A `Settlement` node (src/world/settlement.gd) under Entities in world.tscn marks a stretch of flat floor (width, capacity, optional preferred faction). `WorldData.sites` maps the slot's node name to a `SiteData` (src/sim/sites): kind (&"settlement" now; ruins and shrines in week 29), owning faction, generated name, population, founding year. `SiteSeeder` (src/world) fills it when a world starts or an old save has no sites: preferred faction, else whoever holds the chunk; residents = owner strength / 20, capped by capacity.
+
+At runtime the Settlement builds itself from the owner's FactionDef: `settlement_props` (SettlementProp scenes: width, work spot, worker offset) shuffled with a SeededRng per site and spread along the floor, and `population` `ColonyNpc` residents (src/actors/npcs) in the faction's `npc_frames_dir` look. Residents walk along the floor without physics, idle, stroll, claim and work at work spots, chat with an idle neighbour, look at a nearby player; the settlement shows its name when you walk in and makes the resident nearest you say one of the faction's `barks` every few seconds. Residents are not saved individually; changing a SiteData (population, faction) and calling `build()` changes what is shown.
+
 ## History sim
 
 Two speeds, same code:

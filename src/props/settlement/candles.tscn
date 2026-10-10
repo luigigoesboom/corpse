@@ -1,0 +1,64 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/props/settlement/settlement_prop.gd" id="1_prop"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="2_unshaded"]
+[ext_resource type="Texture2D" path="res://assets/lights/light_banded.tres" id="3_light"]
+
+[node name="Candles" type="Node2D"]
+z_index = -1
+script = ExtResource("1_prop")
+width = 40.0
+work_spot = true
+work_offset = 22.0
+
+[node name="C1" type="Polygon2D" parent="."]
+color = Color(0.937, 0.902, 0.800, 1.00)
+polygon = PackedVector2Array(-14, -10, -11, -10, -11, 0, -14, 0)
+
+[node name="C2" type="Polygon2D" parent="."]
+color = Color(0.937, 0.902, 0.800, 1.00)
+polygon = PackedVector2Array(-7, -16, -4, -16, -4, 0, -7, 0)
+
+[node name="C3" type="Polygon2D" parent="."]
+color = Color(0.937, 0.902, 0.800, 1.00)
+polygon = PackedVector2Array(0, -12, 3, -12, 3, 0, 0, 0)
+
+[node name="C4" type="Polygon2D" parent="."]
+color = Color(0.937, 0.902, 0.800, 1.00)
+polygon = PackedVector2Array(7, -18, 10, -18, 10, 0, 7, 0)
+
+[node name="C5" type="Polygon2D" parent="."]
+color = Color(0.937, 0.902, 0.800, 1.00)
+polygon = PackedVector2Array(13, -9, 16, -9, 16, 0, 13, 0)
+
+[node name="F1" type="Polygon2D" parent="."]
+material = ExtResource("2_unshaded")
+color = Color(1.000, 0.690, 0.251, 1.00)
+polygon = PackedVector2Array(-11, -12, -11.8, -9.8, -13.2, -9.8, -14, -12, -13.2, -14.2, -11.8, -14.2)
+
+[node name="F2" type="Polygon2D" parent="."]
+material = ExtResource("2_unshaded")
+color = Color(1.000, 0.690, 0.251, 1.00)
+polygon = PackedVector2Array(-4, -18, -4.8, -15.8, -6.2, -15.8, -7, -18, -6.3, -20.2, -4.8, -20.2)
+
+[node name="F3" type="Polygon2D" parent="."]
+material = ExtResource("2_unshaded")
+color = Color(1.000, 0.690, 0.251, 1.00)
+polygon = PackedVector2Array(3, -14, 2.2, -11.8, 0.8, -11.8, 0, -14, 0.7, -16.2, 2.2, -16.2)
+
+[node name="F4" type="Polygon2D" parent="."]
+material = ExtResource("2_unshaded")
+color = Color(1.000, 0.690, 0.251, 1.00)
+polygon = PackedVector2Array(10, -20, 9.2, -17.8, 7.8, -17.8, 7, -20, 7.7, -22.2, 9.2, -22.2)
+
+[node name="F5" type="Polygon2D" parent="."]
+material = ExtResource("2_unshaded")
+color = Color(1.000, 0.690, 0.251, 1.00)
+polygon = PackedVector2Array(16, -11, 15.2, -8.8, 13.8, -8.8, 13, -11, 13.8, -13.2, 15.2, -13.2)
+
+[node name="Light0" type="PointLight2D" parent="."]
+position = Vector2(0, -16)
+color = Color(1.000, 0.722, 0.376, 1.00)
+energy = 0.45
+texture = ExtResource("3_light")
+texture_scale = 1.1

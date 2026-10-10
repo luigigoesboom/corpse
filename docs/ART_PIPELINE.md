@@ -71,6 +71,13 @@ The level is a PNG: `data/maps/world.png`, **one pixel = one tile** (32 x 32 px 
 
 `data/maps/territory.png` is the same size as world.png. In Krita, open world.png, add territory.png as a layer on top (File > Import as layer, or drag it in), lower its opacity, and paint each faction's land in its exact color (from its .tres in data/factions: Flesh-Tenders green 112 176 74, Choir of Waking gold 224 184 74). Leave unclaimed land transparent. Export that layer alone to territory.png. Territory is decided per chunk (64 x 64 tiles, the grid squares), so rough blobs are fine. It only applies to new worlds: history owns territory after that.
 
+## Settlements
+
+To add one: in scenes/world.tscn select Entities, add a Node2D, attach src/world/settlement.gd, place it on a **flat** floor (y = tile top + 6, like other floor things) and set `width`. The editor draws its extent. Set `preferred_faction` (a faction id) or leave it empty for whoever holds the chunk. Everything inside is built from the faction:
+- **Props**: scenes in src/props/settlement with the SettlementProp script (origin on the floor, `width` = floor it takes, `work_spot` + `work_offset` = where a resident stands to work). List them in the faction's `settlement_props`. The current ones are programmer shapes; replace their Polygon2Ds with Sprite2Ds of your art and keep the script.
+- **Residents**: strips in `npc_frames_dir` (assets/art/npcs/tender, chorister), 64 x 64 like hosts: `idle`, `run` (played slowed down as a walk), `work` (bent over a task, loops).
+- **Lines**: the faction's `barks`.
+
 ## Light and glow
 
 The world is dark (CanvasModulate on `Darkness` in game.tscn) and lit by PointLight2D nodes using `assets/lights/light_banded.tres` (hard steps, pixel-art friendly). Tiles block light (occluders in gut_tileset.tres).

@@ -1,0 +1,29 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/props/settlement/settlement_prop.gd" id="1_prop"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="2_unshaded"]
+[ext_resource type="Texture2D" path="res://assets/lights/light_banded.tres" id="3_light"]
+
+[node name="Reliquary" type="Node2D"]
+z_index = -1
+script = ExtResource("1_prop")
+width = 44.0
+work_spot = false
+work_offset = 0.0
+
+[node name="Box" type="Polygon2D" parent="."]
+color = Color(0.541, 0.416, 0.227, 1.00)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 0, -18, 0)
+
+[node name="Lid" type="Polygon2D" parent="."]
+color = Color(0.627, 0.478, 0.227, 1.00)
+polygon = PackedVector2Array(-20, -26, 0, -36, 20, -26)
+
+[node name="Window" type="Polygon2D" parent="."]
+color = Color(0.165, 0.094, 0.063, 1.00)
+polygon = PackedVector2Array(-8, -20, 8, -20, 8, -8, -8, -8)
+
+[node name="Bone" type="Polygon2D" parent="."]
+material = ExtResource("2_unshaded")
+color = Color(0.902, 0.871, 0.769, 1.00)
+polygon = PackedVector2Array(5, -14, 3.5, -11.9, 0, -11, -3.5, -11.9, -5, -14, -3.5, -16.1, -0, -17, 3.5, -16.1)

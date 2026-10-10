@@ -1,0 +1,32 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/props/settlement/settlement_prop.gd" id="1_prop"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="2_unshaded"]
+[ext_resource type="Texture2D" path="res://assets/lights/light_banded.tres" id="3_light"]
+
+[node name="Bell" type="Node2D"]
+z_index = -1
+script = ExtResource("1_prop")
+width = 50.0
+work_spot = true
+work_offset = -22.0
+
+[node name="PostL" type="Polygon2D" parent="."]
+color = Color(0.812, 0.773, 0.651, 1.00)
+polygon = PackedVector2Array(-20, -54, -17, -54, -17, 0, -20, 0)
+
+[node name="PostR" type="Polygon2D" parent="."]
+color = Color(0.812, 0.773, 0.651, 1.00)
+polygon = PackedVector2Array(17, -54, 20, -54, 20, 0, 17, 0)
+
+[node name="Beam" type="Polygon2D" parent="."]
+color = Color(0.867, 0.831, 0.714, 1.00)
+polygon = PackedVector2Array(-22, -57, 22, -57, 22, -53, -22, -53)
+
+[node name="Bell" type="Polygon2D" parent="."]
+color = Color(0.627, 0.478, 0.227, 1.00)
+polygon = PackedVector2Array(-8, -53, 8, -53, 11, -34, 14, -30, -14, -30, -11, -34)
+
+[node name="Lip" type="Polygon2D" parent="."]
+color = Color(0.478, 0.353, 0.165, 1.00)
+polygon = PackedVector2Array(-14, -31, 14, -31, 14, -29, -14, -29)

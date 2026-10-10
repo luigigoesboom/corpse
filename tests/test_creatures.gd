@@ -6,10 +6,10 @@ func run() -> void:
 	var state := autoload("WorldState")
 	await start_scene("res://game.tscn")
 
-	# Bile Spitter in the chamber at x = 3700: stand in sight and get spat at.
+	# Bile Spitter at the far end of the chamber (x = 4080): stand in sight and get spat at.
 	var spitter = entity("SpitterChamber")
 	check(spitter.get_node("Mutations").ability(&"acid_gland") != null, "the spitter has the same Acid Gland ability as the player")
-	await goto(Vector2(3450, 3178), 1)
+	await goto(Vector2(3830, 3178), 1)
 	var hp: int = player.health.current
 	var spat := false
 	for i in 150:

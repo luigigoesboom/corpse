@@ -29,6 +29,16 @@ extends Resource
 ## VISION.md): priests near 1, farmers near 0.
 @export_range(0.0, 1.0) var senses_fragment := 0.0
 
+@export_group("Settlements", "")
+## Strips for the residents of its settlements (idle, run, work).
+@export_dir var npc_frames_dir: String
+## What a settlement of theirs is built from (SettlementProp scenes). Laid
+## out along the floor in a repeatable order per site; props marked as work
+## spots are where residents go to work.
+@export var settlement_props: Array[PackedScene] = []
+## Things residents say when you come close.
+@export var barks: Array[String] = []
+
 @export_group("Starting attitudes", "")
 ## Starting strength (members, roughly).
 @export var strength := 100

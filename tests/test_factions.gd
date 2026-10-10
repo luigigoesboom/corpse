@@ -33,9 +33,9 @@ func run() -> void:
 	data.set_relation(&"flesh_tenders", &"choir_of_waking", -150)
 	check(data.relation(&"choir_of_waking", &"flesh_tenders") == -100, "set_relation() is mutual and clamped")
 
-	# NPCs belong to factions.
-	check(entity("FleshTender").faction == &"flesh_tenders" and entity("ChoirAcolyte").faction == &"choir_of_waking",
-		"the placed NPCs know their faction")
+	# Settlements belong to factions (week 27 builds them, see test_settlements).
+	check(data.sites["TenderCamp"].faction == &"flesh_tenders" and data.sites["ChoirChapel"].faction == &"choir_of_waking",
+		"each settlement slot is settled by a faction")
 
 	# Saved and loaded.
 	data.factions[&"choir_of_waking"].strength = 33

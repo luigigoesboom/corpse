@@ -1,0 +1,32 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/props/settlement/settlement_prop.gd" id="1_prop"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="2_unshaded"]
+[ext_resource type="Texture2D" path="res://assets/lights/light_banded.tres" id="3_light"]
+
+[node name="TenderLamp" type="Node2D"]
+z_index = -1
+script = ExtResource("1_prop")
+width = 22.0
+work_spot = false
+work_offset = 0.0
+
+[node name="Post" type="Polygon2D" parent="."]
+color = Color(0.353, 0.227, 0.165, 1.00)
+polygon = PackedVector2Array(-2, -52, 1, -52, 1, 0, -2, 0)
+
+[node name="Arm" type="Polygon2D" parent="."]
+color = Color(0.353, 0.227, 0.165, 1.00)
+polygon = PackedVector2Array(-2, -52, 10, -52, 10, -50, -2, -50)
+
+[node name="Bulb" type="Polygon2D" parent="."]
+material = ExtResource("2_unshaded")
+color = Color(1.000, 0.847, 0.400, 1.00)
+polygon = PackedVector2Array(13, -45, 12.5, -42.5, 11, -40.7, 9, -40, 7, -40.7, 5.5, -42.5, 5, -45, 5.5, -47.5, 7, -49.3, 9, -50, 11, -49.3, 12.5, -47.5)
+
+[node name="Light0" type="PointLight2D" parent="."]
+position = Vector2(9, -45)
+color = Color(1.000, 0.800, 0.533, 1.00)
+energy = 0.55
+texture = ExtResource("3_light")
+texture_scale = 1.5

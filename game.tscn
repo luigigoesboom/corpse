@@ -45,7 +45,7 @@ script = ExtResource("6_items")
 
 [node name="Player" parent="." unique_id=1929283364 instance=ExtResource("2_player")]
 
-[node name="GameCamera" parent="." node_paths=PackedStringArray("target") instance=ExtResource("90_camera")]
+[node name="GameCamera" parent="." unique_id=1290834302 node_paths=PackedStringArray("target") instance=ExtResource("90_camera")]
 target = NodePath("../Player")
 
 [node name="CombatFeel" type="Node" parent="." unique_id=2010135733 node_paths=PackedStringArray("player", "camera")]

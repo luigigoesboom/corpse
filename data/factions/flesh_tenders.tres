@@ -1,6 +1,11 @@
 [gd_resource type="Resource" script_class="FactionDef" format=3]
 
 [ext_resource type="Script" path="res://src/sim/factions/faction_def.gd" id="1_def"]
+[ext_resource type="PackedScene" path="res://src/props/settlement/tent.tscn" id="2_tent"]
+[ext_resource type="PackedScene" path="res://src/props/settlement/flesh_plot.tscn" id="3_plot"]
+[ext_resource type="PackedScene" path="res://src/props/settlement/bile_cistern.tscn" id="4_cistern"]
+[ext_resource type="PackedScene" path="res://src/props/settlement/drying_rack.tscn" id="5_rack"]
+[ext_resource type="PackedScene" path="res://src/props/settlement/tender_lamp.tscn" id="6_lamp"]
 
 [resource]
 script = ExtResource("1_def")
@@ -16,6 +21,9 @@ expansion = 0.45
 piety = 0.3
 trade = 0.7
 senses_fragment = 0.0
+npc_frames_dir = "res://assets/art/npcs/tender"
+settlement_props = Array[PackedScene]([ExtResource("2_tent"), ExtResource("3_plot"), ExtResource("4_cistern"), ExtResource("5_rack"), ExtResource("6_lamp")])
+barks = Array[String](["Mind the bile, it eats boots.", "The lining is soft this season.", "Whatever falls here feeds the walls.", "Don't waste it. Nothing grows back twice.", "You smell of the Choir's candles.", "Pull the bulbs gently, they bruise.", "Bury me in the east wall, where it's warm."])
 strength = 120
 relations = {
 &"choir_of_waking": -20

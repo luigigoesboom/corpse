@@ -1,0 +1,41 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/actors/npcs/colony_npc.gd" id="1_npc"]
+[ext_resource type="Script" path="res://src/actors/components/ground_shadow.gd" id="2_shadow"]
+[ext_resource type="Script" path="res://src/actors/components/layered_sprite.gd" id="3_sprite"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="4_unshaded"]
+
+[node name="ColonyNpc" type="Node2D"]
+script = ExtResource("1_npc")
+
+[node name="Shadow" type="Node2D" parent="."]
+script = ExtResource("2_shadow")
+width = 24.0
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="Sprite" type="Node2D" parent="Visual"]
+material = ExtResource("4_unshaded")
+script = ExtResource("3_sprite")
+body_frames_dir = "res://assets/art/npcs/tender"
+frame_offset = Vector2(0, -32)
+
+[node name="Name" type="Label" parent="."]
+offset_left = -70.0
+offset_top = -78.0
+offset_right = 70.0
+offset_bottom = -64.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+horizontal_alignment = 1
+
+[node name="Bark" type="Label" parent="."]
+offset_left = -110.0
+offset_top = -96.0
+offset_right = 110.0
+offset_bottom = -80.0
+theme_override_colors/font_color = Color(1, 0.95, 0.85, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+horizontal_alignment = 1
+autowrap_mode = 0
