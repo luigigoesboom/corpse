@@ -1,0 +1,38 @@
+class_name FactionDef
+extends Resource
+## What a faction IS, written by hand: one .tres per faction in data/factions.
+## What it currently has and thinks (strength, territory, relations) is
+## FactionData in WorldData, which history changes over time.
+
+@export var id: StringName
+@export var display_name := ""
+## One member: "a Flesh-Tender".
+@export var member_name := ""
+@export_multiline var description := ""
+## What they believe, in their own words. Shown in dialogue and murals later.
+@export_multiline var creed := ""
+## Map color: the territory paint in data/maps/territory.png and the debug map.
+@export var color := Color.WHITE
+## Belief tags the history sim and dialogue react to (deeds they like or hate).
+@export var values: Array[StringName] = []
+
+@export_group("Temperament", "")
+## 0..1, how readily they fight over land and slights.
+@export_range(0.0, 1.0) var aggression := 0.5
+## 0..1, how hungry they are for more territory.
+@export_range(0.0, 1.0) var expansion := 0.5
+## 0..1, how much the god (and the fragment) matters to them.
+@export_range(0.0, 1.0) var piety := 0.5
+## 0..1, how willing they are to trade and talk.
+@export_range(0.0, 1.0) var trade := 0.5
+## 0..1, how directly they sense the fragment across hosts (legend standing,
+## VISION.md): priests near 1, farmers near 0.
+@export_range(0.0, 1.0) var senses_fragment := 0.0
+
+@export_group("Starting attitudes", "")
+## Starting strength (members, roughly).
+@export var strength := 100
+## Faction id -> -100 (war) .. 100 (kin), at world start.
+@export var relations: Dictionary = {}
+## Host type id -> -100 .. 100: how they treat a new host of that type.
+@export var host_attitudes: Dictionary = {}

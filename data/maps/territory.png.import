@@ -1,0 +1,14 @@
+[remap]
+
+importer="image"
+type="Image"
+uid="uid://dolvp8g87wcad"
+path="res://.godot/imported/territory.png-d5fdb28509efe8e431839e200dd3c631.image"
+
+[deps]
+
+source_file="res://data/maps/territory.png"
+dest_files=["res://.godot/imported/territory.png-d5fdb28509efe8e431839e200dd3c631.image"]
+
+[params]
+

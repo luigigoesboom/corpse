@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="FactionDef" format=3]
+
+[ext_resource type="Script" path="res://src/sim/factions/faction_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"choir_of_waking"
+display_name = "Choir of Waking"
+member_name = "a chorister"
+description = "A theocracy that sings to the heart, waiting for the god to rise. They keep relics, read omens in the body's spasms, and listen for the fragment that moves from body to body."
+creed = "It is not dead. It is listening. When the choir is loud enough it will wake, and the faithful will wake with it."
+color = Color(0.88, 0.72, 0.29, 1)
+values = Array[StringName]([&"waking", &"devotion", &"relics", &"the_fragment"])
+aggression = 0.5
+expansion = 0.55
+piety = 0.95
+trade = 0.3
+senses_fragment = 0.9
+strength = 80
+relations = {
+&"flesh_tenders": -30
+}
+host_attitudes = {
+&"antibody": 40,
+&"colonist": 0,
+&"pilgrim": 30
+}

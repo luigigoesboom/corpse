@@ -42,6 +42,9 @@ var next_id := 1
 var lives: Array[LifeRecord] = []
 ## Everything that happened, oldest first (EventRecord). Append only.
 var events: Array[EventRecord] = []
+## Faction id -> FactionData (week 26). Filled when a world starts, from
+## data/factions and the painted territory map (FactionTerritory).
+var factions: Dictionary = {}
 
 
 static func create(seed_value: int) -> WorldData:
@@ -49,6 +52,30 @@ static func create(seed_value: int) -> WorldData:
 	data.world_seed = seed_value
 	data._fit_inventory()
 	return data
+
+
+## The faction holding a chunk, or &"" if nobody does.
+func faction_at(chunk: Vector2i) -> StringName:
+	for id in factions:
+		if factions[id].is_alive() and factions[id].holds(chunk):
+			return id
+	return &""
+
+
+## How faction `a` feels about faction `b`: -100 (war) .. 100 (kin).
+func relation(a: StringName, b: StringName) -> int:
+	if not factions.has(a):
+		return 0
+	return int(factions[a].relations.get(b, 0))
+
+
+## Sets how two factions feel about each other, both ways.
+func set_relation(a: StringName, b: StringName, value: int) -> void:
+	value = clampi(value, -100, 100)
+	if factions.has(a):
+		factions[a].relations[b] = value
+	if factions.has(b):
+		factions[b].relations[a] = value
 
 
 ## The current host's record, or null between death and the next host.
@@ -191,6 +218,7 @@ func to_dict() -> Dictionary:
 		"next_id": next_id,
 		"lives": lives.map(func(life): return life.to_dict()),
 		"events": events.map(func(event): return event.to_dict()),
+		"factions": factions.values().map(func(faction): return faction.to_dict()),
 	}
 
 
@@ -209,6 +237,9 @@ static func from_dict(d: Dictionary) -> WorldData:
 		data.lives.append(LifeRecord.from_dict(life))
 	for event in d.get("events", []):
 		data.events.append(EventRecord.from_dict(event))
+	for faction_dict in d.get("factions", []):
+		var faction := FactionData.from_dict(faction_dict)
+		data.factions[faction.id] = faction
 	data._fit_inventory()
 	return data
 

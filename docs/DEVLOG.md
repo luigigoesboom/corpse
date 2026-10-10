@@ -13,6 +13,11 @@ Next:
 
 ---
 
+## Week 26: factions as data (2026-10-10)
+Done: `FactionDef` resources for the Flesh-Tenders (farmers of the gut lining, practical, trade-minded, blind to the fragment; like colonists, fear antibodies) and the Choir of Waking (theocracy singing to the heart, senses the fragment; reveres antibodies as the god's own hand, welcomes pilgrims). `FactionData` in `WorldData.factions` (strength, territory chunks, mutual relations, founding year), saved, save version 10 with migration; old saves get the starting factions on load. Starting territory is painted in data/maps/territory.png and read per chunk. Placed NPCs belong to a faction (name tinted). Debug map (M) tints territory, names it, and lists strength, land and relations. Found and fixed: Array.sort() does not order StringNames alphabetically, so faction order could differ between runs; ids are now sorted as text. tests/test_factions.gd (16 checks). Logged Q-007: mutation art has to get much cheaper for 100+ mutations.
+Not done: nothing reads faction attitudes yet (host standing is week 31); no settlements (week 27) or history (week 28).
+Next: week 27, settlements built from faction data.
+
 ## Week 25: milestone 3 playtest (2026-10-10)
 The developer played the new build. Notes, in their words where possible, and what was done:
 

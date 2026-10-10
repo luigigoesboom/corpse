@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="FactionDef" format=3]
+
+[ext_resource type="Script" path="res://src/sim/factions/faction_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"flesh_tenders"
+display_name = "Flesh-Tenders"
+member_name = "a Flesh-Tender"
+description = "Farmers of the gut lining. They grow food in the god's own tissue, drain its bile into cisterns, and bury their dead in the walls so the body can use them."
+creed = "The god is soil, not a sleeper. Tend it, take only what grows back, waste nothing. What dies here feeds what lives here."
+color = Color(0.44, 0.69, 0.29, 1)
+values = Array[StringName]([&"tending", &"patience", &"waste_not", &"the_dead_feed_the_body"])
+aggression = 0.25
+expansion = 0.45
+piety = 0.3
+trade = 0.7
+senses_fragment = 0.0
+strength = 120
+relations = {
+&"choir_of_waking": -20
+}
+host_attitudes = {
+&"antibody": -40,
+&"colonist": 20,
+&"pilgrim": -10
+}

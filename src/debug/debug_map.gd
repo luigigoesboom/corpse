@@ -1,7 +1,8 @@
 class_name DebugMap
 extends Control
 ## M toggles a full-screen view of the painted world map, with the player
-## (red dot) and the currently loaded chunks (green boxes).
+## (red dot), the currently loaded chunks (green boxes), old bodies (crosses)
+## and faction territory (tinted chunks, names, and a legend).
 
 @export var player: Node2D
 @export var chunks: ChunkManager
@@ -44,6 +45,7 @@ func _draw() -> void:
 	draw_texture_rect(_texture, Rect2(origin, map_size * px), false)
 
 	var chunk_px := ChunkData.SIZE * px
+	_draw_factions(origin, chunk_px)
 	for c in chunks.get_children():
 		var coord := ChunkData.world_to_chunk(c.position + Vector2.ONE)
 		draw_rect(Rect2(origin + Vector2(coord) * chunk_px, Vector2.ONE * chunk_px), Color.LIME, false, 2.0)
@@ -60,3 +62,53 @@ func _draw() -> void:
 	if player:
 		var p := origin + player.global_position / ChunkData.TILE_PX * px
 		draw_circle(p, maxf(3.0, px), Color.RED)
+
+	var font := get_theme_default_font()
+	var y := 20.0
+	for line in legend_lines():
+		draw_string(font, Vector2(10, y), line.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, line.color)
+		y += 14.0
+
+
+## Each faction's chunks tinted in its color, its name over the middle of them.
+func _draw_factions(origin: Vector2, chunk_px: float) -> void:
+	if WorldState.data == null:
+		return
+	var font := get_theme_default_font()
+	for faction: FactionData in WorldState.data.factions.values():
+		var def := FactionDb.get_def(faction.id)
+		if def == null or not faction.is_alive() or faction.territory.is_empty():
+			continue
+		var middle := Vector2.ZERO
+		for chunk in faction.territory:
+			var rect := Rect2(origin + Vector2(chunk) * chunk_px, Vector2.ONE * chunk_px)
+			draw_rect(rect, Color(def.color, 0.35))
+			draw_rect(rect.grow(-2.0), def.color, false, 2.0)
+			middle += rect.get_center()
+		middle /= faction.territory.size()
+		var width := font.get_string_size(def.display_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
+		draw_string_outline(font, middle - Vector2(width / 2.0, 0), def.display_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, 4, Color.BLACK)
+		draw_string(font, middle - Vector2(width / 2.0, 0), def.display_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, def.color.lightened(0.4))
+
+
+## The legend, one line per faction: name, strength, chunks held, relations.
+func legend_lines() -> Array:
+	var lines := []
+	if WorldState.data == null:
+		return lines
+	var factions: Dictionary = WorldState.data.factions
+	for id in FactionDb.all_ids():
+		if not factions.has(id):
+			continue
+		var faction: FactionData = factions[id]
+		var def := FactionDb.get_def(id)
+		var feelings := PackedStringArray()
+		for other in faction.relations:
+			var other_def := FactionDb.get_def(other)
+			feelings.append("%s %+d" % [other_def.display_name if other_def else String(other), faction.relations[other]])
+		lines.append({
+			"text": "%s: strength %d, %d chunks%s" % [def.display_name, faction.strength, faction.territory.size(),
+				("; " + ", ".join(feelings)) if not feelings.is_empty() else ""],
+			"color": def.color.lightened(0.3),
+		})
+	return lines

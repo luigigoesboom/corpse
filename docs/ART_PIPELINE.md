@@ -67,6 +67,10 @@ The level is a PNG: `data/maps/world.png`, **one pixel = one tile** (32 x 32 px 
 
 **Tips:** sketch the big shapes with a large brush first (chambers, main routes), then carve details. Rooms that need precise layout or many props (colonies, boss arenas) will be Godot scenes placed on the map (roadmap week 10); paint just their outline.
 
+## Painting faction territory
+
+`data/maps/territory.png` is the same size as world.png. In Krita, open world.png, add territory.png as a layer on top (File > Import as layer, or drag it in), lower its opacity, and paint each faction's land in its exact color (from its .tres in data/factions: Flesh-Tenders green 112 176 74, Choir of Waking gold 224 184 74). Leave unclaimed land transparent. Export that layer alone to territory.png. Territory is decided per chunk (64 x 64 tiles, the grid squares), so rough blobs are fine. It only applies to new worlds: history owns territory after that.
+
 ## Light and glow
 
 The world is dark (CanvasModulate on `Darkness` in game.tscn) and lit by PointLight2D nodes using `assets/lights/light_banded.tres` (hard steps, pixel-art friendly). Tiles block light (occluders in gut_tileset.tres).

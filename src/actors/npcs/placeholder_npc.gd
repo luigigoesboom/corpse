@@ -8,12 +8,18 @@ extends Node2D
 		npc_name = value
 		if is_node_ready():
 			$Name.text = value
+## FactionDef id this NPC belongs to (week 26), or empty for none. Tints the
+## name in the faction's color.
+@export var faction: StringName
 
 var _time := 0.0
 
 
 func _ready() -> void:
 	$Name.text = npc_name
+	var def := FactionDb.get_def(faction) if faction != &"" else null
+	if def:
+		$Name.add_theme_color_override("font_color", def.color.lightened(0.3))
 	_time = position.x  # So neighbors do not bob in sync.
 
 

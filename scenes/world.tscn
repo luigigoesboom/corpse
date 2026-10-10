@@ -53,10 +53,12 @@ script = ExtResource("2_entities")
 [node name="FleshTender" parent="Entities" instance=ExtResource("3_npc")]
 position = Vector2(1280, 3206)
 npc_name = "Flesh-Tender"
+faction = &"flesh_tenders"
 
 [node name="ChoirAcolyte" parent="Entities" instance=ExtResource("3_npc")]
 position = Vector2(3200, 3206)
 npc_name = "Choir Acolyte"
+faction = &"choir_of_waking"
 
 [node name="ShaftHermit" parent="Entities" instance=ExtResource("3_npc")]
 position = Vector2(5280, 838)

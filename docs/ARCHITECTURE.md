@@ -202,6 +202,17 @@ Load = cut the chunk from the painted map, then apply its diff. This keeps saves
 - When the format changes, bump `save_version` and add a migration step in `SaveSystem`. Never break old saves silently.
 - Write to a temp file, then rename, so a crash mid-save cannot corrupt the slot.
 
+## Factions (week 26)
+
+Two halves, like items and mutations:
+
+| Part | Where | What |
+|---|---|---|
+| `FactionDef` | data/factions/*.tres (src/sim/factions) | What a faction is, by hand: name, member name, creed, color, value tags, temperament (aggression, expansion, piety, trade, senses_fragment), starting strength, relations to other factions, attitude per host type. Looked up with `FactionDb`. |
+| `FactionData` | `WorldData.factions` (id -> FactionData) | What it has now: strength (0 = gone), territory (chunks), relations, founded_year. Saved; history changes it. |
+
+Starting territory is painted: `data/maps/territory.png`, same size as world.png, each faction's land in its color. `FactionTerritory` (src/world) reads it when a world starts (or an old save without factions loads): a chunk goes to the faction with the most paint in it, if that is at least 10% of the chunk. Relations start mutual (the average of what both defs say). `WorldData.faction_at(chunk)`, `relation(a, b)`, `set_relation(a, b, v)` (mutual, clamped to -100..100). NPCs have a `faction` id. The debug map (M) tints territory and lists each faction. Loop over factions with `FactionDb.all_ids()` (alphabetical), never over Dictionary keys of defs, so history stays repeatable.
+
 ## History sim
 
 Two speeds, same code:

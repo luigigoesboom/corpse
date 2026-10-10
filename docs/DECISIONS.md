@@ -127,4 +127,5 @@ Format: ID, date, decision, why, what it rules out.
 |---|---|---|
 | Q-004 | Outlines or no outlines in the art style? | Week 15 |
 | Q-005 | Final name of the game. | Before the Steam page, week 45 |
+| Q-007 | Mutation art at scale: the goal is tens to hundreds of mutations (like Isaac items), but D-017 overlays need one strip per animation per host body (about 33 frames each now). Proposal: hosts get a per-frame anchor layer (socket points, maybe rotation), drawn once per host; a mutation is one small part sprite per slot (optionally a 2-4 frame loop) placed on the anchor every frame. Hand-drawn overlays stay possible for showcase parts. | Before drawing mutation art |
 | Q-006 | Breakable terrain at all? Developer doubts it. If not, week 8 becomes "chunk diffs for entity state only" (dead NPCs, taken items, corpses). | Week 8 |
