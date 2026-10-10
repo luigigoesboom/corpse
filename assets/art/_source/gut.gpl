@@ -2,13 +2,14 @@ GIMP Palette
 Name: CORPSE Gut
 Columns: 8
 #
-# The Gut's palette (week 39 art pass). Every prop and item sprite made by
-# tools/art/make_props.gd uses only these colors (tests/test_art.gd checks).
-# Grouped in ramps, dark to light. Load it in Aseprite (Palette > Load) and
-# draw with it; change it here and re-run the tool to recolor the props.
+# The Gut's palette. All generated art (tools/pixel, D-028) uses only these
+# colors; tests/test_art.gd checks. Colors come in ramps, dark to light: a
+# line "# ramp <name>" starts one. The art program shades with ramps by name
+# (ramp "bone" step 0 = darkest). Load it in Aseprite with Palette > Load.
 #
-# Outline and flesh walls (from the tiles)
+# ramp outline
  30  15  18	Outline / near-black
+# ramp flesh
  42   7  12	Flesh deepest
  62  14  21	Flesh deep
  94  24  32	Flesh dark
@@ -16,56 +17,96 @@ Columns: 8
 138  44  52	Flesh mid
 180  72  76	Flesh light
 208 104 106	Flesh highlight
-# Mouth and blood
+# ramp blood
  74  15  22	Deep red / mouth
 154  58  58	Blood dark
 220  52  62	Blood
 255  92  84	Blood glow
-# Rag and cloth
+# ramp rag
+ 52  32  44	Rag deep
  77  49  64	Rag shadow
 107  70  86	Rag
-# Skin and host
+140  98 112	Rag light
+# ramp skin
+136  98  84	Skin deep
 185 143 120	Skin shadow
 227 196 168	Skin
-# Leech
+244 222 198	Skin light
+# ramp pilgrim
+ 38  44  56	Pilgrim deep
+ 54  64  77	Pilgrim shadow
+ 79  93 110	Pilgrim cloth
+112 128 146	Pilgrim light
+# ramp antibody
+110 128 146	Antibody deep
+159 178 194	Antibody shadow
+196 211 222	Antibody
+223 232 238	Antibody light
+# ramp tender
+ 46  52  26	Tender deep
+ 65  74  34	Tender shadow
+ 94 107  52	Tender cloth
+128 140  74	Tender light
+# ramp gold
+ 92  70  28	Gold deep
+134 104  42	Gold shadow
+184 146  58	Gold
+224 184  74	Gold light
+# ramp leech
+ 60  70  30	Leech deep
  85  98  42	Leech shadow
 122 138  58	Leech
 167 176  96	Leech belly
-# Bile
+# ramp bile
 127 154  34	Bile shadow
 184 212  58	Bile
 232 245 144	Bile glow
-# Bone
+# ramp bone
 130 118  92	Bone deep
 185 171 136	Bone shadow
 212 202 170	Bone mid
 238 228 200	Bone
-# Lung
+# ramp lung
+150  82  98	Lung deep
 184 111 128	Lung shadow
 227 154 168	Lung
-# Bulb
+246 200 208	Lung light
+# ramp bulb
+ 66  32  44	Bulb deep
  98  51  65	Bulb shadow
 138  74  90	Bulb
-# Wood and leather
+170 104 118	Bulb light
+# ramp fly
+ 36  26  42	Fly deep
+ 58  42  64	Fly
+ 79  58  68	Fly stalk
+104  82 100	Fly light
+# ramp wood
  42  24  16	Wood deep
  74  46  26	Wood dark
 107  74  46	Wood
 160 122  58	Wood light
-# Gold (the Choir)
-134 104  42	Gold shadow
-184 146  58	Gold
-224 184  74	Gold light
-# Stone and ash
+# ramp ash
  46  34  32	Ash deep
  90  74  68	Ash
 122 106  96	Ash light
-# Matron hide
+162 148 136	Ash pale
+# ramp hide
+ 58  10  16	Hide mouth
  98  56  46	Hide shadow
 138  90  74	Hide
 201 142 122	Hide belly
-# Glows
-255 224 102	Glow: eyes
-255  74  74	Glow: red eyes
+215 162 150	Hide light
+# ramp eye
+ 26  11  14	Eye dark
+ 27  47  90	Eye blue
+# ramp glow
 255 176  64	Glow: flame
+255 224 102	Glow: eyes
 255 242 192	Glow: flame core
+# ramp glow_red
+255  74  74	Glow: red eyes
+# ramp glow_fungus
 140 255 204	Glow: fungus
+# ramp wing
+204 214 230	Wing

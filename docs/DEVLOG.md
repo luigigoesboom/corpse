@@ -13,6 +13,11 @@ Next:
 
 ---
 
+## Art program, part 1 (2026-10-11)
+Done: D-028 (the developer will mostly use generated art; no Steam). The generators were throwaway scripts outside the repo, each with its own helpers and colors; now there is one program in tools/pixel. The palette is 26 named ramps (added pilgrim, antibody, tender, fly, eye and wing ramps the hosts and creatures were using off-palette). The canvas records shapes and renders them with light: spheres read as round, limbs as tubes, slabs bevelled; selective outlines; a line where parts overlap; one-pixel nubs pruned. Hosts, residents and mutation overlays now come from one skeleton with IK: poses are where hands and feet go. First pass looked like naked figures in capes with bent knees and a roll that came apart; fixed with a tunic drawn over the thighs, sleeves, thinner limbs, a higher hip, and a roll drawn as a tucked ball. tests/test_art.gd now checks hosts, residents and overlays stay in the palette.
+Not done: creatures, the Matron, props, items and tiles still come from the old scripts' output.
+Next: port the creatures and the Matron to recipes.
+
 ## Week 39: art pass 1 (2026-10-10)
 Done: no placeholder shapes left in the Gut. The palette grew from the starter 20 to 48 colors in ramps taken from the tiles, the hosts, the Matron and the props (assets/art/_source/gut.gpl). A tool rasterized all 25 polygon scenes (settlement and ruin props, the heart-root, clots, the Matron's globs, puddles and ripples, acid spit, the wandering NPC, the training dummy) into outlined, shaded pixel art in that palette, and painted the things that were drawn in code: carcass, reliquary, nest, valve key, brazier with a flickering flame, latch, bone grate, mural slab with panels in its people's color, bone tablet, and an icon per item. Banners now take their people's color in settlements too. tests/test_art.gd keeps it that way (palette only, no polygons but effects).
 Not done: this is generated art, consistent but plain; it is a base to paint over (ART_PIPELINE.md says how). The hosts, creatures and tiles were already pixel art and are untouched.

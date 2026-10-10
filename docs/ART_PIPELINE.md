@@ -82,6 +82,27 @@ To add one: in scenes/world.tscn select Entities, add a Node2D, attach src/world
 
 Like settlements: add a Node2D under Entities in scenes/world.tscn, attach src/world/ruin_site.gd, put it on flat floor (tile top + 6) and set `width`. History decides which dead settlement it is and leaves that place's artifact in it. Ruin props are in src/props/ruin (SettlementProp script; a Polygon2D named `Cloth` gets the dead people's color).
 
+## The art program (D-028)
+
+The game's art is made by code: `tools/pixel`, run headless in Godot (no installs).
+
+```
+Godot --headless --path . --script res://tools/pixel/run.gd -- hosts --preview
+```
+
+Names after `--` are recipes (`tools/pixel/recipes/<name>.gd`, or `all`); `--preview` also writes a contact sheet to `user://pixel_preview/<name>.png` (the path is printed) so you can look without starting the game. Recipes write straight into `assets/art`, so check the preview and `git diff` before committing.
+
+| Part | Job |
+|---|---|
+| `palette.gd` | Reads `assets/art/_source/gut.gpl`. A `# ramp <name>` line starts a ramp (dark to light). `ramp()`, `step(name, i)` (negative counts from the light end), `shade(name, t)`, `snap()`. |
+| `canvas.gd` | One frame. Record shapes (`ellipse`, `circle`, `capsule` = tapered tube, `polygon`, `rect`) with a ramp and options (`z`, `tone`, `dither`, `glow`, `flat`, `lo`/`hi` steps, `line`, `rot`), and `detail()` / `stroke()` pixels; `render()` rasterizes in z order, shades every pixel from the shape's form (ellipse = dome, capsule = tube, polygon = bevelled slab) with light from the top left, prunes one-pixel nubs, draws dark lines where a shape lies behind another, and outlines: near-black, but the shape's own darkest color on the lit side. Glow shapes and details go to a second image. |
+| `rig.gd` | `ik()` (two-bone: knees and elbows from where hands and feet go), `reach()`, `turn()`. |
+| `sheet.gd` | `strip()`, `save()`, `preview()`. |
+| `recipes/swatch.gd` | Test card: spheres, tubes, slabs in every ramp. |
+| `recipes/hosts.gd` | One skeleton for every humanoid; looks (colonist, pilgrim, antibody, tender, chorister) dress it; poses are hand and foot targets; the mutation overlays (acid gland, bone spur, lung sac) are drawn on the same joints. |
+
+Making a new thing: copy the nearest recipe, change the shapes and poses, run with `--preview`, look, repeat. `tests/test_art.gd` checks that everything the program makes stays in the palette.
+
 ## Props and items (week 39 art pass)
 
 All props, items and world objects in the Gut are sprites in the Gut palette (`assets/art/_source/gut.gpl`, 48 colors in ramps: flesh, blood, rag, skin, leech, bile, bone, lung, bulb, wood, gold, ash, Matron hide, glows). In Aseprite: Palette > Load palette > gut.gpl, and paint only with it; `tests/test_art.gd` fails if a prop or item PNG uses any other color.

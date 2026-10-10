@@ -125,7 +125,7 @@ Each region follows the same six-week template. Adjust per region after the slic
 
 | Week | Goal | Done when |
 |---|---|---|
-| 45 | Steam page and a short GIF capture setup. Start a public devlog if you want one. | Store page draft exists (publishing can wait). |
+| 45 | Art program (D-028): rigs and recipes for the next region's creatures and props; GIF capture setup for devlogs. | A new creature can be made from a recipe in an afternoon. |
 | 46 | Refactor anything the slice proved fragile, especially save format and chunk code. | Save files from before the refactor still load (migration works). |
 | 47 | Lungs: maps and terrain (huge open chambers, membranes). | You can explore the Lungs. |
 | 48 | Lungs: set pieces. | Landmarks placed. |
@@ -189,7 +189,7 @@ Each region follows the same six-week template. Adjust per region after the slic
 | 96 | Fix playtest problems. | Top issues fixed. |
 | 97 | Fix playtest problems, continued. | Second round of fixes. |
 | 98 | Trailer capture and edit. | Trailer done. |
-| 99 | Store page final, screenshots, description. | Page ready. |
+| 99 | Release page (not Steam, D-028), screenshots, description. | Page ready. |
 | 100 | Release candidate build. | Feature freeze. |
 | 101 | Bug bash. | No known crash bugs. |
 | 102 | Bug bash, platform checks. | Builds work on target platforms. |
