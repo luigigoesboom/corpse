@@ -105,6 +105,14 @@ Names after `--` are recipes (`tools/pixel/recipes/<name>.gd`, or `all`); `--pre
 
 Making a new thing: copy the nearest recipe, change the shapes and poses, run with `--preview`, look, repeat. `tests/test_art.gd` checks that everything the program makes stays in the palette.
 
+## Kinds of rock and dressing (D-028)
+
+**Painting kinds.** `data/maps/tiles.png` is a second painting, the same size as world.png. Where it is transparent the rock is flesh; elsewhere the nearest of these colors picks the kind (`WorldMap.KIND_PAINT`): bile (150, 180, 40), bruise (110, 60, 170), bone (210, 200, 170), rot (140, 85, 40). Only rock pixels matter, so paint broad areas; soft or noisy borders blend kinds tile by tile. F4 reloads it with the map. The starter painting: bruise in the deep, bile in the east cavern, bone in the upper tunnel, rot around the chamber ruin.
+
+**Tiles.** `recipes/tiles.gd` draws the cobble rock and paved floors once per kind, each in its own 7-step ramp (`flesh`, `rock_bile`, `rock_bruise`, `rock_bone`, `rock_rot`), stacked as 4 x 5 blocks in `gut_tiles.png`, and copies the flesh tiles' collision and occluders to every kind's rows in `gut_tileset.tres`. A cell stores tile and kind in one byte (`ChunkData.cell_of()`, `tile_of()`, `kind_of()`).
+
+**Dressing.** The stuff on the rock: `recipes/dressing.gd` draws, per kind, 6 floor things, 6 ceiling things, 6 wall things (and their mirror) and 6 inlays (buried in the rock, drawn dark) in `dressing.png`, plus 4 big floor and 4 big ceiling pieces (64 px) in `dressing_big.png`, each with a glow sheet. `ChunkDressing` (src/world/chunks) places them on every built chunk from a hash of each tile's position, so a place always looks the same: densities and offsets are constants at its top. Only a view, never saved.
+
 ## Props and items (week 39 art pass)
 
 All props, items and world objects in the Gut are sprites in the Gut palette (`assets/art/_source/gut.gpl`, 48 colors in ramps: flesh, blood, rag, skin, leech, bile, bone, lung, bulb, wood, gold, ash, Matron hide, glows). In Aseprite: Palette > Load palette > gut.gpl, and paint only with it; `tests/test_art.gd` fails if a prop or item PNG uses any other color.

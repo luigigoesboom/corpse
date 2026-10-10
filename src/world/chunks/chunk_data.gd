@@ -9,12 +9,18 @@ const SIZE := 64          ## Tiles per side.
 const TILE_PX := 32       ## Pixels per tile.
 const SIZE_PX := SIZE * TILE_PX
 
-## A cell is EMPTY, rock stored as 1 + its open-sides mask (1..16), or rock
-## further from open space (NEAR: 2 tiles, DEEP: 3+). One byte says both
-## "what is here" and which tile to draw: atlas index = cell - 1.
+## A cell is EMPTY or rock. Rock stores which tile it is and what kind of
+## rock (art program, D-028): cell = 1 + tile + TILES * kind, where tile is
+## its open-sides mask (0..15), NEAR (16: 2 tiles from air) or DEEP (17: 3+),
+## and kind indexes KINDS (flesh, bile, bruise, bone, rot). One byte holds
+## both; tile_of() and kind_of() take it apart.
 const EMPTY := 0
-const NEAR := 17
-const DEEP := 18
+const NEAR := 16
+const DEEP := 17
+## Tiles per kind (16 masks + NEAR + DEEP).
+const TILES := 18
+## Kinds of rock, in atlas order (each kind is 5 more rows of the atlas).
+const KINDS := [&"flesh", &"bile", &"bruise", &"bone", &"rot"]
 ## Open-sides mask bits: which neighbors are open space.
 const OPEN_UP := 1
 const OPEN_RIGHT := 2
@@ -35,6 +41,18 @@ var cells := PackedByteArray()
 func _init(chunk_coord: Vector2i) -> void:
 	coord = chunk_coord
 	cells.resize(SIZE * SIZE)
+
+
+static func cell_of(tile: int, kind: int) -> int:
+	return 1 + tile + TILES * kind
+
+
+static func tile_of(cell: int) -> int:
+	return (cell - 1) % TILES
+
+
+static func kind_of(cell: int) -> int:
+	return (cell - 1) / TILES
 
 
 static func index_of(x: int, y: int) -> int:

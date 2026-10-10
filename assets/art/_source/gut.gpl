@@ -110,3 +110,35 @@ Columns: 8
 140 255 204	Glow: fungus
 # ramp wing
 204 214 230	Wing
+# ramp rock_bile
+ 24  26   8	Bile rock deepest
+ 40  46  14	Bile rock deep
+ 62  72  22	Bile rock dark
+ 84  98  30	Bile rock
+110 126  38	Bile rock mid
+150 168  52	Bile rock light
+196 212  84	Bile rock highlight
+# ramp rock_bruise
+ 22  12  30	Bruise rock deepest
+ 38  22  52	Bruise rock deep
+ 58  34  78	Bruise rock dark
+ 78  46 102	Bruise rock
+100  62 128	Bruise rock mid
+138  96 164	Bruise rock light
+178 138 200	Bruise rock highlight
+# ramp rock_bone
+ 34  30  26	Bone rock deepest
+ 58  52  44	Bone rock deep
+ 86  78  66	Bone rock dark
+112 102  86	Bone rock
+140 130 110	Bone rock mid
+184 172 146	Bone rock light
+222 212 186	Bone rock highlight
+# ramp rock_rot
+ 30  18  10	Rot rock deepest
+ 52  32  18	Rot rock deep
+ 76  48  26	Rot rock dark
+ 98  64  34	Rot rock
+124  82  44	Rot rock mid
+164 114  62	Rot rock light
+204 152  94	Rot rock highlight

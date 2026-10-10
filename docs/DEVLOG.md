@@ -13,6 +13,10 @@ Next:
 
 ---
 
+## Art program, part 4: kinds of rock and dressing (2026-10-11)
+Done: five kinds of rock (flesh, bile, bruise, bone, rot), each the same cobble-and-paved-floor drawing in its own ramp with dither; painted in a new data/maps/tiles.png (world.png untouched), starter painting puts bruise in the deep, bile in the east cavern, bone in the upper tunnel, rot round the chamber ruin. The developer then said colors were not the problem: the caves looked sterile, there was not enough stuff. So: dressing. Per kind, things on floors (cilia, teeth, polyps, pustules, crystals, shards, mushrooms, maggots), from ceilings (tendrils, drips, sacs, stalactites, roots, spores), on walls (veins, teeth, ribs, shelf fungus), buried in the rock (veins, ribs, cysts, curled dead things), and rarer big pieces (tendril curtains, tumours, rib arches, bile spires, a giant glowing mushroom). Placed per chunk from a hash of each tile, so it is the same every time, nothing saved. First pass was too small and sparse; now denser, bigger, with inlays and big pieces.
+Not done: the backdrop behind the caves is still plain blobs; props and items still use the week 39 art.
+
 ## Art program, part 3: masks (2026-10-11)
 The developer liked the direction and the dithering, and asked for characters that are more unnatural, with no visible eyes and big masks. Every humanoid is now wrong on purpose: long spindly legs with knobbly knees, a short hunched trunk, arms hanging past the knees, big long-fingered hands, the head pushed forward. Faces are gone: the colonist wears a tall bone oval with a seam and three holes, the pilgrim a bone beak under the hood, the antibody's head is a blank egg, Tenders a leather plate with the mouth sewn shut, choristers a gold sun held over the face. Hurt and dying hosts' masks crack. Creatures keep their glowing eyes (they show where a leech is looking).
 

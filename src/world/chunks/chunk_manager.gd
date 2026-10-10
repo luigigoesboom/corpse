@@ -61,8 +61,10 @@ func _process(_delta: float) -> void:
 
 
 ## Atlas coords of the tile for a (non-empty) ChunkData cell.
+## Each kind of rock has its own 4 x 5 block of the atlas, stacked downward.
 static func atlas_coords(cell: int) -> Vector2i:
-	return Vector2i((cell - 1) % 4, (cell - 1) / 4)
+	var tile := ChunkData.tile_of(cell)
+	return Vector2i(tile % 4, tile / 4 + 5 * ChunkData.kind_of(cell))
 
 
 ## Fills a TileMapLayer with a whole chunk at once (arenas, tools), with its
@@ -156,6 +158,10 @@ func _build_some(budget: int) -> void:
 		job.next = end
 		if end == total:
 			_pending.pop_front()
+			var dressing := ChunkDressing.new()  # The stuff on the rock (D-028).
+			dressing.name = "Dressing"
+			dressing.setup(job.data)
+			layer.add_child(dressing)
 			chunk_loaded.emit(job.coord)
 			queue_redraw()
 

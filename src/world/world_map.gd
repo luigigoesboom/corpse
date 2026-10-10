@@ -12,14 +12,46 @@ extends RefCounted
 ## with the size of the map.
 
 const DEFAULT_PATH := "res://data/maps/world.png"
+## Kinds of rock (D-028): a second painting the same size as world.png.
+## Transparent = flesh; otherwise the nearest of KIND_PAINT picks the kind.
+const KINDS_PATH := "res://data/maps/tiles.png"
+const KIND_PAINT := {
+	&"bile": Color8(150, 180, 40),
+	&"bruise": Color8(110, 60, 170),
+	&"bone": Color8(210, 200, 170),
+	&"rot": Color8(140, 85, 40),
+}
 
 var size: Vector2i
 ## The painted image as loaded. Also used by the debug map.
 var image: Image
+## The kinds painting, or null (all flesh).
+var kinds: Image
 
 
 static func load_from(path: String = DEFAULT_PATH) -> WorldMap:
-	return WorldMap.new(read_image(path))
+	var map := WorldMap.new(read_image(path))
+	if path == DEFAULT_PATH and (ResourceLoader.exists(KINDS_PATH) or FileAccess.file_exists(KINDS_PATH)):
+		map.kinds = read_image(KINDS_PATH)
+	return map
+
+
+## Which kind of rock a tile is (index into ChunkData.KINDS).
+func kind_at(tile: Vector2i) -> int:
+	if kinds == null or tile.x < 0 or tile.y < 0 or tile.x >= kinds.get_width() or tile.y >= kinds.get_height():
+		return 0
+	var c := kinds.get_pixelv(tile)
+	if c.a < 0.5:
+		return 0
+	var best := 0
+	var best_d := INF
+	for name in KIND_PAINT:
+		var p: Color = KIND_PAINT[name]
+		var d := Vector3(c.r - p.r, c.g - p.g, c.b - p.b).length_squared()
+		if d < best_d:
+			best_d = d
+			best = ChunkData.KINDS.find(name)
+	return best
 
 
 ## Loads the map PNG. Shared with the editor preview.
@@ -92,10 +124,11 @@ func make_chunk(chunk_coord: Vector2i) -> ChunkData:
 		for x in ChunkData.SIZE:
 			var i := (y + B) * w + (x + B)
 			var cell := ChunkData.EMPTY
+			var kind := kind_at(origin + Vector2i(x, y)) if solid[i] else 0
 			if deep2[i]:
-				cell = ChunkData.DEEP
+				cell = ChunkData.cell_of(ChunkData.DEEP, kind)
 			elif deep1[i]:
-				cell = ChunkData.NEAR
+				cell = ChunkData.cell_of(ChunkData.NEAR, kind)
 			elif solid[i]:
 				# Which sides face open space picks the tile (rims, rounded corners).
 				# Buried rock (mask 0) uses a tile without collision.
@@ -104,7 +137,7 @@ func make_chunk(chunk_coord: Vector2i) -> ChunkData:
 				if not solid[i + 1]: open |= ChunkData.OPEN_RIGHT
 				if not solid[i + w]: open |= ChunkData.OPEN_DOWN
 				if not solid[i - 1]: open |= ChunkData.OPEN_LEFT
-				cell = 1 + open
+				cell = ChunkData.cell_of(open, kind)
 			data.cells[ChunkData.index_of(x, y)] = cell
 	return data
 

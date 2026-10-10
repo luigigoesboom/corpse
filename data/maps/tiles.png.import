@@ -1,0 +1,14 @@
+[remap]
+
+importer="image"
+type="Image"
+uid="uid://ddxxk6h5wllqr"
+path="res://.godot/imported/tiles.png-1775552a48336287a8a054d364a9029d.image"
+
+[deps]
+
+source_file="res://data/maps/tiles.png"
+dest_files=["res://.godot/imported/tiles.png-1775552a48336287a8a054d364a9029d.image"]
+
+[params]
+

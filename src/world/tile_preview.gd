@@ -68,4 +68,4 @@ func _rebuild() -> void:
 				var cell := data.cells[i]
 				if cell != ChunkData.EMPTY:
 					terrain.set_cell(origin + Vector2i(i % ChunkData.SIZE, i / ChunkData.SIZE), 0,
-						Vector2i((cell - 1) % 4, (cell - 1) / 4))
+						ChunkManager.atlas_coords(cell))
