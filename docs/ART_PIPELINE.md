@@ -90,7 +90,7 @@ The game's art is made by code: `tools/pixel`, run headless in Godot (no install
 Godot --headless --path . --script res://tools/pixel/run.gd -- hosts --preview
 ```
 
-Names after `--` are recipes (`tools/pixel/recipes/<name>.gd`, or `all`); `--preview` also writes a contact sheet to `user://pixel_preview/<name>.png` (the path is printed) so you can look without starting the game. Recipes write straight into `assets/art`, so check the preview and `git diff` before committing.
+Names after `--` are recipes (`tools/pixel/recipes/<name>.gd`, or `all`); `--preview` also writes a contact sheet to `tools/pixel/preview/<name>.png` (not in git) so you can look without starting the game. Recipes write straight into `assets/art`, so check the preview and `git diff` before committing.
 
 | Part | Job |
 |---|---|

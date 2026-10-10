@@ -20,3 +20,6 @@ Thumbs.db
 /Sound FX Starter Pack Vol. 1/
 /assets/audio/sfx/*.wav
 /assets/audio/sfx/*.wav.import
+
+# Art program preview sheets (tools/pixel/run.gd --preview)
+tools/pixel/preview/

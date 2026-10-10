@@ -7,7 +7,7 @@ extends SceneTree
 ##   static func make(pal, out: Array) -> void
 ## which writes its PNGs into the project and appends {"name", "body",
 ## "glow"} for the preview. "all" runs every recipe. --preview writes a
-## contact sheet per recipe to user://pixel_preview/<name>.png (and prints
+## contact sheet per recipe to tools/pixel/preview/<name>.png (gitignored; prints
 ## where that is) without needing the game.
 
 const Palette := preload("res://tools/pixel/palette.gd")
@@ -32,7 +32,7 @@ func _initialize() -> void:
 		recipe.make(pal, out)
 		print("%s: %d images in %d ms" % [name, out.size(), Time.get_ticks_msec() - started])
 		if preview and not out.is_empty():
-			var path := "user://pixel_preview/%s.png" % name
+			var path := "res://tools/pixel/preview/%s.png" % name
 			Sheet.save(Sheet.preview(out), path)
 			print("  preview: ", ProjectSettings.globalize_path(path))
 	quit()
