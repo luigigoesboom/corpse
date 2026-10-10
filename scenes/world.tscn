@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" path="res://src/world/heart_root.tscn" id="14_root"]
 [ext_resource type="PackedScene" path="res://src/world/ichor_clot.tscn" id="15_clot"]
 [ext_resource type="Script" path="res://src/world/guard_post.gd" id="16_post"]
+[ext_resource type="PackedScene" path="res://src/actors/bosses/gullet_matron.tscn" id="17_matron"]
 
 [node name="World" type="Node2D"]
 
@@ -208,3 +209,6 @@ amount = 10
 position = Vector2(4224, 3206)
 script = ExtResource("16_post")
 width = 320.0
+
+[node name="GulletMatron" parent="Entities" instance=ExtResource("17_matron")]
+position = Vector2(6900, 3860)

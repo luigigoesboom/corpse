@@ -100,6 +100,16 @@ static func describe(event: EventRecord, data: WorldData) -> String:
 					text = "%s went through the pockets of %s, a dead host." % [_faction(data, by), host]
 		&"shrine_robbed":
 			text = "%s, a host, took relics from the body of %s in the shrine at %s." % [event.actors[1] if event.actors.size() > 1 else "Someone", d.get("host", "someone"), site]
+		&"vengeance_sworn":
+			text = "%s swore vengeance on %s, a host who killed %d of them." % [a, event.actors[1] if event.actors.size() > 1 else "a stranger", d.get("dead", 1)]
+		&"offerings_fed":
+			text = "%s grew strong on offerings of ichor; %d more came to %s." % [a, d.get("count", 0), site]
+		&"deep_settled":
+			text = "With the Gullet Matron dead, %s sent %d of their own down into the deep." % [a, d.get("count", 0)]
+		&"pilgrims_came":
+			text = "%d pilgrims came to %s to kneel before the body of %s." % [d.get("count", 0), site, event.actors[1] if event.actors.size() > 1 else "a host"]
+		&"shrine_desecrated":
+			text = "%s, their shrine at %s robbed, trusted nobody after." % [a, site]
 		&"corpse_rotted":
 			text = "The body of %s rotted further." % (event.actors[0] if event.actors.size() > 0 else "someone")
 		&"creatures_returned":

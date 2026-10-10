@@ -13,6 +13,10 @@ extends RefCounted
 ## same world seed always gives the same history.
 
 const YEARS := 2000
+## Between lives (week 37): hand-made places (sites in a slot) cannot be
+## taken, razed or abandoned, so the places the player knows stay; their
+## people, numbers, wars and neighbours still change.
+static var protect_slots := false
 const TENDERS := &"flesh_tenders"
 const CHOIR := &"choir_of_waking"
 ## A settlement this big gets crowded and sends settlers off.
@@ -57,6 +61,22 @@ static func run(data: WorldData, years := YEARS) -> void:
 		tick(data, rng)
 	data.year = now
 	_into_the_present(data, rng)
+
+
+## History between two lives (week 37): `years` more years of the same
+## yearly simulation, ending at data.year, with hand-made places protected.
+## Returns the events it logged.
+static func between_lives(data: WorldData, years: int, rng: RandomNumberGenerator) -> Array:
+	var first := data.events.size()
+	var now := data.year
+	data.year = now - years
+	protect_slots = true
+	for i in years:
+		data.year += 1
+		tick(data, rng)
+	protect_slots = false
+	data.year = now
+	return data.events.slice(first)
 
 
 ## One year for every living faction and settlement.
@@ -224,7 +244,7 @@ static func _battles(data: WorldData, rng: RandomNumberGenerator) -> void:
 			for h in homes:
 				if h.population > home.population:
 					home = h
-			var last_stand := defender.defined and targets.size() == 1
+			var last_stand := (defender.defined and targets.size() == 1) or (protect_slots and site.slot != "")
 			if attack > defense and not last_stand:
 				var dead := int(site.population * rng.randf_range(0.3, 0.6))
 				home.population = maxi(5, home.population - int(home.population * rng.randf_range(0.05, 0.15)))
@@ -256,7 +276,7 @@ static func _disasters(data: WorldData, rng: RandomNumberGenerator) -> void:
 		var kind: StringName = DISASTERS[rng.randi() % DISASTERS.size()]
 		var dead := int(site.population * rng.randf_range(0.25, 0.6))
 		var owner: FactionData = data.factions[site.faction]
-		var protected := owner.defined and _sites_of(data, owner.id).size() == 1
+		var protected: bool = (owner.defined and _sites_of(data, owner.id).size() == 1) or (protect_slots and site.slot != "")
 		site.population -= dead
 		if protected:
 			site.population = maxi(DESTINED_FLOOR, site.population)
@@ -276,6 +296,8 @@ static func _falls(data: WorldData) -> void:
 			continue
 		if faction.defined:
 			continue  # Destined: protected elsewhere, never falls.
+		if protect_slots and _sites_of(data, faction.id).any(func(s): return s.slot != ""):
+			continue  # Between lives: a people the player can visit does not vanish.
 		var last := ""
 		for site in _sites_of(data, faction.id):
 			last = site.id

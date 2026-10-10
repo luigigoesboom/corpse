@@ -59,6 +59,9 @@ func bank() -> void:
 	var amount := _data.bank_ichor()
 	bank_text = "The root drinks %d ichor. Something in you grows heavier, and stays." % amount if amount > 0 else "You have nothing to give it."
 	if _keeper != &"" and amount > 0:
+		var life := _data.current_life()
+		if life:
+			life.offerings[_keeper] = int(life.offerings.get(_keeper, 0)) + amount
 		var changes := _data.record_deed(_keeper, mini(amount / ICHOR_PER_STANDING, MAX_STANDING_PER_OFFERING))
 		for faction in changes:
 			var message := Standing.change_message(EventText._faction(_data, faction), changes[faction])

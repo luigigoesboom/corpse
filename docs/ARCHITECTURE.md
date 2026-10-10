@@ -286,6 +286,18 @@ A `HeartRoot` (src/world) banks it: interact opens data/dialogue/heart_root.dial
 | wider_choice | 40 | `Game.rebirth_options()`: 4 hosts |
 | lasting_graft | 60 | `end_life()` keeps the first mutation slot in `kept_graft`; the next host is born with it |
 
+## Between lives (week 37)
+
+`Aftermath.apply()` now: rolls the gap, then `HistorySim.between_lives(data, years)` runs the same yearly simulation as worldgen for those years (with `protect_slots` on: sites in a hand-made slot cannot be taken, razed or abandoned, and peoples living in one do not fall), then `DeedEchoes.apply()` turns the last life's deeds into events with visible effects, then CorpseFate, scavengers, creatures returning (never bosses, `Aftermath.BOSSES`) and dropped items. The time screen hints at the biggest change involving a people you can meet ("While you were gone: ...") and at each echo.
+
+| Deed (last life) | Echo |
+|---|---|
+| Killed residents of a people | `vengeance_sworn` (rumors) |
+| Ichor offered at a keeper's root (`LifeRecord.offerings`) | `offerings_fed`: their home grows by half the ichor |
+| Killed the Gullet Matron | `deep_settled`: the strongest destined people grows by 40 |
+| A body of the fragment lies enshrined | `pilgrims_came`: +20 people at that site every gap |
+| Robbed a shrine | `shrine_desecrated`: the keepers' relations with everyone drop 15 |
+
 ## Death and rebirth flow
 
 Week 33: before scavengers, `CorpseFate.apply()` lets factions claim bodies nobody has claimed yet. The claimant is the faction holding the body's chunk (chance 0.9 x tier strength), else a fragment-sensing faction (strength x senses x 0.6). It picks a fate from its FactionDef `corpse_fates` weights (Choir: enshrined 6, studied 2, looted 1; Flesh-Tenders: eaten 5, looted 3, studied 1); a faction whose legend is below -30 loots instead of enshrining. Enshrined and studied bodies move to the faction's biggest lived-in settlement (`places`: slot -> `Settlement.body_spot()`, built by Game, so the sim stays node-free), 40 px apart. Enshrined: kept whole, scavengers skip it; taking from it is a `shrine_robbed` deed (-40) unless the keepers count you a friend. Studied: mutations cut out. Eaten: mutations gone, things left. Looted: pockets emptied. Each claim is a `corpse_claimed` event (rumors weigh it like a host death) and a hint for the newest body.

@@ -72,6 +72,8 @@ var _slam_target_x := 0.0
 var _brood_ready_at := 0.0
 var _clock := 0.0
 var _brood: Array[Node] = []
+## Globs, puddles, ripples she made (freed with her when she leaves the tree).
+var _spawned: Array[Node] = []
 
 @onready var health: Health = $Health
 @onready var _visual: Node2D = $Visual
@@ -252,6 +254,7 @@ func _land() -> void:
 		wave.maker_hurtbox = $Hurtbox
 		wave.position = global_position + Vector2(direction * 40.0, 0)
 		get_parent().add_child(wave)
+		_spawned.append(wave)
 	_end_attack()
 
 
@@ -277,6 +280,17 @@ func _spit_volley() -> void:
 		var dy: float = _player.global_position.y + 20.0 - glob.position.y
 		glob.velocity = Vector2((land_x - glob.position.x) / flight, (dy - 0.5 * 650.0 * flight * flight) / flight)
 		get_parent().add_child(glob)
+		_spawned.append(glob)
+
+
+## Leaving the tree (her chunk unloads, the world rebuilds for a new life):
+## take her brood and hazards with her, so nothing is left floating about.
+func _exit_tree() -> void:
+	for node in _brood + _spawned:
+		if is_instance_valid(node):
+			node.queue_free()
+	_brood.clear()
+	_spawned.clear()
 
 
 func _spawn_brood() -> void:

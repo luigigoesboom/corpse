@@ -8,6 +8,9 @@ extends RefCounted
 ## Plain data in, plain data out: no nodes, so it can run anywhere.
 
 ## name, chance weight, years min/max, strength.
+## Creature kinds that never come back once killed.
+const BOSSES := [&"gullet_matron"]
+
 const TIERS := [
 	{"name": &"days", "weight": 2, "years": [0, 0], "strength": 0.1},
 	{"name": &"months", "weight": 3, "years": [0, 1], "strength": 0.3},
@@ -39,11 +42,36 @@ static func apply(data: WorldData, tier_index: int, rng: RandomNumberGenerator, 
 	var strength: float = tier.strength
 	data.year += years
 	var report := {"tier": tier.name, "years": years, "strength": strength, "hints": []}
+	# The years pass (week 37), then what the last host did echoes in them.
+	var happened := HistorySim.between_lives(data, years, SeededRng.make([data.world_seed, "between", data.lives.size()]))
+	DeedEchoes.apply(data, _last_dead(data), report)
+	_hint_history(data, happened, report)
 	CorpseFate.apply(data, strength, rng, places, report)  # Factions first (week 33).
 	_scavenge_bodies(data, strength, rng, report)
 	_creatures_return(data, strength, rng, report)
 	_dropped_items_vanish(data, strength, rng, report)
 	return report
+
+
+static func _last_dead(data: WorldData) -> LifeRecord:
+	for i in range(data.lives.size() - 1, -1, -1):
+		if not data.lives[i].is_alive():
+			return data.lives[i]
+	return null
+
+
+## The biggest thing that happened while you were gone, if it touched a
+## people you can meet.
+static func _hint_history(data: WorldData, happened: Array, report: Dictionary) -> void:
+	var known := {}
+	for site: SiteData in data.sites.values():
+		if site.slot != "" and site.is_lived_in():
+			known[site.faction] = true
+	for type in [&"war_declared", &"peace", &"site_taken", &"disaster", &"schism", &"prophet", &"wonder"]:
+		for event in happened:
+			if event.type == type and event.actors.any(func(a): return known.has(StringName(str(a)))):
+				report.hints.append("While you were gone: %s" % EventText.describe(event, data))
+				return
 
 
 ## Old bodies lose things to scavengers and rot. The newest body always
@@ -91,7 +119,7 @@ static func _creatures_return(data: WorldData, strength: float, rng: RandomNumbe
 	for key in data.removed_entities.keys():
 		var kind = data.removed_entities[key]
 		# Only creatures come back; picked-up items (&"item") and old saves (true) do not.
-		if kind is StringName and kind != &"item" and rng.randf() < strength:
+		if kind is StringName and kind != &"item" and not kind in BOSSES and rng.randf() < strength:
 			data.removed_entities.erase(key)
 			returned.append(kind)
 	if not returned.is_empty():

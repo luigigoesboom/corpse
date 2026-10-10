@@ -26,7 +26,7 @@ static func candidates(data: WorldData, speaker_faction: StringName, exclude: Ar
 		var weight := 1.0 / (1.0 + age / 40.0)
 		if ours:
 			weight *= 3.0
-		if event.type in [&"host_died", &"resident_killed", &"boss_slain", &"corpse_claimed"]:
+		if event.type in [&"host_died", &"resident_killed", &"boss_slain", &"corpse_claimed", &"vengeance_sworn", &"deep_settled", &"pilgrims_came"]:
 			weight *= 10.0  # Everybody talks about the strangers who die here, and who kill.
 		elif event.type in [&"corpse_scavenged", &"corpse_rotted", &"creatures_returned", &"wonder", &"prophet", &"trade_pact", &"site_founded"]:
 			weight *= 0.5
