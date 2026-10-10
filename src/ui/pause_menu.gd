@@ -9,6 +9,7 @@ const MAIN_MENU := "res://scenes/main_menu.tscn"
 
 
 func _ready() -> void:
+	UiSounds.wire(self)  # Hover and select sounds (week 40).
 	process_mode = PROCESS_MODE_ALWAYS
 	%ResumeButton.pressed.connect(resume_pressed.emit)
 	%SaveButton.pressed.connect(save_pressed.emit)

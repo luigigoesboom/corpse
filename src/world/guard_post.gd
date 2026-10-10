@@ -150,6 +150,7 @@ func _process(delta: float) -> void:
 		if _warned > WARN_SECONDS or (at_the_gap and _warned > 1.0):
 			_alarm = true
 			raise_alarm()
+			Sfx.play(&"alarm", global_position)
 			EventBus.notify.emit("The watch draws on you")
 	else:
 		_warned = maxf(0.0, _warned - delta)
@@ -185,7 +186,7 @@ func _set_grate_open(open: bool) -> void:
 		return
 	_grate.get_node("Shape").set_deferred(&"disabled", open)
 	_grate.get_node("Bars").visible = not open
-	Sfx.play(&"land", global_position)
+	Sfx.play(&"grate", global_position)
 
 
 func _sentry_key(i: int) -> String:
@@ -226,6 +227,7 @@ class Latch extends Area2D:
 		if post.is_grate_open():
 			return
 		post.latched = true
+		Sfx.play(&"latch", global_position)
 		EventBus.notify.emit("You lift the latch. The grate swings down.")
 
 

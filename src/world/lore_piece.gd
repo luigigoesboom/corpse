@@ -89,6 +89,7 @@ func title() -> String:
 
 func interact() -> void:
 	var fresh := WorldState.data.learn(event_ids())
+	Sfx.play(&"mural")
 	Conversation.open(self, DIALOGUE, Reading.new(title(), text()))
 	if fresh > 0:
 		EventBus.notify.emit("You learn %d new things about the past (History tab)" % fresh)

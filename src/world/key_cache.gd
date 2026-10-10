@@ -85,7 +85,7 @@ func interact() -> void:
 		return
 	_prompt.visible = false
 	EventBus.inventory_changed.emit()
-	Sfx.play(&"pickup", global_position)
+	Sfx.play(&"key", global_position)
 	var life := data.current_life()
 	if keeper == &"":
 		data.log_deed(&"key_found", [life.host_name if life else "someone"], {"key": key})
@@ -101,6 +101,7 @@ func interact() -> void:
 			if message != "":
 				EventBus.notify.emit(message)
 		watchers[0].say("Thief! The heart-key!")
+		Sfx.play(&"theft")
 		for settlement in _settlements():
 			settlement.raise_alarm()
 

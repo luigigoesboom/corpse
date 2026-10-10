@@ -126,6 +126,7 @@ func _update_attack() -> void:
 	elif _state_time < 0.6:
 		if not _bite.active:
 			_bite.activate()
+			Sfx.play(&"leech_bite", global_position)
 			velocity.x = _dir * lunge_speed
 	elif _state_time < 1.0:
 		_bite.deactivate()
@@ -153,6 +154,8 @@ func _pick_animation() -> StringName:
 
 
 func _enter(new_state: State) -> void:
+	if new_state == State.ATTACK and state != State.ATTACK:
+		Sfx.play(&"leech_hiss", global_position)
 	state = new_state
 	_state_time = 0.0
 	_out_of_reach_time = 0.0

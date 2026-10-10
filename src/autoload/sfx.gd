@@ -1,23 +1,47 @@
 extends Node
-## Sound effects.
+## Sound effects (week 40).
 ##
 ##   Sfx.play(&"hit")                  plays everywhere
 ##   Sfx.play(&"hit", global_position) quieter the further it is from the camera
 ##
-## A sound plays assets/audio/sfx/<name>.wav if that file exists (copied from
-## the licensed sound pack by tools/copy_sfx.sh, not in git), otherwise its
-## generated placeholder: a short recipe below (a pitch sweep and/or noise).
+## Where a sound comes from, first found wins:
+##   1. assets/audio/sfx/<id>.wav: copied from the licensed pack by
+##      tools/copy_sfx.sh (not in git: the license forbids sharing them)
+##   2. assets/audio/generated/<id>.wav: our own, made by tools/sound/sounds.gd
+##   3. a tiny inline recipe below (the oldest placeholders)
+## SOUNDS sets each one's volume (dB), pitch and bus (SFX unless said).
 
 const RATE := 22050
-const VOICES := 8
+const VOICES := 12
 ## Sounds further than this from the screen center are not played.
 const HEARING_RANGE := 900.0
-const FILE_DIR := "res://assets/audio/sfx/"
-## Volume (dB) for sounds played from files; others default to FILE_VOLUME.
-const FILE_VOLUMES := {&"swing": -10.0, &"pickup": -8.0, &"spit": -8.0, &"dash": -10.0, &"eat": -8.0}
-const FILE_VOLUME := -6.0
+const PACK_DIR := "res://assets/audio/sfx/"
+const OWN_DIR := "res://assets/audio/generated/"
 
-## name: [seconds, start Hz, end Hz, noise amount 0..1, wave ("sine"/"square"), volume dB]
+## id: [volume dB, pitch, bus]. Volumes are for the pack's copies; our own
+## files and recipes are mixed to sit at about the same level.
+const SOUNDS := {
+	&"jump": [-18.0, 1.0, &"SFX"], &"land": [-16.0, 1.0, &"SFX"], &"swing": [-10.0, 1.0, &"SFX"],
+	&"hit": [-6.0, 1.0, &"SFX"], &"hurt": [-6.0, 1.0, &"SFX"], &"die": [-6.0, 1.0, &"SFX"],
+	&"pickup": [-8.0, 1.0, &"SFX"], &"eat": [-8.0, 1.0, &"SFX"], &"spit": [-8.0, 1.0, &"SFX"],
+	&"dash": [-10.0, 1.0, &"SFX"], &"enemy_die": [-6.0, 1.0, &"SFX"], &"buzz": [-24.0, 1.0, &"SFX"],
+	&"dodge": [-16.0, 1.0, &"SFX"],
+	# Creatures.
+	&"leech_bite": [-8.0, 1.0, &"SFX"], &"leech_hiss": [-14.0, 1.0, &"SFX"], &"spitter_charge": [-12.0, 1.0, &"SFX"],
+	&"squelch": [-12.0, 1.0, &"SFX"],
+	&"matron_roar": [-2.0, 0.55, &"SFX"], &"matron_slam": [-4.0, 0.8, &"SFX"], &"matron_lunge": [-6.0, 0.9, &"SFX"],
+	&"matron_hurt": [-8.0, 0.75, &"SFX"], &"matron_die": [-2.0, 0.8, &"SFX"], &"matron_phase": [-4.0, 0.8, &"SFX"],
+	# The world.
+	&"alert": [-12.0, 1.0, &"SFX"], &"alarm": [-8.0, 0.8, &"SFX"], &"grate": [-8.0, 0.8, &"SFX"],
+	&"latch": [-10.0, 1.0, &"SFX"], &"ichor": [-12.0, 0.7, &"SFX"], &"bank": [-6.0, 0.85, &"UI"],
+	&"boon": [-6.0, 0.9, &"UI"], &"key": [-6.0, 0.8, &"UI"], &"heart_root": [-8.0, 0.8, &"SFX"],
+	&"mural": [-10.0, 1.0, &"UI"], &"theft": [-8.0, 0.9, &"UI"], &"death_sting": [-6.0, 0.9, &"UI"],
+	&"rebirth": [-6.0, 0.85, &"UI"], &"years": [-8.0, 1.0, &"UI"], &"discover": [-10.0, 0.85, &"UI"],
+	# Menus.
+	&"ui_hover": [-18.0, 1.0, &"UI"], &"ui_select": [-12.0, 1.0, &"UI"], &"ui_open": [-12.0, 1.0, &"UI"],
+	&"ui_close": [-12.0, 1.0, &"UI"], &"ui_tab": [-14.0, 1.0, &"UI"],
+}
+## Inline placeholders: [seconds, start Hz, end Hz, noise 0..1, "sine"/"square", volume dB].
 const RECIPES := {
 	&"jump": [0.10, 260.0, 520.0, 0.0, "square", -18.0],
 	&"land": [0.07, 90.0, 50.0, 0.6, "sine", -16.0],
@@ -36,24 +60,39 @@ const RECIPES := {
 
 var _streams := {}
 var _volumes := {}
+var _pitches := {}
+var _buses := {}
 var _players: Array[AudioStreamPlayer] = []
 var _next := 0
 
 
 func _ready() -> void:
 	process_mode = PROCESS_MODE_ALWAYS
-	for id in RECIPES:
-		var path := FILE_DIR + String(id) + ".wav"
-		if ResourceLoader.exists(path):
-			_streams[id] = load(path)
-			_volumes[id] = FILE_VOLUMES.get(id, FILE_VOLUME)
-		else:
+	for id in SOUNDS:
+		var info: Array = SOUNDS[id]
+		_buses[id] = info[2]
+		var pack := PACK_DIR + String(id) + ".wav"
+		var own := OWN_DIR + String(id) + ".wav"
+		if ResourceLoader.exists(pack):
+			_streams[id] = load(pack)
+			_volumes[id] = info[0]
+			_pitches[id] = info[1]
+		elif ResourceLoader.exists(own):
+			_streams[id] = load(own)
+			_volumes[id] = info[0] - 2.0
+			_pitches[id] = 1.0
+		elif RECIPES.has(id):
 			_streams[id] = _make(RECIPES[id])
 			_volumes[id] = RECIPES[id][5]
+			_pitches[id] = 1.0
 	for i in VOICES:
 		var player := AudioStreamPlayer.new()
 		add_child(player)
 		_players.append(player)
+
+
+func has_sound(id: StringName) -> bool:
+	return _streams.has(id)
 
 
 func play(id: StringName, at := Vector2.INF) -> void:
@@ -71,7 +110,8 @@ func play(id: StringName, at := Vector2.INF) -> void:
 	_next = (_next + 1) % VOICES
 	player.stream = _streams[id]
 	player.volume_db = volume
-	player.pitch_scale = randf_range(0.93, 1.07)  # Cosmetic, so global randf is fine.
+	player.bus = _buses.get(id, &"SFX")
+	player.pitch_scale = _pitches[id] * randf_range(0.93, 1.07)  # Cosmetic, so global randf is fine.
 	player.play()
 
 

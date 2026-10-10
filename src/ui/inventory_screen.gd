@@ -39,6 +39,7 @@ var _hints: Label
 
 
 func _ready() -> void:
+	UiSounds.wire(self)  # Hover and select sounds (week 40).
 	process_mode = PROCESS_MODE_ALWAYS
 	_build()
 	EventBus.inventory_changed.connect(_refresh)
@@ -51,6 +52,8 @@ func open() -> void:
 
 
 func show_tab(index: int) -> void:
+	if index != tab:
+		Sfx.play(&"ui_tab")
 	tab = posmod(index, TABS.size())
 	for i in _pages.size():
 		_pages[i].visible = i == tab

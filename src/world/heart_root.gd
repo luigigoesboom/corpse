@@ -32,10 +32,11 @@ func _process(delta: float) -> void:
 func interact() -> void:
 	var talk := RootTalk.new(WorldState.data, keeper)
 	talk.changed.connect(func(): EventBus.ichor_changed.emit())
+	talk.poured.connect(func(_amount): Sfx.play(&"bank"))
 	talk.boon_bought.connect(func(id): EventBus.boon_bought.emit(id))
 	talk.standing_message_ready.connect(func(text): EventBus.notify.emit(text))
 	Conversation.open(self, DIALOGUE, talk)
-	Sfx.play(&"eat")
+	Sfx.play(&"heart_root", global_position)
 
 
 func _show_prompt(on: bool) -> void:

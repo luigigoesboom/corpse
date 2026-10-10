@@ -178,7 +178,7 @@ func _perceive(delta: float, player: Node2D, watching: bool) -> void:
 	if awareness >= 1.0 and not noticed:
 		noticed = true
 		_facing = signf(offset.x) if offset.x != 0.0 else _facing
-		Sfx.play(&"hit", global_position)
+		Sfx.play(&"alert", global_position)
 	_mark.text = "!" if noticed else ("?" if awareness > 0.15 else "")
 	_mark.add_theme_color_override(&"font_color", Color(1, 0.35, 0.3) if noticed else Color(1, 0.9, 0.5))
 

@@ -66,6 +66,16 @@ corpse/
 
 Naming: `snake_case` for files and folders, `PascalCase` for `class_name`.
 
+## Sound (week 40)
+
+Buses (res://default_bus_layout.tres): Master <- Music, Ambience (-6 dB), SFX (a small cave reverb), UI.
+
+**Sfx** (autoload): `Sfx.play(id, position)`. `SOUNDS` lists every id with its volume, pitch and bus. A sound plays, first found: `assets/audio/sfx/<id>.wav` (copied from the licensed Ovani pack by `tools/copy_sfx.sh`, gitignored), `assets/audio/generated/<id>.wav` (ours, committed), or an inline recipe. Creatures, the Matron, guards, the watch, ichor, roots, boons, keys, murals, settlements, the death screen and rebirth all have their own sounds; `UiSounds.wire(node)` gives every button under a node hover and select sounds (also buttons added later).
+
+**Ambience** (src/world/ambience.gd, added by Game): eight looping layers on the Ambience bus, crossfaded by `targets_at(camera)`: the body (heartbeat and drone, louder deeper down), one per kind of rock (`WorldMap.kind_weights()` over the kinds painting, shared with the backdrop tint), settlement murmur (group `settlements`, within 600 px), and the boss layer while a boss fight is on. A layer uses `assets/audio/ambience/amb_<layer>.wav` from the pack if copied, else our own loop. Keeps playing while paused.
+
+**Our own sounds**: `tools/sound/synth.gd` (tones, noise, squelches, bubbles, drips, heartbeats, filters, seamless loops, WAV writer) and `tools/sound/sounds.gd` (every recipe; run it with `--script res://tools/sound/sounds.gd`).
+
 ## Autoloads
 
 | Name | Job |

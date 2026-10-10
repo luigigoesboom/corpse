@@ -39,6 +39,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func close_all() -> void:
 	Player.swallow_attack()  # A click that closed a menu is not a swing.
+	if _inventory.visible or _pause.visible:
+		Sfx.play(&"ui_close")
 	_inventory.visible = false
 	_pause.visible = false
 	death_screen.visible = false
@@ -53,6 +55,7 @@ func show_death(life: LifeRecord, life_number: int) -> void:
 
 
 func _open(screen: Control) -> void:
+	Sfx.play(&"ui_open")
 	screen.visible = true
 	screen.open()
 	get_tree().paused = true

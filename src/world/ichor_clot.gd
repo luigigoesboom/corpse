@@ -19,5 +19,5 @@ func _on_body_entered(body: Node2D) -> void:
 	data.removed_entities[EntityLayer.key_of(self)] = &"item"
 	EventBus.ichor_gained.emit(amount, global_position)
 	EventBus.notify.emit("+%d ichor" % amount)
-	Sfx.play(&"pickup")
+	Sfx.play(&"squelch")
 	get_parent().remove_child.call_deferred(self)

@@ -6,6 +6,7 @@ extends RefCounted
 ## without the UI.
 
 signal changed
+signal poured(amount: int)
 signal boon_bought(id: StringName)
 signal standing_message_ready(text: String)
 
@@ -57,6 +58,8 @@ var status: String:
 ## Pours everything carried into the bank.
 func bank() -> void:
 	var amount := _data.bank_ichor()
+	if amount > 0:
+		poured.emit(amount)
 	bank_text = "The root drinks %d ichor. Something in you grows heavier, and stays." % amount if amount > 0 else "You have nothing to give it."
 	if _keeper != &"" and amount > 0:
 		var life := _data.current_life()

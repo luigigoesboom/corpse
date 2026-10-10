@@ -20,6 +20,7 @@ var _showing_time := false
 
 
 func _ready() -> void:
+	UiSounds.wire(self)  # Hover and select sounds (week 40).
 	process_mode = PROCESS_MODE_ALWAYS
 	%ContinueButton.pressed.connect(_on_button_pressed)
 
@@ -34,6 +35,7 @@ func _on_button_pressed() -> void:
 ## Second step: how much time passed, a hint or two of what changed, and
 ## the hosts to wake as (one button each; none = a plain "Wake" button).
 func show_time(report: Dictionary, options: Array = []) -> void:
+	Sfx.play(&"years")
 	_showing_time = true
 	%Title.text = Aftermath.gap_text(report)
 	var hints: Array = report.hints
@@ -56,6 +58,7 @@ func show_time(report: Dictionary, options: Array = []) -> void:
 
 
 func show_life(life: LifeRecord, life_number: int) -> void:
+	Sfx.play(&"death_sting")
 	_showing_time = false
 	for child in %Options.get_children():
 		child.queue_free()

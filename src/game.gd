@@ -30,6 +30,9 @@ func _ready() -> void:
 	EventBus.entity_killed.connect(_on_entity_killed)
 	EventBus.ichor_gained.connect(_on_ichor_gained)
 	EventBus.boon_bought.connect(_on_boon_bought)
+	var ambience := Ambience.new()  # The Gut's background sound (week 40).
+	ambience.name = "Ambience"
+	add_child(ambience)
 	if WorldState.data:
 		# "Continue" in the main menu already loaded a save.
 		_on_world_loaded()
@@ -189,6 +192,7 @@ func _start_next_life(option: Dictionary = {}) -> void:
 	EventBus.inventory_changed.emit()
 	EventBus.mutations_changed.emit()
 	var life := data.current_life()
+	Sfx.play(&"rebirth")
 	EventBus.notify.emit("You wake as %s, a %s, at %s." % [life.host_name, host.display_name, life.origin])
 
 
@@ -221,6 +225,7 @@ func _on_entity_killed(entity: Node) -> void:
 
 ## Ichor gained somewhere: drops fly from there to the host (only a view).
 func _on_ichor_gained(amount: int, from: Vector2) -> void:
+	Sfx.play(&"ichor", from)
 	var rng := RandomNumberGenerator.new()  # Looks only; not saved, not repeatable.
 	for i in clampi(amount, 1, 12):
 		var orb := IchorOrb.new()
@@ -230,6 +235,7 @@ func _on_ichor_gained(amount: int, from: Vector2) -> void:
 
 
 func _on_boon_bought(id: StringName) -> void:
+	Sfx.play(&"boon")
 	if id == &"hardy":
 		_player.health.max_health += 1
 		_player.health.set_current(_player.health.current + 1)

@@ -229,7 +229,7 @@ func _start_active() -> void:
 	match attack:
 		Attack.LUNGE:
 			_mouth.activate()
-			Sfx.play(&"dash", global_position)
+			Sfx.play(&"matron_lunge", global_position)
 		Attack.VOLLEY:
 			_spit_volley()
 		Attack.SLAM:
@@ -251,7 +251,7 @@ func _land() -> void:
 	_marker.visible = false
 	velocity.x = 0.0
 	EventBus.shake_requested.emit(12.0)
-	Sfx.play(&"enemy_die", global_position)
+	Sfx.play(&"matron_slam", global_position)
 	for direction in [-1.0, 1.0]:
 		var wave := SHOCKWAVE.instantiate()
 		wave.direction = direction
@@ -365,7 +365,7 @@ func _enter(next: State) -> void:
 		State.INTRO:
 			_visual.visible = true
 			_visual.position.y = 70.0
-			Sfx.play(&"die", global_position)
+			Sfx.play(&"matron_roar", global_position)
 			EventBus.boss_engaged.emit(self)
 		State.STALK:
 			attack = Attack.NONE
@@ -392,12 +392,14 @@ func _play(animation: StringName) -> void:
 
 func _on_hurt(amount: int, _from: Vector2, _knockback: float) -> void:
 	_flash = 0.07
+	Sfx.play(&"matron_hurt", global_position)
 	DamageNumber.spawn(get_parent(), global_position + Vector2(0, -90), amount, Color(1, 0.85, 0.6))
 	if phase == 1 and health.current <= health.max_health / 2:
 		phase = 2
 		health.invulnerable = true
 		EventBus.shake_requested.emit(10.0)
 		EventBus.notify.emit("%s howls. Something in her splits open." % display_name)
+		Sfx.play(&"matron_phase", global_position)
 		_enter(State.PHASE_SHIFT)
 		return
 	if _clock < _poise_immune_until:
@@ -413,6 +415,7 @@ func _on_hurt(amount: int, _from: Vector2, _knockback: float) -> void:
 
 
 func _on_died() -> void:
+	Sfx.play(&"matron_die", global_position)
 	state = State.DEAD
 	state_time = 0.0
 	for hitbox in [_mouth, _tail, _contact]:

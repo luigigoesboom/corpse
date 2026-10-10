@@ -5,6 +5,7 @@ const GAME := "res://game.tscn"
 
 
 func _ready() -> void:
+	UiSounds.wire(self)  # Hover and select sounds (week 40).
 	%NewButton.pressed.connect(_on_new_pressed)
 	%ContinueButton.pressed.connect(_on_continue_pressed)
 	%QuitButton.pressed.connect(get_tree().quit)

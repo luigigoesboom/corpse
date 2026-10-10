@@ -14,7 +14,7 @@ func run() -> void:
 	var ruined := true
 	for key in ["ChamberRuin", "CavernRuin"]:
 		var site = data.site_in_slot(key)
-		ruined = ruined and site != null and site.kind == &"ruin" and site.ended_year >= 0 and site.ended_year < data.year
+		ruined = ruined and site != null and site.kind == &"ruin" and site.ended_year >= 0 and site.ended_year <= data.year
 	check(ruined, "both ruin slots hold settlements that history destroyed or abandoned")
 
 	# The ruin tells how it ended, in the log's words.
@@ -78,3 +78,24 @@ func run() -> void:
 	check(saves.load_game(99) == OK, "a version 12 save loads")
 	await wait_frames(10)
 	check(state.data.site_in_slot("ChamberRuin") != null and state.data.artifacts.size() >= 1, "and its ruins and artifacts are filled in")
+
+	# Some histories end with fewer ruins than there are ruin slots (seed
+	# 205895 has none): the slots still get one, older than the history.
+	var bare := WorldData.create(205895)
+	bare.year = HistorySim.YEARS
+	HistorySim.run(bare)
+	check(bare.sites.values().filter(func(s): return s.kind == &"ruin").is_empty(), "seed 205895's history leaves no ruins")
+	var slots: Array = game._entities.templates().filter(func(t): return "width" in t and t.has_method("story_text"))
+	load("res://src/world/site_seeder.gd").fill_ruin_slots(bare, slots)
+	var filled := 0
+	var told := true
+	for slot in slots:
+		var site = bare.site_in_slot(slot.get_meta(&"entity_key", ""))
+		if site and site.kind == &"ruin":
+			filled += 1
+			told = told and ArtifactForge.events_at(bare, site.id).size() >= 2
+	check(filled == slots.size() and slots.size() == 2 and told, "both slots get an older ruin, with a founding and an end in the log")
+	var in_order := true
+	for i in range(1, bare.events.size()):
+		in_order = in_order and bare.events[i].year >= bare.events[i - 1].year
+	check(in_order, "and the log still reads in order")

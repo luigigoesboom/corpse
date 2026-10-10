@@ -76,6 +76,7 @@ var mutation_cooldown: Timer = Timer.new()
 
 
 func _ready() -> void:
+	UiSounds.wire(self)  # Hover and select sounds (week 40).
 	balloon.hide()
 	Engine.get_singleton("DialogueManager").mutated.connect(_on_mutated)
 

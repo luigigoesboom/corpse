@@ -36,19 +36,8 @@ func _process(delta: float) -> void:
 
 ## The average tint of the kinds of rock painted around a point.
 func _target_tint(at: Vector2) -> Color:
-	if _kinds == null:
-		return Color.WHITE
+	var weights := WorldMap.kind_weights(_kinds, at)
 	var sum := Color(0, 0, 0)
-	var tile := Vector2i((at / ChunkData.TILE_PX).floor())
-	var n := 0
-	for dy in range(-8, 9, 4):
-		for dx in range(-12, 13, 4):
-			sum += TINTS[ChunkData.KINDS[_kind_at(tile + Vector2i(dx, dy))]]
-			n += 1
-	return sum / n
-
-
-func _kind_at(tile: Vector2i) -> int:
-	if tile.x < 0 or tile.y < 0 or tile.x >= _kinds.get_width() or tile.y >= _kinds.get_height():
-		return 0
-	return WorldMap.kind_of_color(_kinds.get_pixelv(tile))
+	for k in weights.size():
+		sum += TINTS[ChunkData.KINDS[k]] * weights[k]
+	return sum

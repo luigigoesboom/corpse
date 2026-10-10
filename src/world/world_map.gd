@@ -43,6 +43,32 @@ func kind_at(tile: Vector2i) -> int:
 	return kind_of_color(kinds.get_pixelv(tile))
 
 
+## How much of each kind of rock is painted around a world point: a grid of
+## samples over about a screen, as fractions (one per ChunkData.KINDS) that
+## add up to 1. `kinds_image` may be null (then it is all flesh). Used by the
+## backdrop's tint and the ambience (week 40).
+static func kind_weights(kinds_image: Image, at: Vector2) -> Array:
+	var out := []
+	out.resize(ChunkData.KINDS.size())
+	out.fill(0.0)
+	if kinds_image == null:
+		out[0] = 1.0
+		return out
+	var tile := Vector2i((at / ChunkData.TILE_PX).floor())
+	var n := 0
+	for dy in range(-8, 9, 4):
+		for dx in range(-12, 13, 4):
+			var p := tile + Vector2i(dx, dy)
+			var kind := 0
+			if p.x >= 0 and p.y >= 0 and p.x < kinds_image.get_width() and p.y < kinds_image.get_height():
+				kind = kind_of_color(kinds_image.get_pixelv(p))
+			out[kind] += 1.0
+			n += 1
+	for k in out.size():
+		out[k] /= n
+	return out
+
+
 ## The kind a painted color means (index into ChunkData.KINDS): transparent
 ## is flesh, otherwise the nearest of KIND_PAINT.
 static func kind_of_color(c: Color) -> int:

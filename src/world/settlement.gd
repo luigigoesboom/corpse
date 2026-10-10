@@ -49,6 +49,7 @@ var _player_inside := false
 func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
+	add_to_group(&"settlements")  # Ambience murmurs near them (week 40).
 	build()
 
 
@@ -119,6 +120,7 @@ func _process(delta: float) -> void:
 	var local := to_local(player.global_position)
 	var inside := absf(local.x) < width / 2.0 + 40.0 and absf(local.y) < 140.0
 	if inside and not _player_inside:
+		Sfx.play(&"discover")
 		var def := FactionDb.get_def(site.faction)
 		EventBus.notify.emit("%s, a %s settlement" % [site.name, def.display_name if def else "?"])
 	_player_inside = inside

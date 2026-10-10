@@ -50,10 +50,31 @@ static func fill_ruin_slots(data: WorldData, ruins: Array) -> void:
 				best = candidate
 				best_score = score
 		if best == null:
-			continue
+			best = _older_ruin(data, key)  # History left too few ruins: one older than it.
 		best.slot = key
 		var artifact := ArtifactForge.forge_for_site(data, best)
 		if artifact:
 			var rng := SeededRng.make([data.world_seed, "artifact_spot", key])
 			var spot: Vector2 = slot.position + Vector2(roundf(rng.randf_range(-0.3, 0.3) * slot.width), 0)
 			data.add_dropped_item(ChunkData.world_to_chunk(spot), StringName(artifact.id), spot)
+
+
+## A ruin from before the history began (about 1 world in 20 ends with fewer
+## ruins than there are ruin slots). Some people founded it early and left
+## it; the log says so, so its mural and tablet have something to tell.
+static func _older_ruin(data: WorldData, key: String) -> SiteData:
+	var rng := SeededRng.make([data.world_seed, "older_ruin", key])
+	var peoples: Array = data.factions.values()
+	peoples.sort_custom(func(a, b): return a.founded_year < b.founded_year)
+	var people: FactionData = peoples[rng.randi() % mini(3, peoples.size())]
+	var now := data.year
+	data.year = maxi(1, people.founded_year) + rng.randi_range(1, 40)
+	var site := HistorySim._new_site(data, people, 30, rng)
+	data.log_event(&"site_founded", [people.id], {"site": site.id})
+	data.year += rng.randi_range(80, 300)
+	var gone := site.population
+	HistorySim._end_site(data, site)
+	data.log_event(&"site_abandoned", [people.id], {"site": site.id, "dead": gone})
+	data.year = now
+	data.events.sort_custom(func(a, b): return a.year < b.year)
+	return site

@@ -130,6 +130,8 @@ func spit_velocity(from: Vector2) -> Vector2:
 
 
 func _enter(new_state: State) -> void:
+	if new_state == State.WINDUP:
+		Sfx.play(&"spitter_charge", global_position)
 	state = new_state
 	_state_time = 0.0
 
