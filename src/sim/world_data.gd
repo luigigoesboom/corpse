@@ -62,6 +62,8 @@ var boons: Dictionary = {}
 ## Slot -> mutation id the fragment keeps through death (Boons lasting_graft);
 ## the next host is born with it.
 var kept_graft: Dictionary = {}
+## Events the fragment has read on murals and tablets (week 35): id -> true.
+var known_events: Dictionary = {}
 
 
 static func create(seed_value: int) -> WorldData:
@@ -257,6 +259,16 @@ func log_deed(type: StringName, actors: Array, details: Dictionary) -> EventReco
 	return event
 
 
+## Marks events as read (week 35). Returns how many were new.
+func learn(ids: Array) -> int:
+	var fresh := 0
+	for id in ids:
+		if not known_events.has(id):
+			known_events[id] = true
+			fresh += 1
+	return fresh
+
+
 func add_ichor(amount: int) -> void:
 	ichor = maxi(0, ichor + amount)
 
@@ -357,7 +369,7 @@ func to_dict() -> Dictionary:
 		"sites": sites.values().map(func(site): return site.to_dict()),
 		"artifacts": artifacts.values().map(func(artifact): return artifact.to_dict()),
 		"legend": legend.duplicate(),
-		"ichor": ichor, "ichor_banked": ichor_banked, "boons": boons.duplicate(), "kept_graft": kept_graft.duplicate(),
+		"ichor": ichor, "ichor_banked": ichor_banked, "boons": boons.duplicate(), "kept_graft": kept_graft.duplicate(), "known_events": known_events.duplicate(),
 	}
 
 
@@ -390,6 +402,7 @@ static func from_dict(d: Dictionary) -> WorldData:
 	data.ichor_banked = int(d.get("ichor_banked", 0))
 	data.boons = d.get("boons", {}).duplicate()
 	data.kept_graft = d.get("kept_graft", {}).duplicate()
+	data.known_events = d.get("known_events", {}).duplicate()
 	data._fit_inventory()
 	return data
 

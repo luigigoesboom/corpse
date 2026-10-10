@@ -3,11 +3,12 @@ extends Control
 ##   Pockets: the 8 pockets and what the selected item does. Enter eats, X drops.
 ##   Body:    this host and the part in each body slot, with its key.
 ##   Lives:   every host so far, where its body lies and what is still on it.
+##   History: what the fragment has read on murals and tablets, per people (week 35).
 ## Q / E (LB / RB on a pad) switch tabs, Tab or Esc closes (GameUI).
 ## Keyboard and gamepad move the selection; the mouse selects by hovering and
 ## uses the buttons. Built in code: the .tscn is just this script on a Control.
 
-const TABS := ["Pockets", "Body", "Lives"]
+const TABS := ["Pockets", "Body", "Lives", "History"]
 const BODY_SLOTS := ["head", "mouth", "back", "arm", "belly"]
 const SLOT_SIZE := Vector2(52, 52)
 const CREATURE_NAMES: Dictionary = preload("res://src/ui/death_screen.gd").CREATURE_NAMES
@@ -31,6 +32,8 @@ var _drop: Button
 var _host: Label
 var _body_list: GridContainer
 var _lives_list: VBoxContainer
+var _history_scroll: ScrollContainer
+var _history_list: VBoxContainer
 var _lives_scroll: ScrollContainer
 var _hints: Label
 
@@ -60,9 +63,9 @@ func show_tab(index: int) -> void:
 		1:
 			_tab_buttons[tab].grab_focus()
 			_hints.text = "Q / E: tabs    Tab: close"
-		2:
+		2, 3:
 			_tab_buttons[tab].grab_focus()
-			_lives_scroll.scroll_vertical = 0
+			_scroll_of(tab).scroll_vertical = 0
 			_hints.text = "Up / Down: scroll    Q / E: tabs    Tab: close"
 
 
@@ -75,10 +78,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		show_tab(tab + 1)
 	elif tab == 0 and event.is_action_pressed("ui_drop"):
 		_on_drop_pressed()
-	elif tab == 2 and event.is_action_pressed("ui_down"):
-		_lives_scroll.scroll_vertical += 24
-	elif tab == 2 and event.is_action_pressed("ui_up"):
-		_lives_scroll.scroll_vertical -= 24
+	elif tab >= 2 and event.is_action_pressed("ui_down"):
+		_scroll_of(tab).scroll_vertical += 24
+	elif tab >= 2 and event.is_action_pressed("ui_up"):
+		_scroll_of(tab).scroll_vertical -= 24
 	else:
 		return
 	get_viewport().set_input_as_handled()
@@ -96,6 +99,7 @@ func _refresh() -> void:
 	_select(_selected)
 	_refresh_body()
 	_refresh_lives()
+	_refresh_history()
 
 
 # --- Pockets ---------------------------------------------------------------
@@ -288,7 +292,7 @@ func _build() -> void:
 	pages.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	pages.custom_minimum_size = Vector2(0, 220)
 	root.add_child(pages)
-	_pages = [_build_pockets(), _build_body(), _build_lives()]
+	_pages = [_build_pockets(), _build_body(), _build_lives(), _build_history()]
 	for page in _pages:
 		page.set_anchors_preset(Control.PRESET_FULL_RECT)
 		pages.add_child(page)
@@ -382,6 +386,51 @@ func _build_lives() -> Control:
 	_lives_list.add_theme_constant_override("separation", 3)
 	_lives_scroll.add_child(_lives_list)
 	return _lives_scroll
+
+
+func _build_history() -> Control:
+	_history_scroll = ScrollContainer.new()
+	_history_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_history_list = VBoxContainer.new()
+	_history_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_history_list.add_theme_constant_override("separation", 3)
+	_history_scroll.add_child(_history_list)
+	return _history_scroll
+
+
+func _scroll_of(index: int) -> ScrollContainer:
+	return _lives_scroll if index == 2 else _history_scroll
+
+
+# --- History ----------------------------------------------------------------
+
+## Everything read on murals and tablets, per people, oldest first: the past
+## pieced together from what you found.
+func _refresh_history() -> void:
+	var data := WorldState.data
+	for child in _history_list.get_children():
+		child.queue_free()
+	var known := Lore.known_by_people(data)
+	if known.is_empty():
+		var empty := _label("You know nothing of the past yet. Read the murals in settlements and what is left in ruins.", 16, DIM_TEXT)
+		empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_history_list.add_child(empty)
+		return
+	var peoples := known.keys()
+	peoples.sort_custom(func(a, b): return known[a][0].year < known[b][0].year)
+	for people in peoples:
+		var faction: FactionData = data.factions.get(people)
+		var title := _label(EventText._faction(data, people).capitalize() if faction == null else faction.display_name, 16)
+		if faction:
+			title.add_theme_color_override("font_color", faction.color.lightened(0.3))
+		_history_list.add_child(title)
+		var lines := PackedStringArray()
+		for event in known[people]:
+			lines.append(EventText.line(event, data))
+		var body := _label("
+".join(lines), 16, DIM_TEXT)
+		body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_history_list.add_child(body)
 
 
 func _box(fill: Color, border: Color) -> StyleBoxFlat:

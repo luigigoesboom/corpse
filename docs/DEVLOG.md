@@ -13,6 +13,11 @@ Next:
 
 ---
 
+## Week 35: murals and lore objects (2026-10-10)
+Done: every settlement has a mural of its people's past, painted in their own medium (the Choir's gold leaf and bile on rib, the Tenders' stitched gut-lining, bone cuttings, soot on hide); every ruin keeps its fallen people's mural and a bone tablet about how the place began and ended. Each mural shows up to four moments, always including how the people began, and different murals of one people show different moments. Reading one (E, page by page in the dialogue balloon) teaches what it shows; the new History tab lays out everything you know per people, by year, so the Choir's schism on one wall and its wars on another make one story. Save version 18. tests/test_lore.gd.
+Not done: murals are drawn in code (four painted panels); murals do not lie yet (a people painting its defeats as victories would be fun later); nothing reacts to what you know.
+Next: week 36, non-combat options.
+
 ## Week 34: ichor (2026-10-10)
 Done: D-027 after the developer said lives felt a bit pointless. Ichor, the god's dried blood: killing gives it (deeper creatures more), clots lie in the ruins and down in the deep tunnel, and the host carries it, shown under the hearts with drops flying in. At death it stays in the body (the epitaph says how much); go back for it, or lose some to drying, eating and looting between lives. Heart-roots drink it and bank it for good: the Choir's altar in its chapel (refuses you if they hate you, pleased by every offering) and a wild root in the deep tunnel. Banked ichor buys four boons that last across lives: sense your old body (a mark on screen), one more heart, four hosts to pick from, one graft that survives death. Save version 17. tests/test_ichor.gd covers the rules and the done-when (die carrying ichor, go back, bank it, buy a heart, the next host has it). Roadmap reshuffled (D-027).
 Not done: placeholder art for the roots and clots; no ichor from the boss in the world yet (week 37 places her); boons are single purchases with no levels.

@@ -68,6 +68,7 @@ func build() -> void:
 		return
 	var rng := SeededRng.make([WorldState.data.world_seed, "settlement", site.id])
 	_lay_out_props(def, rng)
+	_add_mural()
 	var bounds := walk_bounds()
 	for i in site.residents_shown(capacity):
 		var npc: ColonyNpc = RESIDENT.instantiate()
@@ -85,6 +86,14 @@ func _lay_out_props(def: FactionDef, rng: RandomNumberGenerator) -> void:
 		if prop.work_spot:
 			var spot_x := prop.position.x + prop.work_offset
 			_work_spots.append({"x": spot_x, "facing": signf(prop.position.x - spot_x) if prop.work_offset != 0.0 else 1.0, "taken": false})
+
+
+## Their mural (week 35), near the right end: their story as they tell it.
+func _add_mural() -> void:
+	var mural := LorePiece.new()
+	mural.setup(LorePiece.Kind.MURAL, site.faction, site.id, site.id.hash())
+	mural.position = Vector2(width / 2.0 - EDGE - 34.0, 0)
+	_add_built(mural)
 
 
 func _add_built(node: Node) -> void:

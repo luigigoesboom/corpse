@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://bflv241avat2y"
+path="res://.godot/imported/reading.dialogue-1a7caa4ec761e8bbbc1a9ebc40827900.tres"
+
+[deps]
+
+source_file="res://data/dialogue/reading.dialogue"
+dest_files=["res://.godot/imported/reading.dialogue-1a7caa4ec761e8bbbc1a9ebc40827900.tres"]
+
+[params]
+
+defaults=true

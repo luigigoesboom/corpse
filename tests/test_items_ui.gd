@@ -28,15 +28,17 @@ func run() -> void:
 	screen.get_node("%DropButton").pressed.emit()
 	await process_frame
 	check(_ordinary(items).size() == 1 and is_equal_approx(_ordinary(items)[0].position.y, 3200.0 + ChunkData.FLOOR_SINK), "a dropped item lands on the floor")
-	# Tabs (week 25 rework): E / Q (LB / RB) cycle Pockets, Body, Lives.
+	# Tabs (week 25 rework): E / Q (LB / RB) cycle Pockets, Body, Lives, History.
 	await ui_action("ui_tab_next")
 	check(screen.tab == 1, "E switches to the Body tab")
 	await ui_action("ui_tab_next")
 	check(screen.tab == 2, "and again to Lives")
 	await ui_action("ui_tab_next")
+	check(screen.tab == 3, "and to History (week 35)")
+	await ui_action("ui_tab_next")
 	check(screen.tab == 0, "and wraps back to Pockets")
 	await ui_action("ui_tab_prev")
-	check(screen.tab == 2, "Q goes the other way")
+	check(screen.tab == 3, "Q goes the other way")
 	await ui_action("ui_tab_prev")
 	await ui_action("ui_tab_prev")
 	await ui_action("inventory")

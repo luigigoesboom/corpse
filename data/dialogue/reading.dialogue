@@ -1,0 +1,16 @@
+# Reading a mural or a tablet (week 35). Pages come from Reading
+# (src/dialogue/reading.gd); the text is made by Lore from the event log.
+
+~ start
+{{title}}: {{page(0)}}
+if count > 1
+	{{title}}: {{page(1)}}
+if count > 2
+	{{title}}: {{page(2)}}
+if count > 3
+	{{title}}: {{page(3)}}
+if count > 4
+	{{title}}: {{page(4)}}
+if count > 5
+	{{title}}: {{page(5)}}
+=> END

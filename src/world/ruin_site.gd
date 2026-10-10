@@ -55,6 +55,16 @@ func build() -> void:
 		var cloth := prop.get_node_or_null("Cloth") as Polygon2D
 		if cloth:
 			cloth.color = (people.color if people else Color(0.6, 0.55, 0.5)).darkened(0.25)
+	# What is left to read (week 35): the fallen people's mural, and a bone
+	# telling what happened here.
+	var mural := LorePiece.new()
+	mural.setup(LorePiece.Kind.MURAL, site.faction, site.id, site.id.hash() + 1)
+	mural.position = Vector2(-width / 2.0 + EDGE + 34.0, 0)
+	_add_built(mural)
+	var tablet := LorePiece.new()
+	tablet.setup(LorePiece.Kind.TABLET, site.faction, site.id, 0)
+	tablet.position = Vector2(width / 2.0 - EDGE - 20.0, 0)
+	_add_built(tablet)
 	_title = _label(title_text(), 32, -156.0, false)
 	_story = _label(story_text(), 16, -124.0, true)
 
@@ -123,3 +133,8 @@ func _draw() -> void:
 	draw_line(Vector2(-half, 0), Vector2(-half, -30), color, 2.0)
 	draw_line(Vector2(half, 0), Vector2(half, -30), color, 2.0)
 	draw_string(ThemeDB.fallback_font, Vector2(-half + 4, -34), "Ruin slot", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, color)
+
+
+func _add_built(node: Node) -> void:
+	node.set_meta(&"built", true)
+	add_child(node)
