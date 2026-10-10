@@ -34,6 +34,8 @@ var _shown := 0.0
 func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
+	add_to_group(&"minimap_marks")
+	set_meta(&"minimap_color", Color8(150, 140, 130))
 	build()
 
 

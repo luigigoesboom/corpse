@@ -5,6 +5,11 @@ Three lines a week minimum. Newest at the top.
 Template:
 
 ```
+## Map shaping and minimap (2026-10-11)
+Done: world.png reshaped from data/maps/_source/world_painted.png by tools/map/shape_world.gd (caves instead of boxes, a ledged shaft up to a new cave above the camp, a hollow; tests/test_map.gd climbs it). Minimap top right: what you have seen, walls in their rock color, marks for settlements, the guard post, ruins, heart-roots and (with the boon) your last body. Seen tiles are saved (version 22).
+Not done: No full-screen map yet (M is still the debug map). Teleports reveal only where you land.
+Next: Play it and say how the minimap feels (size, colors). Then week 42, onboarding.
+
 ## Week N (YYYY-MM-DD)
 Done:
 Not done:

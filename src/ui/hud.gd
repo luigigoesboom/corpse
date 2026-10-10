@@ -16,6 +16,7 @@ const HEART_GAP := 6.0
 
 var _message_tween: Tween
 var _health: Health
+var minimap: Minimap
 var _ichor: Label
 var _ichor_shown := 0
 
@@ -30,6 +31,10 @@ func _ready() -> void:
 	EventBus.mutations_changed.connect(_refresh_mutations)
 	EventBus.world_loaded.connect(_refresh_mutations)
 	_refresh_mutations()
+	minimap = Minimap.new()
+	minimap.name = "Minimap"
+	add_child(minimap)
+	minimap.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_KEEP_SIZE, 8)
 	_ichor = Label.new()
 	_ichor.position = Vector2(30, 34)
 	_ichor.add_theme_color_override(&"font_color", Color(1, 0.45, 0.45))
@@ -40,6 +45,11 @@ func _ready() -> void:
 	EventBus.world_loaded.connect(_refresh_ichor)
 	EventBus.inventory_changed.connect(_refresh_ichor)  # Reclaiming a body.
 	_refresh_ichor()
+
+
+## Shows the minimap (top right) for this map and player.
+func bind_map(chunks: ChunkManager, player: Node2D) -> void:
+	minimap.bind(chunks, player)
 
 
 func bind_health(health: Health) -> void:

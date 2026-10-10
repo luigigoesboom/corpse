@@ -67,6 +67,9 @@ var known_events: Dictionary = {}
 ## Valve keys lying at a hand-made place (week 38): key id -> place id,
 ## "" while the key is an item somewhere (pockets, a body, the floor).
 var key_places: Dictionary = {}
+## What the fragment has seen (the minimap, after week 41): chunk ->
+## PackedByteArray bitset, one bit per tile of the chunk (64 x 64 / 8 bytes).
+var explored: Dictionary = {}
 
 
 static func create(seed_value: int) -> WorldData:
@@ -262,6 +265,34 @@ func log_deed(type: StringName, actors: Array, details: Dictionary) -> EventReco
 	return event
 
 
+## Marks every tile in `rect` (tile coordinates) as seen. Works a chunk at
+## a time (packed arrays are copied, so each chunk's bits are written back).
+func reveal(rect: Rect2i) -> void:
+	var size := ChunkData.SIZE
+	var first := Vector2i(floori(rect.position.x / float(size)), floori(rect.position.y / float(size)))
+	var last := Vector2i(floori((rect.end.x - 1) / float(size)), floori((rect.end.y - 1) / float(size)))
+	for cy in range(first.y, last.y + 1):
+		for cx in range(first.x, last.x + 1):
+			var chunk := Vector2i(cx, cy)
+			var bits: PackedByteArray = explored.get(chunk, PackedByteArray())
+			if bits.is_empty():
+				bits.resize(size * size / 8)
+			var area := rect.intersection(Rect2i(chunk * size, Vector2i(size, size)))
+			for y in range(area.position.y, area.end.y):
+				for x in range(area.position.x, area.end.x):
+					var i := (y - cy * size) * size + (x - cx * size)
+					bits[i >> 3] |= 1 << (i & 7)
+			explored[chunk] = bits
+
+
+func is_explored(tile: Vector2i) -> bool:
+	var bits: PackedByteArray = explored.get(Vector2i(floori(tile.x / float(ChunkData.SIZE)), floori(tile.y / float(ChunkData.SIZE))), PackedByteArray())
+	if bits.is_empty():
+		return false
+	var i := posmod(tile.y, ChunkData.SIZE) * ChunkData.SIZE + posmod(tile.x, ChunkData.SIZE)
+	return bits[i >> 3] & (1 << (i & 7)) != 0
+
+
 ## Marks events as read (week 35). Returns how many were new.
 func learn(ids: Array) -> int:
 	var fresh := 0
@@ -372,7 +403,7 @@ func to_dict() -> Dictionary:
 		"sites": sites.values().map(func(site): return site.to_dict()),
 		"artifacts": artifacts.values().map(func(artifact): return artifact.to_dict()),
 		"legend": legend.duplicate(),
-		"ichor": ichor, "ichor_banked": ichor_banked, "boons": boons.duplicate(), "kept_graft": kept_graft.duplicate(), "known_events": known_events.duplicate(), "key_places": key_places.duplicate(),
+		"ichor": ichor, "ichor_banked": ichor_banked, "boons": boons.duplicate(), "kept_graft": kept_graft.duplicate(), "known_events": known_events.duplicate(), "key_places": key_places.duplicate(), "explored": explored.duplicate(true),
 	}
 
 
@@ -407,6 +438,7 @@ static func from_dict(d: Dictionary) -> WorldData:
 	data.kept_graft = d.get("kept_graft", {}).duplicate()
 	data.known_events = d.get("known_events", {}).duplicate()
 	data.key_places = d.get("key_places", {}).duplicate()
+	data.explored = d.get("explored", {}).duplicate(true)
 	data._fit_inventory()
 	return data
 

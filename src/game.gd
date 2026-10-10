@@ -22,6 +22,7 @@ func _ready() -> void:
 	_items.attach(_chunks, _player)
 	_corpses.attach(_chunks)
 	$UI/HUD.bind_health(_player.health)
+	$UI/HUD.bind_map(_chunks, _player)
 	_player.health.changed.connect(_on_player_health_changed)
 	$UI/PauseMenu.save_pressed.connect(quick_save)
 	$UI/PauseMenu.load_pressed.connect(quick_load)

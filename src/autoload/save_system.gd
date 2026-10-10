@@ -17,7 +17,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 21
+const SAVE_VERSION := 22
 const SLOTS := [1, 2, 3]
 
 
@@ -209,4 +209,8 @@ func _migrate(save: Dictionary) -> Dictionary:
 		# v21 (week 38): where the valve keys lie. Nothing to convert: a world
 		# without key places gets them from its history when it loads.
 		save.save_version = 21
+	if save.save_version == 21:
+		# v22 (after week 41): what the fragment has seen, for the minimap.
+		# Nothing to convert: an old world starts unseen.
+		save.save_version = 22
 	return save

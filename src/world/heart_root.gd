@@ -15,6 +15,8 @@ var _time := 0.0
 
 
 func _ready() -> void:
+	add_to_group(&"minimap_marks")
+	set_meta(&"minimap_color", Color8(255, 60, 70))
 	$Prompt.visible = false
 	body_entered.connect(func(body): if body is Player: _show_prompt(true))
 	body_exited.connect(func(body): if body is Player: _show_prompt(false))

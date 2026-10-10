@@ -379,6 +379,10 @@ Original plan:
 - Grafting = instance the part scene, attach to the named socket on the host rig, add the ability node to the player.
 - Creatures use the exact same system, so any creature mutation can in theory be taken by the player.
 
+## Minimap (after week 41)
+
+`WorldData.explored` keeps which tiles the player has seen: chunk -> a 512-byte bitset (one bit per tile), saved (version 22). `Minimap` (src/ui/minimap.gd, made by the HUD, top right) reveals about a screen around the host four times a second (`reveal(rect)`) and redraws 120 x 68 tiles around it, one pixel per tile: seen air dark red, walls next to air in their rock kind's color, everything else dark. Marks: settlements gold, the guard post orange, anything in group `minimap_marks` in its `minimap_color` meta (ruins grey, heart-roots red), the last body if the host has the sense_bodies boon. The game calls `HUD.bind_map(chunks, player)`.
+
 ## Debug tools (build them early, they pay back fast)
 
 - F3 overlay: FPS, position, chunk coord, region, rot, year.
