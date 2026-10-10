@@ -53,6 +53,8 @@ func _init(w: int, h: int, palette: RefCounted) -> void:
 ##   lo, hi: int      use only ramp steps lo..hi (e.g. keep cloth out of highlights)
 ##   line: bool       dark line where it lies behind another shape (default true)
 ##   rot: float       ellipse rotation, radians
+##   alpha: float     see-through (wings), 0..1
+##   seam: bool       dark line even behind a shape of the same ramp (segments)
 
 func ellipse(center: Vector2, rx: float, ry: float, ramp: StringName, opts := {}) -> void:
 	_add("ellipse", {"c": center, "rx": maxf(rx, 0.5), "ry": maxf(ry, 0.5)}, ramp, opts)
@@ -156,8 +158,8 @@ func render() -> Dictionary:
 				if q.x < 0 or q.y < 0 or q.x >= width or q.y >= height:
 					continue
 				var other = _ids[q.y * width + q.x]
-				if other >= 0 and other != id and _in_front(other, id) and _shapes[other].ramp != _shapes[id].ramp:
-					lines.append([Vector2i(x, y), pal.step(_shapes[id].ramp, 0)])
+				if other >= 0 and other != id and _in_front(other, id) and (_shapes[other].ramp != _shapes[id].ramp or _shapes[id].opts.get("seam", false)):
+					lines.append([Vector2i(x, y), pal.step(_shapes[id].ramp, int(_shapes[id].opts.get("lo", 0)))])
 					break
 	for l in lines:
 		body.set_pixelv(l[0], l[1])
@@ -249,7 +251,7 @@ func _shade(s: Dictionary, n: Vector3, x: int, y: int, id: int) -> Color:
 			i += 1
 	else:
 		i = roundi(f)
-	return r[clampi(lo + i, lo, hi)]
+	return Color(r[clampi(lo + i, lo, hi)], float(s.opts.get("alpha", 1.0)))
 
 
 func _raster(id: int, ids: PackedInt32Array, normals: PackedVector3Array) -> void:

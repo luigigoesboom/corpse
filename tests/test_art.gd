@@ -22,9 +22,11 @@ func run() -> void:
 	var checked := 0
 	var dirs := ["res://assets/art/props/", "res://assets/art/items/"]
 	# Everything the art program (tools/pixel, D-028) makes.
-	for root in ["res://assets/art/hosts/", "res://assets/art/npcs/", "res://assets/art/mutations/"]:
+	for root in ["res://assets/art/hosts/", "res://assets/art/npcs/", "res://assets/art/mutations/", "res://assets/art/creatures/"]:
 		for sub in DirAccess.get_directories_at(root):
 			dirs.append(root + sub + "/")
+			if DirAccess.dir_exists_absolute(root + sub + "/glow"):
+				dirs.append(root + sub + "/glow/")
 	for dir in dirs:
 		for file in DirAccess.get_files_at(dir):
 			if not file.ends_with(".png") or file.ends_with("_cloth.png"):
@@ -39,7 +41,7 @@ func run() -> void:
 						strays += 1
 			if strays > 0:
 				off.append("%s (%d px)" % [file, strays])
-	check(checked >= 100 and off.is_empty(), "%d sprites (props, items, hosts, residents, mutations) keep to the palette %s" % [checked, off])
+	check(checked >= 100 and off.is_empty(), "%d sprites (props, items, hosts, residents, mutations, creatures) keep to the palette %s" % [checked, off])
 
 	# Nothing placed in the Gut is still made of placeholder polygons: the
 	# world's entities, what settlements and ruins build, items, hazards.

@@ -13,6 +13,10 @@ Next:
 
 ---
 
+## Art program, part 2 (2026-10-11)
+Done: creatures and the Matron come from recipes now. The leech is a row of seamed segments with one pale belly strip (first try was a lumpy blob: same-colored segments got no dividing lines, so the canvas has a `seam` option now); the spitter has a dithered bulb on a bent stalk; the fly has see-through wings (`alpha`). The Matron: segments in the darker hide steps with soft seams, brood sacs, a glowing bile bladder, a ring of teeth, four eyes. Fixed on the way: her tail went down through the floor when it was meant to rise (an old sign bug), and her belly hung out of the frame. tests/test_art.gd covers creatures and their glow strips.
+Next: props, items and tiles as recipes.
+
 ## Art program, part 1 (2026-10-11)
 Done: D-028 (the developer will mostly use generated art; no Steam). The generators were throwaway scripts outside the repo, each with its own helpers and colors; now there is one program in tools/pixel. The palette is 26 named ramps (added pilgrim, antibody, tender, fly, eye and wing ramps the hosts and creatures were using off-palette). The canvas records shapes and renders them with light: spheres read as round, limbs as tubes, slabs bevelled; selective outlines; a line where parts overlap; one-pixel nubs pruned. Hosts, residents and mutation overlays now come from one skeleton with IK: poses are where hands and feet go. First pass looked like naked figures in capes with bent knees and a roll that came apart; fixed with a tunic drawn over the thighs, sleeves, thinner limbs, a higher hip, and a roll drawn as a tucked ball. tests/test_art.gd now checks hosts, residents and overlays stay in the palette.
 Not done: creatures, the Matron, props, items and tiles still come from the old scripts' output.

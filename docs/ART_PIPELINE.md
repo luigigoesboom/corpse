@@ -95,10 +95,12 @@ Names after `--` are recipes (`tools/pixel/recipes/<name>.gd`, or `all`); `--pre
 | Part | Job |
 |---|---|
 | `palette.gd` | Reads `assets/art/_source/gut.gpl`. A `# ramp <name>` line starts a ramp (dark to light). `ramp()`, `step(name, i)` (negative counts from the light end), `shade(name, t)`, `snap()`. |
-| `canvas.gd` | One frame. Record shapes (`ellipse`, `circle`, `capsule` = tapered tube, `polygon`, `rect`) with a ramp and options (`z`, `tone`, `dither`, `glow`, `flat`, `lo`/`hi` steps, `line`, `rot`), and `detail()` / `stroke()` pixels; `render()` rasterizes in z order, shades every pixel from the shape's form (ellipse = dome, capsule = tube, polygon = bevelled slab) with light from the top left, prunes one-pixel nubs, draws dark lines where a shape lies behind another, and outlines: near-black, but the shape's own darkest color on the lit side. Glow shapes and details go to a second image. |
+| `canvas.gd` | One frame. Record shapes (`ellipse`, `circle`, `capsule` = tapered tube, `polygon`, `rect`) with a ramp and options (`z`, `tone`, `dither`, `glow`, `flat`, `lo`/`hi` steps, `line`, `rot`, `alpha`, `seam`), and `detail()` / `stroke()` pixels; `render()` rasterizes in z order, shades every pixel from the shape's form (ellipse = dome, capsule = tube, polygon = bevelled slab) with light from the top left, prunes one-pixel nubs, draws dark lines where a shape lies behind another, and outlines: near-black, but the shape's own darkest color on the lit side. Glow shapes and details go to a second image. |
 | `rig.gd` | `ik()` (two-bone: knees and elbows from where hands and feet go), `reach()`, `turn()`. |
 | `sheet.gd` | `strip()`, `save()`, `preview()`. |
 | `recipes/swatch.gd` | Test card: spheres, tubes, slabs in every ramp. |
+| `recipes/creatures.gd` | Gut Leech (seamed segments, belly strip, ring mouth), Bile Spitter (stalk, dithered bulb, bile gland), Rot Fly (see-through wings). 48 px frames, glow strips in `glow/`. |
+| `recipes/matron.gd` | The Gullet Matron, 128 px: seven seamed segments, brood sacs, belly, glowing bile bladder, ring of teeth, four eyes. |
 | `recipes/hosts.gd` | One skeleton for every humanoid; looks (colonist, pilgrim, antibody, tender, chorister) dress it; poses are hand and foot targets; the mutation overlays (acid gland, bone spur, lung sac) are drawn on the same joints. |
 
 Making a new thing: copy the nearest recipe, change the shapes and poses, run with `--preview`, look, repeat. `tests/test_art.gd` checks that everything the program makes stays in the palette.
