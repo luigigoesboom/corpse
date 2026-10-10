@@ -38,6 +38,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func close_all() -> void:
+	Player.swallow_attack()  # A click that closed a menu is not a swing.
 	_inventory.visible = false
 	_pause.visible = false
 	death_screen.visible = false

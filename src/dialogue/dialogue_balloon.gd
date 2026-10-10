@@ -48,6 +48,7 @@ var dialogue_line: DialogueLine:
 		else:
 			# The dialogue has finished so close the balloon
 			get_tree().paused = false
+			Player.swallow_attack()  # The closing click is not a sword swing.
 			if owner == null:
 				queue_free()
 			else:

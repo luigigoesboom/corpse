@@ -93,6 +93,15 @@ var _was_on_floor := true
 ## landing, a jump) that guards can hear from further away.
 var _loud := 0.0
 var _base_light_energy := 1.0
+## Set when a conversation or menu closes: the click that closed it must not
+## also swing the sword (it could hit the person you were talking to). The
+## attack stays locked until the button is let go.
+static var attack_locked := false
+
+
+## Call when a conversation or menu closes on a click.
+static func swallow_attack() -> void:
+	attack_locked = true
 ## Hides the host while it lies dead (its Corpse is drawn instead).
 var body_hidden := false
 
@@ -271,6 +280,10 @@ func teleport(at: Vector2) -> void:
 
 
 func _handle_attack() -> void:
+	if attack_locked:
+		if not Input.is_action_pressed("attack"):
+			attack_locked = false
+		return
 	if _attack_timer <= 0.0 and _attack_hitbox.active:
 		_attack_hitbox.deactivate()
 		_slash.visible = false

@@ -86,3 +86,15 @@ func run() -> void:
 	await wait_frames(5)
 	var fresh = entity("LeechChamber")
 	check(fresh != null and fresh.get_node("Health").current == 3 and fresh.modulate.a == 1.0, "a save without the kill brings the leech back fresh")
+
+	# The click that closes a conversation or a menu is not a sword swing.
+	await wait_frames(60)
+	player.get_script().swallow_attack()
+	Input.action_press("attack")
+	await wait_frames(2)
+	var swung: bool = player._attack_cooldown_timer > 0.0
+	Input.action_release("attack")
+	await wait_frames(2)
+	check(not swung, "the click that closed a conversation does not swing")
+	await press("attack", 2)
+	check(player._attack_cooldown_timer > 0.0, "the next click swings as usual")
