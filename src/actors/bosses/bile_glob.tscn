@@ -4,16 +4,19 @@
 [ext_resource type="Script" path="res://src/actors/components/hitbox.gd" id="2_hit"]
 [ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="3_unshaded"]
 
+[ext_resource type="Texture2D" path="res://assets/art/props/bile_glob_glow.png" id="art_1"]
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_glob"]
 radius = 6.0
 
 [node name="BileGlob" type="Node2D"]
 script = ExtResource("1_s")
 
-[node name="Visual" type="Polygon2D" parent="."]
+[node name="ArtGlow" type="Sprite2D" parent="."]
 material = ExtResource("3_unshaded")
-color = Color(0.72, 0.83, 0.23, 1)
-polygon = PackedVector2Array(-6, 0, -4, -4, 0, -6, 4, -4, 6, 0, 4, 4, 0, 6, -4, 4)
+texture = ExtResource("art_1")
+centered = false
+offset = Vector2(-7, -7)
 
 [node name="Hitbox" type="Area2D" parent="."]
 collision_layer = 32

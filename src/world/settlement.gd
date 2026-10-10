@@ -85,6 +85,9 @@ func build() -> void:
 ## marked as such.
 func _lay_out_props(def: FactionDef, rng: RandomNumberGenerator) -> void:
 	for prop in PropLayout.lay_out(self, def.settlement_props, width, EDGE, rng):
+		var cloth := prop.get_node_or_null("Cloth") as CanvasItem
+		if cloth:
+			cloth.modulate = def.color  # Banners in their people's color (week 39).
 		if prop.work_spot:
 			var spot_x := prop.position.x + prop.work_offset
 			_work_spots.append({"x": spot_x, "facing": signf(prop.position.x - spot_x) if prop.work_offset != 0.0 else 1.0, "taken": false})

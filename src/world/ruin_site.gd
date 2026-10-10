@@ -52,9 +52,9 @@ func build() -> void:
 	var rng := SeededRng.make([WorldState.data.world_seed, "ruin", site.id])
 	var people: FactionData = WorldState.data.factions.get(site.faction)
 	for prop in PropLayout.lay_out(self, KIT, width, EDGE, rng):
-		var cloth := prop.get_node_or_null("Cloth") as Polygon2D
+		var cloth := prop.get_node_or_null("Cloth") as CanvasItem
 		if cloth:
-			cloth.color = (people.color if people else Color(0.6, 0.55, 0.5)).darkened(0.25)
+			cloth.modulate = (people.color if people else Color(0.6, 0.55, 0.5)).darkened(0.25)
 	# What is left to read (week 35): the fallen people's mural, and a bone
 	# telling what happened here.
 	var mural := LorePiece.new()

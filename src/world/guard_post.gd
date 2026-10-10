@@ -19,6 +19,7 @@ extends Settlement
 ## attacks. Dead sentries may be replaced between lives (removed_entities).
 
 const BRAZIER_RADIUS := 80.0
+const GRATE_ART := preload("res://assets/art/props/grate_body.png")
 const WARN_SECONDS := 4.0
 ## Ichor a sentry takes to look away.
 const BRIBE_COST := 20
@@ -169,10 +170,12 @@ func _make_grate() -> StaticBody2D:
 	shape.shape = rect
 	shape.position = Vector2(0, 5)
 	grate.add_child(shape)
-	var bars := Polygon2D.new()
+	var bars := Sprite2D.new()
 	bars.name = "Bars"
-	bars.polygon = PackedVector2Array([Vector2(-gap_half_width, -3), Vector2(gap_half_width, -3), Vector2(gap_half_width, 6), Vector2(-gap_half_width, 6)])
-	bars.color = Color(0.82, 0.78, 0.66)
+	bars.texture = GRATE_ART
+	bars.centered = false
+	bars.offset = Vector2(-GRATE_ART.get_width() / 2.0, -4)
+	bars.scale.x = gap_half_width * 2.0 / 128.0
 	grate.add_child(bars)
 	return grate
 
@@ -214,15 +217,16 @@ class Latch extends Area2D:
 		shape.position = Vector2(0, -20)
 		add_child(shape)
 
+		var art := Sprite2D.new()
+		art.texture = preload("res://assets/art/props/latch_body.png")
+		art.offset = Vector2(0, -13)
+		add_child(art)
+
 	func interact() -> void:
 		if post.is_grate_open():
 			return
 		post.latched = true
 		EventBus.notify.emit("You lift the latch. The grate swings down.")
-
-	func _draw() -> void:
-		draw_rect(Rect2(-2, -22, 4, 22), Color(0.6, 0.55, 0.45))
-		draw_circle(Vector2(0, -22), 3.0, Color(0.85, 0.8, 0.7))
 
 
 ## A fire in a bone bowl: whoever stands near it is easy to see.
@@ -238,13 +242,24 @@ class Brazier extends Node2D:
 		light.shadow_enabled = true
 		light.position = Vector2(0, -26)
 		add_child(light)
+		_add_art()
 
-	func _process(_delta: float) -> void:
-		queue_redraw()
-
-	func _draw() -> void:
-		draw_colored_polygon(PackedVector2Array([Vector2(-10, -18), Vector2(10, -18), Vector2(6, -8), Vector2(-6, -8)]), Color(0.85, 0.8, 0.68))
-		draw_rect(Rect2(-2, -8, 4, 8), Color(0.7, 0.65, 0.55))
-		var flick := 2.0 * sin(Time.get_ticks_msec() / 90.0)
-		draw_colored_polygon(PackedVector2Array([Vector2(-7, -18), Vector2(0, -34 - flick), Vector2(7, -18)]), Color(1, 0.6, 0.2))
-		draw_colored_polygon(PackedVector2Array([Vector2(-3, -18), Vector2(0, -27 + flick), Vector2(3, -18)]), Color(1, 0.9, 0.5))
+	func _add_art() -> void:
+		var bowl := Sprite2D.new()
+		bowl.texture = preload("res://assets/art/props/brazier_body.png")
+		bowl.offset = Vector2(0, -10)
+		add_child(bowl)
+		var flame := AnimatedSprite2D.new()
+		var frames := SpriteFrames.new()
+		var strip: Texture2D = preload("res://assets/art/props/brazier_flame_glow.png")
+		for i in 4:
+			var atlas := AtlasTexture.new()
+			atlas.atlas = strip
+			atlas.region = Rect2(i * 16, 0, 16, 18)
+			frames.add_frame(&"default", atlas)
+		frames.set_animation_speed(&"default", 8.0)
+		flame.sprite_frames = frames
+		flame.material = preload("res://assets/materials/unshaded.tres")
+		flame.position = Vector2(0, -27)
+		add_child(flame)
+		flame.play()

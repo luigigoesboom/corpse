@@ -5,16 +5,19 @@
 [ext_resource type="Texture2D" path="res://assets/lights/light_banded.tres" id="8_light"]
 [ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="9_unshaded"]
 
+[ext_resource type="Texture2D" path="res://assets/art/props/acid_projectile_glow.png" id="art_1"]
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_glob"]
 radius = 10.0
 
 [node name="AcidProjectile" type="Node2D"]
 script = ExtResource("1_proj")
 
-[node name="Visual" type="Polygon2D" parent="."]
+[node name="ArtGlow" type="Sprite2D" parent="."]
 material = ExtResource("9_unshaded")
-color = Color(0.75, 0.85, 0.2, 1)
-polygon = PackedVector2Array(8, 0, 3, -5, -5, -4, -8, 0, -5, 4, 3, 5)
+texture = ExtResource("art_1")
+centered = false
+offset = Vector2(-9, -6)
 
 [node name="Light" type="PointLight2D" parent="."]
 shadow_enabled = true

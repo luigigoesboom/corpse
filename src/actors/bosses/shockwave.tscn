@@ -4,16 +4,19 @@
 [ext_resource type="Script" path="res://src/actors/components/hitbox.gd" id="2_hit"]
 [ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="3_unshaded"]
 
+[ext_resource type="Texture2D" path="res://assets/art/props/shockwave_glow.png" id="art_1"]
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wave"]
 size = Vector2(26, 16)
 
 [node name="Shockwave" type="Node2D"]
 script = ExtResource("1_s")
 
-[node name="Visual" type="Polygon2D" parent="."]
+[node name="ArtGlow" type="Sprite2D" parent="."]
 material = ExtResource("3_unshaded")
-color = Color(0.92, 0.55, 0.5, 0.9)
-polygon = PackedVector2Array(-14, 0, -6, -8, 4, -16, 10, -10, 14, 0)
+texture = ExtResource("art_1")
+centered = false
+offset = Vector2(-15, -17)
 
 [node name="Hitbox" type="Area2D" parent="."]
 position = Vector2(0, -8)

@@ -11,6 +11,9 @@ extends Area2D
 
 const UNSHADED := preload("res://assets/materials/unshaded.tres")
 const THEFT_DEED := -100
+const RELIQUARY_ART := preload("res://assets/art/props/key_reliquary_body.png")
+const NEST_ART := preload("res://assets/art/props/key_nest_body.png")
+const KEY_ART := preload("res://assets/art/props/valve_key_body.png")
 
 @export var place := ValveKeys.MATRON_NEST
 @export var key := ValveKeys.GUT
@@ -19,11 +22,20 @@ const THEFT_DEED := -100
 
 var _prompt: Label
 var _time := 0.0
+var _key_sprite: Sprite2D
 
 
 func _ready() -> void:
 	collision_layer = 2
 	collision_mask = 4
+	var art := Sprite2D.new()
+	art.texture = NEST_ART if place == ValveKeys.MATRON_NEST else RELIQUARY_ART
+	art.offset = Vector2(0, -art.texture.get_height() / 2.0)
+	add_child(art)
+	_key_sprite = Sprite2D.new()
+	_key_sprite.texture = KEY_ART
+	_key_sprite.material = UNSHADED
+	add_child(_key_sprite)
 	var shape := CollisionShape2D.new()
 	var rect := RectangleShape2D.new()
 	rect.size = Vector2(40, 40)
@@ -59,7 +71,8 @@ func _process(delta: float) -> void:
 	_time += delta
 	$Light.visible = has_key()
 	_prompt.text = "E: take the %s" % ItemDb.display_name(key)
-	queue_redraw()
+	_key_sprite.visible = has_key()
+	_key_sprite.position = Vector2(0, (-24.0 if place == ValveKeys.MATRON_NEST else -22.0) + sin(_time * 3.0) * 1.5)
 
 
 func interact() -> void:
@@ -116,21 +129,3 @@ func _settlements() -> Array:
 		if node is Settlement and node.site and node.site.faction == keeper and node.global_position.distance_to(global_position) < 600.0:
 			out.append(node)
 	return out
-
-
-func _draw() -> void:
-	if place == ValveKeys.MATRON_NEST:
-		# A nest of shed skin and bone.
-		draw_colored_polygon(PackedVector2Array([Vector2(-30, 0), Vector2(-24, -10), Vector2(-8, -14), Vector2(10, -13), Vector2(26, -9), Vector2(32, 0)]), Color(0.4, 0.26, 0.22))
-		for i in 5:
-			draw_line(Vector2(-22 + i * 11, -2), Vector2(-16 + i * 11, -11 - (i % 2) * 3), Color(0.8, 0.75, 0.62), 2.0)
-	else:
-		# A reliquary box on bone legs.
-		draw_rect(Rect2(-14, -12, 28, 12), Color(0.55, 0.42, 0.28))
-		draw_rect(Rect2(-16, -34, 32, 22), Color(0.78, 0.62, 0.3))
-		draw_rect(Rect2(-12, -30, 24, 14), Color(0.3, 0.18, 0.14))
-	if has_key():
-		var bob := sin(_time * 3.0) * 1.5
-		var center := Vector2(0, (-22 if place == ValveKeys.MATRON_NEST else -24) + bob)
-		draw_arc(center, 6.0, 0.0, TAU, 16, Color(1, 0.55, 0.45), 3.0)
-		draw_arc(center, 3.0, 0.0, TAU, 12, Color(0.6, 0.1, 0.12), 2.0)

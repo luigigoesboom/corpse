@@ -4,6 +4,9 @@
 [ext_resource type="Texture2D" path="res://assets/lights/light_banded.tres" id="2_light"]
 [ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="3_unshaded"]
 
+[ext_resource type="Texture2D" path="res://assets/art/props/ichor_clot_body.png" id="art_1"]
+[ext_resource type="Texture2D" path="res://assets/art/props/ichor_clot_glow.png" id="art_2"]
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_reach"]
 radius = 16.0
 
@@ -16,14 +19,16 @@ script = ExtResource("1_clot")
 position = Vector2(0, -10)
 shape = SubResource("CircleShape2D_reach")
 
-[node name="Crust" type="Polygon2D" parent="."]
-color = Color(0.36, 0.08, 0.1, 1)
-polygon = PackedVector2Array(-12, 0, -9, -8, -3, -12, 4, -11, 10, -6, 12, 0)
+[node name="Art" type="Sprite2D" parent="."]
+texture = ExtResource("art_1")
+centered = false
+offset = Vector2(-13, -13)
 
-[node name="Shine" type="Polygon2D" parent="."]
+[node name="ArtGlow" type="Sprite2D" parent="."]
 material = ExtResource("3_unshaded")
-color = Color(0.95, 0.25, 0.3, 1)
-polygon = PackedVector2Array(-6, -2, -4, -8, 1, -9, 6, -5, 6, -2)
+texture = ExtResource("art_2")
+centered = false
+offset = Vector2(-13, -13)
 
 [node name="Light" type="PointLight2D" parent="."]
 position = Vector2(0, -8)

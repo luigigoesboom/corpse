@@ -4,6 +4,8 @@
 [ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="2_unshaded"]
 [ext_resource type="Texture2D" path="res://assets/lights/light_banded.tres" id="3_light"]
 
+[ext_resource type="Texture2D" path="res://assets/art/props/flesh_plot_body.png" id="art_1"]
+
 [node name="FleshPlot" type="Node2D"]
 z_index = -1
 script = ExtResource("1_prop")
@@ -11,26 +13,8 @@ width = 84.0
 work_spot = true
 work_offset = -30.0
 
-[node name="Bed" type="Polygon2D" parent="."]
-color = Color(0.290, 0.102, 0.118, 1.00)
-polygon = PackedVector2Array(-40, -7, 40, -7, 40, 0, -40, 0)
+[node name="Art" type="Sprite2D" parent="."]
+texture = ExtResource("art_1")
+centered = false
+offset = Vector2(-41, -22)
 
-[node name="Rim" type="Polygon2D" parent="."]
-color = Color(0.416, 0.165, 0.180, 1.00)
-polygon = PackedVector2Array(-40, -8, 40, -8, 40, -6, -40, -6)
-
-[node name="Bulb1" type="Polygon2D" parent="."]
-color = Color(0.784, 0.416, 0.471, 1.00)
-polygon = PackedVector2Array(-19, -13, -19.9, -10, -22.5, -7.8, -26, -7, -29.5, -7.8, -32.1, -10, -33, -13, -32.1, -16, -29.5, -18.2, -26, -19, -22.5, -18.2, -19.9, -16)
-
-[node name="Bulb2" type="Polygon2D" parent="."]
-color = Color(0.831, 0.478, 0.525, 1.00)
-polygon = PackedVector2Array(0, -14, -1.1, -10.5, -4, -7.9, -8, -7, -12, -7.9, -14.9, -10.5, -16, -14, -14.9, -17.5, -12, -20.1, -8, -21, -4, -20.1, -1.1, -17.5)
-
-[node name="Bulb3" type="Polygon2D" parent="."]
-color = Color(0.784, 0.416, 0.471, 1.00)
-polygon = PackedVector2Array(16, -12, 15.2, -9.5, 13, -7.7, 10, -7, 7, -7.7, 4.8, -9.5, 4, -12, 4.8, -14.5, 7, -16.3, 10, -17, 13, -16.3, 15.2, -14.5)
-
-[node name="Bulb4" type="Polygon2D" parent="."]
-color = Color(0.722, 0.353, 0.416, 1.00)
-polygon = PackedVector2Array(34, -14, 33.1, -11, 30.5, -8.8, 27, -8, 23.5, -8.8, 20.9, -11, 20, -14, 20.9, -17, 23.5, -19.2, 27, -20, 30.5, -19.2, 33.1, -17)

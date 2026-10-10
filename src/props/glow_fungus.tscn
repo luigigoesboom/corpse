@@ -5,27 +5,22 @@
 [ext_resource type="Texture2D" path="res://assets/lights/light_banded.tres" id="3_light"]
 [ext_resource type="Material" path="res://assets/materials/additive_glow.tres" id="4_glow"]
 
+[ext_resource type="Texture2D" path="res://assets/art/props/glow_fungus_body.png" id="art_1"]
+[ext_resource type="Texture2D" path="res://assets/art/props/glow_fungus_glow.png" id="art_2"]
+
 [node name="GlowFungus" type="Node2D"]
 script = ExtResource("1_fungus")
 
-[node name="Stems" type="Polygon2D" parent="."]
-color = Color(0.3, 0.22, 0.26, 1)
-polygon = PackedVector2Array(-7, 0, -6, -10, -4, -10, -4, 0, 2, 0, 3, -16, 5, -16, 5, 0, 9, 0, 10, -7, 11, -7, 11, 0)
+[node name="Art" type="Sprite2D" parent="."]
+texture = ExtResource("art_1")
+centered = false
+offset = Vector2(-11, -23)
 
-[node name="CapSmall" type="Polygon2D" parent="."]
+[node name="ArtGlow" type="Sprite2D" parent="."]
 material = ExtResource("2_unshaded")
-color = Color(0.6, 1, 0.8, 1)
-polygon = PackedVector2Array(-10, -9, -8, -13, -3, -13, -1, -9)
-
-[node name="CapBig" type="Polygon2D" parent="."]
-material = ExtResource("2_unshaded")
-color = Color(0.7, 1, 0.85, 1)
-polygon = PackedVector2Array(-2, -15, 0, -20, 4, -22, 8, -20, 10, -15)
-
-[node name="CapTiny" type="Polygon2D" parent="."]
-material = ExtResource("2_unshaded")
-color = Color(0.6, 1, 0.8, 1)
-polygon = PackedVector2Array(8, -6, 9, -9, 12, -9, 13, -6)
+texture = ExtResource("art_2")
+centered = false
+offset = Vector2(-11, -23)
 
 [node name="Halo" type="Sprite2D" parent="."]
 material = ExtResource("4_glow")

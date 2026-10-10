@@ -21,9 +21,8 @@ width = 12.0
 position = Vector2(0, -10)
 shape = SubResource("CircleShape2D_reach")
 
-[node name="Visual" type="Polygon2D" parent="."]
-material = ExtResource("9_unshaded")
-polygon = PackedVector2Array(0, -20, 8, -10, 0, 0, -8, -10)
+[node name="Visual" type="Sprite2D" parent="."]
+offset = Vector2(0, -10)
 
 [node name="Light" type="PointLight2D" parent="."]
 shadow_enabled = true

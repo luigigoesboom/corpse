@@ -82,6 +82,19 @@ To add one: in scenes/world.tscn select Entities, add a Node2D, attach src/world
 
 Like settlements: add a Node2D under Entities in scenes/world.tscn, attach src/world/ruin_site.gd, put it on flat floor (tile top + 6) and set `width`. History decides which dead settlement it is and leaves that place's artifact in it. Ruin props are in src/props/ruin (SettlementProp script; a Polygon2D named `Cloth` gets the dead people's color).
 
+## Props and items (week 39 art pass)
+
+All props, items and world objects in the Gut are sprites in the Gut palette (`assets/art/_source/gut.gpl`, 48 colors in ramps: flesh, blood, rag, skin, leech, bile, bone, lung, bulb, wood, gold, ash, Matron hide, glows). In Aseprite: Palette > Load palette > gut.gpl, and paint only with it; `tests/test_art.gd` fails if a prop or item PNG uses any other color.
+
+| Where | What |
+|---|---|
+| `assets/art/props/<prop>_body.png` | The prop, lit by the scene's lights. Outlined in near-black. |
+| `assets/art/props/<prop>_glow.png` | Parts that shine (flames, eyes, relics), drawn unshaded on top. |
+| `assets/art/props/<prop>_cloth.png` | Light greys tinted in game: banners in their people's color, mural panels. |
+| `assets/art/items/<item id>.png` | 16 x 16 icon standing on the bottom edge. Artifacts share `artifact.png`; anything without an icon uses `unknown.png`. |
+
+How they were made: `tools/art/make_props.gd` rasterized every old polygon placeholder (colors snapped to the palette, shaded below, lit along the top, outlined) and painted the code-drawn ones (carcass, reliquary, nest, valve key, brazier and its 4-frame flame, latch, grate, mural, tablet) and the item icons; `tools/art/swap_props.py` swapped the scenes' polygons for `Art` / `ArtGlow` / `Cloth` Sprite2D nodes. To redraw a prop, just paint over its PNG (same size keeps it in place; a different size: move the sprite's offset so the bottom stays on the floor line). The only polygons left are effects (the slash, the slam marker).
+
 ## Light and glow
 
 The world is dark (CanvasModulate on `Darkness` in game.tscn) and lit by PointLight2D nodes using `assets/lights/light_banded.tres` (hard steps, pixel-art friendly). Tiles block light (occluders in gut_tileset.tres).

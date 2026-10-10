@@ -7,6 +7,9 @@ extends Area2D
 
 const DIALOGUE := preload("res://data/dialogue/reading.dialogue")
 const UNSHADED := preload("res://assets/materials/unshaded.tres")
+const MURAL_ART := preload("res://assets/art/props/mural_body.png")
+const MURAL_PANELS := preload("res://assets/art/props/mural_cloth.png")
+const TABLET_ART := preload("res://assets/art/props/tablet_body.png")
 
 enum Kind { MURAL, TABLET }
 
@@ -37,6 +40,16 @@ func _ready() -> void:
 	collision_layer = 2
 	collision_mask = 4
 	z_index = -1
+	var art := Sprite2D.new()
+	art.texture = MURAL_ART if kind == Kind.MURAL else TABLET_ART
+	art.offset = Vector2(0, -art.texture.get_height() / 2.0)
+	add_child(art)
+	if kind == Kind.MURAL:
+		var panels := Sprite2D.new()
+		panels.texture = MURAL_PANELS
+		panels.offset = art.offset
+		panels.modulate = tint  # Painted in its people's color.
+		add_child(panels)
 	var shape := CollisionShape2D.new()
 	var rect := RectangleShape2D.new()
 	rect.size = Vector2(60, 50) if kind == Kind.MURAL else Vector2(36, 30)
@@ -79,19 +92,3 @@ func interact() -> void:
 	Conversation.open(self, DIALOGUE, Reading.new(title(), text()))
 	if fresh > 0:
 		EventBus.notify.emit("You learn %d new things about the past (History tab)" % fresh)
-
-
-func _draw() -> void:
-	if kind == Kind.TABLET:
-		draw_colored_polygon(PackedVector2Array([Vector2(-12, 0), Vector2(-10, -22), Vector2(-2, -28), Vector2(9, -24), Vector2(12, 0)]), Color(0.86, 0.82, 0.7))
-		for i in 4:
-			draw_line(Vector2(-7, -20 + i * 5), Vector2(6, -21 + i * 5), Color(0.45, 0.4, 0.33), 1.0)
-		return
-	# A slab with four painted panels.
-	draw_rect(Rect2(-30, -58, 60, 58), Color(0.32, 0.26, 0.24))
-	draw_rect(Rect2(-27, -55, 54, 52), Color(0.55, 0.47, 0.4))
-	for i in 4:
-		var panel := Rect2(-25 + (i % 2) * 26, -53 + (i / 2) * 25, 24, 23)
-		draw_rect(panel, tint.darkened(0.2 + 0.15 * i))
-		draw_circle(panel.get_center() + Vector2(-3 + i, -2), 3.0, tint.lightened(0.4))
-		draw_line(panel.get_center() + Vector2(-8, 7), panel.get_center() + Vector2(8, 5 - i * 2), tint.lightened(0.2), 1.0)

@@ -1,0 +1,63 @@
+{
+	"res://src/actors/bosses/bile_glob.tscn": [],
+	"res://src/actors/bosses/bile_puddle.tscn": [],
+	"res://src/actors/bosses/shockwave.tscn": [],
+	"res://src/actors/creatures/training_dummy.tscn": [
+		{
+			"kind": "body",
+			"offset": [
+				-17,
+				-61
+			],
+			"parent": "Visual",
+			"png": "res://assets/art/props/training_dummy_visual_body.png",
+			"replaces": 2
+		},
+		{
+			"parent": "Visual",
+			"polygons": [
+				"Post",
+				"Sack"
+			]
+		}
+	],
+	"res://src/actors/npcs/placeholder_npc.tscn": [
+		{
+			"kind": "body",
+			"offset": [
+				-13,
+				-33
+			],
+			"parent": "Visual",
+			"png": "res://assets/art/props/placeholder_npc_visual_body.png",
+			"replaces": 2
+		},
+		{
+			"parent": "Visual",
+			"polygons": [
+				"Body",
+				"Eye"
+			]
+		}
+	],
+	"res://src/mutations/acid_projectile.tscn": [],
+	"res://src/props/glow_fungus.tscn": [],
+	"res://src/props/ruin/bone_heap.tscn": [],
+	"res://src/props/ruin/broken_wall.tscn": [],
+	"res://src/props/ruin/cold_hearth.tscn": [],
+	"res://src/props/ruin/rubble.tscn": [],
+	"res://src/props/ruin/toppled_pillar.tscn": [],
+	"res://src/props/ruin/torn_banner.tscn": [],
+	"res://src/props/settlement/banner.tscn": [],
+	"res://src/props/settlement/bell.tscn": [],
+	"res://src/props/settlement/bile_cistern.tscn": [],
+	"res://src/props/settlement/candles.tscn": [],
+	"res://src/props/settlement/drying_rack.tscn": [],
+	"res://src/props/settlement/flesh_plot.tscn": [],
+	"res://src/props/settlement/reliquary.tscn": [],
+	"res://src/props/settlement/shrine.tscn": [],
+	"res://src/props/settlement/tender_lamp.tscn": [],
+	"res://src/props/settlement/tent.tscn": [],
+	"res://src/world/heart_root.tscn": [],
+	"res://src/world/ichor_clot.tscn": []
+}

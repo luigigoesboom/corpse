@@ -4,6 +4,8 @@
 [ext_resource type="Script" path="res://src/actors/components/hitbox.gd" id="2_hit"]
 [ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="3_unshaded"]
 
+[ext_resource type="Texture2D" path="res://assets/art/props/bile_puddle_glow.png" id="art_1"]
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_puddle"]
 size = Vector2(36, 10)
 
@@ -11,10 +13,11 @@ size = Vector2(36, 10)
 z_index = -1
 script = ExtResource("1_s")
 
-[node name="Visual" type="Polygon2D" parent="."]
+[node name="ArtGlow" type="Sprite2D" parent="."]
 material = ExtResource("3_unshaded")
-color = Color(0.6, 0.75, 0.18, 0.85)
-polygon = PackedVector2Array(-20, 0, -15, -4, -5, -5, 7, -4, 16, -3, 20, 0, 11, 2, -10, 2)
+texture = ExtResource("art_1")
+centered = false
+offset = Vector2(-21, -6)
 
 [node name="Hitbox" type="Area2D" parent="."]
 position = Vector2(0, -4)

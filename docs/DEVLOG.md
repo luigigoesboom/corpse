@@ -13,6 +13,11 @@ Next:
 
 ---
 
+## Week 39: art pass 1 (2026-10-10)
+Done: no placeholder shapes left in the Gut. The palette grew from the starter 20 to 48 colors in ramps taken from the tiles, the hosts, the Matron and the props (assets/art/_source/gut.gpl). A tool rasterized all 25 polygon scenes (settlement and ruin props, the heart-root, clots, the Matron's globs, puddles and ripples, acid spit, the wandering NPC, the training dummy) into outlined, shaded pixel art in that palette, and painted the things that were drawn in code: carcass, reliquary, nest, valve key, brazier with a flickering flame, latch, bone grate, mural slab with panels in its people's color, bone tablet, and an icon per item. Banners now take their people's color in settlements too. tests/test_art.gd keeps it that way (palette only, no polygons but effects).
+Not done: this is generated art, consistent but plain; it is a base to paint over (ART_PIPELINE.md says how). The hosts, creatures and tiles were already pixel art and are untouched.
+Next: week 40, audio pass.
+
 ## Week 38: the Gut valve key (2026-10-10)
 Done: the first key of the heart, a ring of grown bone. History decides who holds it: a Choir that found relics or had prophets keeps it in a reliquary in its chapel; otherwise it sank into the deep and the Gullet Matron nested around it, at the far east end of the tunnel. The Choir's key: ask for it as their friend, buy it for 100 ichor, or steal it from the reliquary (sneak and wait until nobody faces you; seen, it is theft and the chapel turns on you). The Matron's key: kill her, or come down the east cavern and sneak to the nest; she sleeps through a sneaking host until 35% of her wake range. Die with it and it lies on your body; if the Choir claims that body, they carry the key back to their reliquary. tests/test_valve_key.gd covers all five ways and the loss. The altar moved off the mural, the Matron sits by her nest. Save version 21.
 Also: tests/test_settlements.gd watched residents for half a game-minute and sometimes nobody chose to work in a small camp; now a full minute.

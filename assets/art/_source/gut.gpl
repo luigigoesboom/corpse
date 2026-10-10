@@ -1,26 +1,71 @@
 GIMP Palette
-Name: CORPSE Gut (starter)
-Columns: 6
+Name: CORPSE Gut
+Columns: 8
 #
-# Starter palette for the Gut: the colors the placeholders use, grouped
-# dark to light. Trim it, change it, add to it; aim for about 10-16 in the end.
+# The Gut's palette (week 39 art pass). Every prop and item sprite made by
+# tools/art/make_props.gd uses only these colors (tests/test_art.gd checks).
+# Grouped in ramps, dark to light. Load it in Aseprite (Palette > Load) and
+# draw with it; change it here and re-run the tool to recolor the props.
+#
+# Outline and flesh walls (from the tiles)
  30  15  18	Outline / near-black
+ 42   7  12	Flesh deepest
+ 62  14  21	Flesh deep
+ 94  24  32	Flesh dark
+116  34  42	Flesh
+138  44  52	Flesh mid
+180  72  76	Flesh light
+208 104 106	Flesh highlight
+# Mouth and blood
  74  15  22	Deep red / mouth
-107  70  86	Rag
+154  58  58	Blood dark
+220  52  62	Blood
+255  92  84	Blood glow
+# Rag and cloth
  77  49  64	Rag shadow
+107  70  86	Rag
+# Skin and host
 185 143 120	Skin shadow
 227 196 168	Skin
+# Leech
  85  98  42	Leech shadow
 122 138  58	Leech
 167 176  96	Leech belly
+# Bile
 127 154  34	Bile shadow
 184 212  58	Bile
 232 245 144	Bile glow
+# Bone
+130 118  92	Bone deep
 185 171 136	Bone shadow
+212 202 170	Bone mid
 238 228 200	Bone
+# Lung
 184 111 128	Lung shadow
 227 154 168	Lung
+# Bulb
  98  51  65	Bulb shadow
 138  74  90	Bulb
+# Wood and leather
+ 42  24  16	Wood deep
+ 74  46  26	Wood dark
+107  74  46	Wood
+160 122  58	Wood light
+# Gold (the Choir)
+134 104  42	Gold shadow
+184 146  58	Gold
+224 184  74	Gold light
+# Stone and ash
+ 46  34  32	Ash deep
+ 90  74  68	Ash
+122 106  96	Ash light
+# Matron hide
+ 98  56  46	Hide shadow
+138  90  74	Hide
+201 142 122	Hide belly
+# Glows
 255 224 102	Glow: eyes
 255  74  74	Glow: red eyes
+255 176  64	Glow: flame
+255 242 192	Glow: flame core
+140 255 204	Glow: fungus

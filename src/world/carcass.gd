@@ -6,6 +6,7 @@ extends Area2D
 
 const LIFETIME := 90.0
 const UNSHADED := preload("res://assets/materials/unshaded.tres")
+const ART := preload("res://assets/art/props/carcass_body.png")
 
 var kind: StringName
 var _age := 0.0
@@ -15,6 +16,11 @@ var _prompt: Label
 func _ready() -> void:
 	collision_layer = 2
 	collision_mask = 4
+	var art := Sprite2D.new()
+	art.texture = ART
+	art.centered = false
+	art.offset = Vector2(-17, -14)
+	add_child(art)
 	var shape := CollisionShape2D.new()
 	var circle := CircleShape2D.new()
 	circle.radius = 18.0
@@ -55,9 +61,3 @@ func interact() -> void:
 
 func _name() -> String:
 	return String(kind).replace("_", " ") if kind != &"" else "carcass"
-
-
-func _draw() -> void:
-	draw_colored_polygon(PackedVector2Array([Vector2(-14, 0), Vector2(-10, -6), Vector2(-2, -8), Vector2(8, -6), Vector2(14, 0)]), Color(0.45, 0.16, 0.16))
-	draw_line(Vector2(-8, -4), Vector2(6, -5), Color(0.75, 0.3, 0.3), 2.0)
-	draw_circle(Vector2(9, -3), 1.5, Color(0.9, 0.85, 0.75))
