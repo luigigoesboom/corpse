@@ -3,6 +3,10 @@ extends RefCounted
 ##
 ## One skeleton for every humanoid: hip, chest, head, two arms and two legs.
 ## A pose says where the feet and hands go; knees and elbows come from IK.
+## Nobody shows a face: every look wears a big mask (a bone oval, a bone
+## beak, a blank egg of a head, a stitched leather plate, a gold sun), and
+## the bodies are wrong on purpose: spindly legs, a short hunched trunk,
+## arms that hang past the knees, big hands, the head pushed forward.
 ## Looks (colonist, pilgrim, antibody, tender, chorister) dress the same
 ## skeleton, so every host shares poses and the mutation overlays, drawn on
 ## the same joints, fit all of them.
@@ -18,18 +22,20 @@ const Sheet := preload("res://tools/pixel/sheet.gd")
 
 const F := 64
 const GROUND := 62.5
-const THIGH := 9.5
-const SHIN := 9.5
-const TORSO := 13.0
-const UPPER_ARM := 7.0
-const FOREARM := 7.0
+const THIGH := 10.0
+const SHIN := 10.5
+const TORSO := 11.0
+const UPPER_ARM := 8.5
+const FOREARM := 10.0
+## Every body leans forward this much (degrees), the head even more.
+const HUNCH := 9.0
 
 const LOOKS := {
-	"colonist": {"cloth": &"rag", "skin": &"skin", "eye": Color8(26, 11, 14)},
-	"pilgrim": {"cloth": &"pilgrim", "skin": &"skin", "eye": Color8(26, 11, 14), "hood": true, "cloak": true},
-	"antibody": {"cloth": &"antibody", "skin": &"antibody", "eye": Color8(27, 47, 90), "round": true},
-	"tender": {"cloth": &"tender", "skin": &"skin", "eye": Color8(26, 11, 14), "apron": true},
-	"chorister": {"cloth": &"gold", "skin": &"skin", "eye": Color8(26, 11, 14), "hood": true, "cloak": true},
+	"colonist": {"cloth": &"rag", "skin": &"skin", "mask": "bone"},
+	"pilgrim": {"cloth": &"pilgrim", "skin": &"skin", "hood": true, "cloak": true, "mask": "beak"},
+	"antibody": {"cloth": &"antibody", "skin": &"antibody", "round": true, "mask": "egg"},
+	"tender": {"cloth": &"tender", "skin": &"skin", "apron": true, "mask": "stitched"},
+	"chorister": {"cloth": &"gold", "skin": &"skin", "hood": true, "cloak": true, "mask": "halo"},
 }
 const HOSTS := ["colonist", "pilgrim", "antibody"]
 const RESIDENTS := ["tender", "chorister"]
@@ -81,7 +87,7 @@ static func make(pal, out: Array) -> void:
 ##   around `pivot` (from the ground under the hip)
 
 static func P(d := {}) -> Dictionary:
-	var p = {"bob": 0.0, "lean": 0.0, "ff": Vector2(3, 0), "fb": Vector2(-3, 0), "hf": Vector2(2, 13), "hb": Vector2(-1, 13),
+	var p = {"bob": 0.0, "lean": 0.0, "ff": Vector2(3, 0), "fb": Vector2(-3, 0), "hf": Vector2(3, 17), "hb": Vector2(0, 17),
 		"tilt": 0.0, "eye": "open", "turn": 0.0, "pivot": Vector2(0, 0), "x": 0.0}
 	p.merge(d, true)
 	return p
@@ -149,10 +155,10 @@ static func skeleton(p: Dictionary) -> Dictionary:
 	if p.has("roll"):
 		return _roll_bones(p.roll)
 	var hip = Vector2(F / 2.0 - 1.0 + p.x, GROUND - THIGH - SHIN + 0.2 + p.bob)
-	var up = Vector2.from_angle(deg_to_rad(-90.0 + p.lean))
+	var up = Vector2.from_angle(deg_to_rad(-90.0 + p.lean + HUNCH))
 	var chest = hip + up * TORSO
-	var head_dir = Vector2.from_angle(deg_to_rad(-90.0 + p.lean + p.tilt))
-	var head = chest + head_dir * 9.0 + Vector2(1.5, 0)
+	var head_dir = Vector2.from_angle(deg_to_rad(-90.0 + p.lean + p.tilt + HUNCH * 2.5))
+	var head = chest + head_dir * 9.5 + Vector2(2.0, 0)
 	var shoulder = chest + Vector2(0.5, 1.5)
 	var b = {"hip": hip, "chest": chest, "head": head, "shoulder": shoulder}
 	for side in ["f", "b"]:
@@ -227,15 +233,15 @@ static func _body(pal, look: Dictionary, b: Dictionary, p: Dictionary) -> Image:
 		var belt_a: Vector2 = b.hip - b.up * -1.5 - side * 6.0
 		var belt_b: Vector2 = b.hip - b.up * -1.5 + side * 6.0
 		c.stroke(belt_a, belt_b, pal.step(cloth, 0))
-	# Head.
-	var r = 8.5 if look.get("round", false) else 7.5
-	if look.get("hood", false):
-		c.circle(b.head + Vector2(-1.0, -0.5), r + 1.2, cloth, {"z": 1.9, "lo": 1})
-		c.circle(b.head + Vector2(2.2, 1.2), 5.2, skin, {"z": 2.0})
+	# Head, mostly hidden: a hood or a skull, and the mask over the face.
+	if look.mask == "egg":
+		_mask(c, pal, b, p, look)
 	else:
-		c.circle(b.head, r, skin, {"z": 2.0})
-		c.detail(Vector2i(b.head + Vector2(-2, 6)), pal.step(skin, 1))  # Jaw shadow.
-	_face(c, pal, b, p, look)
+		if look.get("hood", false):
+			c.circle(b.head + Vector2(-1.5, -0.5), 8.0, cloth, {"z": 1.9, "lo": 1})
+		else:
+			c.circle(b.head, 6.5, skin, {"z": 2.0, "tone": -0.1})
+		_mask(c, pal, b, p, look)
 	_arm(c, b, "f", skin, 3.0, 0.0)
 	for arm in ["b", "f"]:  # Sleeves.
 		var elbow: Vector2 = b["elbow_" + arm]
@@ -257,38 +263,69 @@ static func _roll(c, pal, look: Dictionary, angle: float) -> Image:
 	c.capsule(centre + Vector2(-1, 5).rotated(a), knees, 2.6, 2.2, skin, {"z": 0.5, "tone": -0.1})
 	c.capsule(knees, centre + Vector2(0.5, 8.0).rotated(a), 2.0, 1.8, skin, {"z": 0.6, "tone": -0.1})
 	c.capsule(centre + Vector2(1, -1).rotated(a), centre + Vector2(6.0, 2.0).rotated(a), 1.7, 1.5, skin, {"z": 2})
-	var eye = Vector2i((head + Vector2(2.0, -0.5).rotated(a)).floor())
-	c.detail(eye, look.eye)
+	_mask(c, pal, {"head": head, "up": Vector2(0, -1).rotated(a)}, {"tilt": 0.0}, look)
 	return c.render().body
 
 
 static func _leg(c, b: Dictionary, side: String, skin: StringName, cloth: StringName, z: float, tone: float) -> void:
 	var hip: Vector2 = b.hip + Vector2(-1.5 if side == "b" else 1.5, 1.0)
-	c.capsule(hip, b["knee_" + side], 2.4, 2.0, skin, {"z": z, "tone": tone})
-	c.capsule(b["knee_" + side], b["foot_" + side], 2.0, 1.7, skin, {"z": z, "tone": tone})
+	c.capsule(hip, b["knee_" + side], 2.0, 1.5, skin, {"z": z, "tone": tone})
+	c.circle(b["knee_" + side], 1.8, skin, {"z": z + 0.02, "tone": tone})  # Knobbly knees.
+	c.capsule(b["knee_" + side], b["foot_" + side], 1.5, 1.1, skin, {"z": z, "tone": tone})
 	var foot: Vector2 = b["foot_" + side]
-	c.capsule(foot + Vector2(-1, 0), foot + Vector2(3, 0.5), 1.8, 1.6, skin, {"z": z + 0.1, "tone": tone - 0.08})
+	c.capsule(foot + Vector2(-1, -0.5), foot + Vector2(5, 0.5), 1.6, 0.8, skin, {"z": z + 0.1, "tone": tone - 0.08})
 
 
 static func _arm(c, b: Dictionary, side: String, skin: StringName, z: float, tone: float) -> void:
-	c.capsule(b.shoulder, b["elbow_" + side], 1.9, 1.7, skin, {"z": z, "tone": tone})
-	c.capsule(b["elbow_" + side], b["hand_" + side], 1.7, 1.5, skin, {"z": z, "tone": tone})
-	c.circle(b["hand_" + side], 1.9, skin, {"z": z + 0.05, "tone": tone})
+	c.capsule(b.shoulder, b["elbow_" + side], 1.6, 1.3, skin, {"z": z, "tone": tone})
+	c.capsule(b["elbow_" + side], b["hand_" + side], 1.3, 1.1, skin, {"z": z, "tone": tone})
+	var hand: Vector2 = b["hand_" + side]
+	var along: Vector2 = (hand - b["elbow_" + side]).normalized()
+	c.circle(hand, 2.4, skin, {"z": z + 0.05, "tone": tone})  # Big hands, long fingers.
+	c.capsule(hand, hand + along * 3.5 + along.orthogonal() * 1.0, 1.0, 0.6, skin, {"z": z + 0.06, "tone": tone - 0.05})
 
 
-static func _face(c, pal, b: Dictionary, p: Dictionary, look: Dictionary) -> void:
-	var eye: Color = look.eye
-	var at = Vector2i((b.head + Vector2(4.0 if look.get("hood", false) else 3.5, -1.0)).floor())
-	match p.eye:
-		"open":
-			c.detail(at, eye)
-			c.detail(at + Vector2i(0, 1), eye)
-		"shut":
-			c.detail(at + Vector2i(-1, 1), eye)
-			c.detail(at + Vector2i(0, 1), eye)
-		"x":
-			for d in [Vector2i(-1, -1), Vector2i(1, -1), Vector2i(0, 0), Vector2i(-1, 1), Vector2i(1, 1)]:
-				c.detail(at + d, eye)
+## The mask, in the head's own directions (fwd = where it faces, up = top
+## of the head), so it tilts and falls with the body. No eyes anywhere.
+## When hurt or dead (p.eye "x") the mask is cracked.
+static func _mask(c, pal, b: Dictionary, p: Dictionary, look: Dictionary) -> void:
+	var up: Vector2 = Vector2.from_angle(b.up.angle() + deg_to_rad(p.get("tilt", 0.0) + HUNCH * 1.5))
+	var fwd: Vector2 = up.rotated(PI / 2.0)
+	var head: Vector2 = b.head
+	var rot: float = up.angle() + PI / 2.0
+	var crack: bool = p.get("eye", "open") == "x"
+	match look.mask:
+		"bone":  # A tall oval of bone, a seam down the middle, three holes in a row.
+			var centre = head + fwd * 3.0
+			c.ellipse(centre, 5.0, 9.0, &"bone", {"z": 2.5, "rot": rot, "lo": 1})
+			c.stroke(centre + fwd * 3.0 + up * 6.0, centre + fwd * 3.5 - up * 6.0, pal.step(&"bone", 0))
+			for k in 3:
+				c.detail(Vector2i((centre + fwd * 1.5 + up * (2.0 - k * 2.5)).floor()), pal.step(&"ash", 0))
+		"beak":  # A long beak of bone, curving down.
+			c.ellipse(head + fwd * 2.5, 4.0, 6.0, &"bone", {"z": 2.5, "rot": rot, "lo": 1})
+			c.capsule(head + fwd * 4.0 + up * 1.0, head + fwd * 15.0 - up * 4.0, 3.2, 0.7, &"bone", {"z": 2.6, "lo": 1, "tone": -0.05})
+			c.stroke(head + fwd * 5.0 - up * 0.5, head + fwd * 13.0 - up * 3.5, pal.step(&"bone", 0))
+		"egg":  # No mask: the head itself is a blank, tall egg.
+			c.ellipse(head + up * 2.5 + fwd * 1.0, 6.5, 10.5, look.skin, {"z": 2.0, "rot": rot, "dither": true})
+			c.stroke(head + up * 11.0 + fwd * 1.0, head + up * 3.0 + fwd * 4.5, pal.step(look.skin, 0))
+		"stitched":  # A flat leather plate, its mouth sewn shut.
+			var plate = head + fwd * 3.5
+			c.polygon(PackedVector2Array([plate + up * 8.0 - fwd * 1.0, plate + up * 7.0 + fwd * 3.5, plate - up * 7.0 + fwd * 3.5,
+				plate - up * 9.0 - fwd * 1.5]), &"wood", {"z": 2.5, "lo": 1})
+			for k in 4:  # Stitches across the mouth.
+				var at: Vector2 = plate + fwd * 2.0 - up * (2.0 + k * 1.5)
+				c.stroke(at - fwd * 1.0, at + fwd * 1.0, pal.step(&"ash", -1))
+			c.stroke(plate + fwd * 1.0 + up * 5.0, plate + fwd * 3.0 + up * 5.0, pal.step(&"wood", 0))
+		"halo":  # A big gold sun held over the face, rays scratched in.
+			var sun = head + fwd * 4.0
+			c.circle(sun, 9.0, &"gold", {"z": 2.5, "lo": 1})
+			for k in 8:
+				var a = TAU * k / 8.0
+				c.stroke(sun + Vector2.from_angle(a) * 3.5, sun + Vector2.from_angle(a) * 7.5, pal.step(&"gold", 1))
+			c.circle(sun, 2.5, &"gold", {"z": 2.6, "lo": 2})
+	if crack:
+		c.stroke(head + fwd * 2.0 + up * 6.0, head + fwd * 4.0 - up * 1.0, pal.step(&"outline", 0))
+		c.stroke(head + fwd * 4.0 - up * 1.0, head + fwd * 3.0 - up * 5.0, pal.step(&"outline", 0))
 
 
 # --- Mutation overlays ------------------------------------------------------------------

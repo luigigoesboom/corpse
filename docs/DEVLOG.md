@@ -13,6 +13,9 @@ Next:
 
 ---
 
+## Art program, part 3: masks (2026-10-11)
+The developer liked the direction and the dithering, and asked for characters that are more unnatural, with no visible eyes and big masks. Every humanoid is now wrong on purpose: long spindly legs with knobbly knees, a short hunched trunk, arms hanging past the knees, big long-fingered hands, the head pushed forward. Faces are gone: the colonist wears a tall bone oval with a seam and three holes, the pilgrim a bone beak under the hood, the antibody's head is a blank egg, Tenders a leather plate with the mouth sewn shut, choristers a gold sun held over the face. Hurt and dying hosts' masks crack. Creatures keep their glowing eyes (they show where a leech is looking).
+
 ## Art program, part 2 (2026-10-11)
 Done: creatures and the Matron come from recipes now. The leech is a row of seamed segments with one pale belly strip (first try was a lumpy blob: same-colored segments got no dividing lines, so the canvas has a `seam` option now); the spitter has a dithered bulb on a bent stalk; the fly has see-through wings (`alpha`). The Matron: segments in the darker hide steps with soft seams, brood sacs, a glowing bile bladder, a ring of teeth, four eyes. Fixed on the way: her tail went down through the floor when it was meant to rise (an old sign bug), and her belly hung out of the frame. tests/test_art.gd covers creatures and their glow strips.
 Next: props, items and tiles as recipes.
