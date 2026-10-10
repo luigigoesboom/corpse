@@ -419,4 +419,7 @@ func _drop_loot() -> void:
 	var data := WorldState.data
 	if data:
 		var life := data.current_life()
-		data.log_event(&"boss_slain", [life.host_name if life else "someone"], {"boss": display_name})
+		data.log_deed(&"boss_slain", [life.host_name if life else "someone"], {"boss": display_name})
+		for faction: FactionData in data.factions.values():
+			if faction.defined and faction.is_alive():
+				data.record_deed(faction.id, 20)  # The Gut is safer: everybody is grateful.

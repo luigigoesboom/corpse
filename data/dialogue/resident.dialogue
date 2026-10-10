@@ -5,6 +5,8 @@
 
 ~ start
 {{npc}}: {{greeting}}
+if recognized
+	{{npc}}: {{recognition}}
 if hostile
 	=> END
 => menu

@@ -56,9 +56,9 @@ func run() -> void:
 
 	# Friends feel it too.
 	data.set_relation(&"flesh_tenders", &"choir_of_waking", 50)
-	var choir_before: int = data.standing(&"choir_of_waking")
+	var choir_before: int = data.host_standing(&"choir_of_waking")
 	data.record_deed(&"flesh_tenders", -40)
-	check(data.standing(&"choir_of_waking") == choir_before - 10, "a deed against a faction's friends costs a quarter as much with it")
+	check(data.host_standing(&"choir_of_waking") == choir_before - 10, "a deed against a faction's friends costs a quarter as much with it")
 
 	# Prices follow standing.
 	data.current_life().standing[&"flesh_tenders"] = -10

@@ -50,6 +50,9 @@ var factions: Dictionary = {}
 var sites: Dictionary = {}
 ## Artifact id (also its item id) -> ArtifactData (week 29).
 var artifacts: Dictionary = {}
+## The fragment's legend (week 32): faction id -> -100..100, from deeds in
+## every life. Only factions that sense the fragment act on it directly.
+var legend: Dictionary = {}
 
 
 static func create(seed_value: int) -> WorldData:
@@ -160,9 +163,17 @@ func log_event(type: StringName, actors: Array, details: Dictionary) -> EventRec
 	return event
 
 
-## How a faction feels about the current host, -100..100 (week 31). Starts
-## at the faction's attitude to this host type; deeds move it.
+## How a faction feels about the current host, -100..100: this body's own
+## standing (week 31) plus what the faction knows of the fragment inside it,
+## as much as it can sense the fragment (week 32, VISION.md):
+##   standing = host_standing + legend_standing * senses_fragment
 func standing(faction: StringName) -> int:
+	var senses: float = factions[faction].senses_fragment if factions.has(faction) else 0.0
+	return clampi(host_standing(faction) + roundi(legend_standing(faction) * senses), -100, 100)
+
+
+## This body only: starts at the faction's attitude to this host type.
+func host_standing(faction: StringName) -> int:
 	var life := current_life()
 	if life == null:
 		return 0
@@ -172,33 +183,56 @@ func standing(faction: StringName) -> int:
 	return int(def.host_attitudes.get(life.host_type, 0)) if def else 0
 
 
-## Moves one faction's standing. Returns [tier before, tier after]
-## (see Standing.tier()).
+## The fragment's legend with a faction, built from deeds in every life.
+func legend_standing(faction: StringName) -> int:
+	return int(legend.get(faction, 0))
+
+
+## Moves one faction's standing with this body. Returns [tier before, tier
+## after] of the full standing (see Standing.tier()).
 func change_standing(faction: StringName, amount: int) -> Array:
 	var life := current_life()
 	if life == null or faction == &"":
 		return [&"", &""]
 	var before := standing(faction)
-	var after := clampi(before + amount, -100, 100)
-	life.standing[faction] = after
-	return [Standing.tier(before), Standing.tier(after)]
+	life.standing[faction] = clampi(host_standing(faction) + amount, -100, 100)
+	return [Standing.tier(before), Standing.tier(standing(faction))]
 
 
-## A deed that matters to `faction` (week 31): moves its standing by
-## `amount`, and a little for the factions that love or hate it: its
-## friends feel a quarter of it, its enemies a tenth the other way.
+## A deed that matters to `faction` (weeks 31, 32): moves its standing with
+## this body by `amount` and the fragment's legend by half of it; its friends
+## feel a quarter, its enemies a tenth the other way.
 ## Returns {faction id: [tier before, tier after]} for every faction moved.
 func record_deed(faction: StringName, amount: int) -> Dictionary:
-	var changes := {faction: change_standing(faction, amount)}
+	var changes := {faction: _deed_on(faction, amount)}
 	for other: FactionData in factions.values():
 		if other.id == faction or not other.is_alive():
 			continue
 		var feeling := relation(faction, other.id)
 		if feeling > 30:
-			changes[other.id] = change_standing(other.id, amount / 4)
+			changes[other.id] = _deed_on(other.id, amount / 4)
 		elif feeling < -40:
-			changes[other.id] = change_standing(other.id, -amount / 10)
+			changes[other.id] = _deed_on(other.id, -amount / 10)
 	return changes
+
+
+func _deed_on(faction: StringName, amount: int) -> Array:
+	var before := standing(faction)
+	var life := current_life()
+	if life:
+		life.standing[faction] = clampi(host_standing(faction) + amount, -100, 100)
+	legend[faction] = clampi(legend_standing(faction) + amount / 2, -100, 100)
+	return [Standing.tier(before), Standing.tier(standing(faction))]
+
+
+## Logs an event as a deed of the current host (week 32): fragment-sensing
+## people remember it across lives (Legend).
+func log_deed(type: StringName, actors: Array, details: Dictionary) -> EventRecord:
+	var event := log_event(type, actors, details)
+	var life := current_life()
+	if life:
+		life.deed_event_ids.append(event.id)
+	return event
 
 
 func record_kill(creature_kind: StringName) -> void:
@@ -275,6 +309,7 @@ func to_dict() -> Dictionary:
 		"factions": factions.values().map(func(faction): return faction.to_dict()),
 		"sites": sites.values().map(func(site): return site.to_dict()),
 		"artifacts": artifacts.values().map(func(artifact): return artifact.to_dict()),
+		"legend": legend.duplicate(),
 	}
 
 
@@ -302,6 +337,7 @@ static func from_dict(d: Dictionary) -> WorldData:
 	for artifact_dict in d.get("artifacts", []):
 		var artifact := ArtifactData.from_dict(artifact_dict)
 		data.artifacts[artifact.id] = artifact
+	data.legend = d.get("legend", {}).duplicate()
 	data._fit_inventory()
 	return data
 

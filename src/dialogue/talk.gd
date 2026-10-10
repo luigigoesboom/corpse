@@ -23,6 +23,9 @@ var standing := 0
 ## Message for a standing tier change caused by this talk (a trade), or "".
 var standing_message := ""
 var hostile := false
+## A fragment-sensing speaker knows you from an earlier body (week 32), and says so.
+var recognized := false
+var recognition := ""
 var can_trade := false
 var has_payment := false
 var offer_text := ""
@@ -49,6 +52,9 @@ func _init(data: WorldData, speaker_name: String, faction_id: StringName, rng_se
 	people = EventText._faction(data, faction_id) if faction_id != &"" else ""
 	standing = data.standing(faction_id) if faction_id != &"" else 0
 	hostile = Standing.tier(standing) == Standing.HOSTILE
+	if _def and _def.senses_fragment >= 0.5:
+		recognition = Legend.recognition(data, faction_id)
+		recognized = recognition != ""
 	greeting = _pick(_greetings(), "Hm.")
 	farewell = _pick(_def.farewells if _def else [], "Go well.")
 	creed = _creed()

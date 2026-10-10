@@ -124,7 +124,22 @@ func is_hostile() -> bool:
 ## A resident was hit. By the player, that is a deed against its people.
 func resident_hurt(npc: ColonyNpc) -> void:
 	if npc.health.last_hit_source == &"player" and not npc.health.is_dead():
+		_remember_attack()
 		_deed(HURT_DEED)
+
+
+## The first time this body attacks this settlement, it is a deed the
+## fragment is remembered for (week 32).
+func _remember_attack() -> void:
+	var data := WorldState.data
+	var life := data.current_life()
+	if life == null:
+		return
+	for id in life.deed_event_ids:
+		for event in data.events:
+			if event.id == id and event.type == &"resident_attacked" and event.data.get("site") == site.id:
+				return
+	data.log_deed(&"resident_attacked", [site.faction, life.host_name], {"site": site.id})
 
 
 ## A resident died: one fewer, and if the player did it, the world knows.
@@ -135,7 +150,7 @@ func resident_died(npc: ColonyNpc) -> void:
 	site.population = maxi(0, site.population - SiteData.PEOPLE_PER_RESIDENT)
 	if npc.health.last_hit_source == &"player":
 		var life := WorldState.data.current_life()
-		WorldState.data.log_event(&"resident_killed", [site.faction, life.host_name if life else "someone"],
+		WorldState.data.log_deed(&"resident_killed", [site.faction, life.host_name if life else "someone"],
 			{"site": site.id, "victim": npc.npc_name})
 		_deed(KILL_DEED)
 

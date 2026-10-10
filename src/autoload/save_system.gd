@@ -14,7 +14,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 14
+const SAVE_VERSION := 15
 
 
 func slot_path(slot: int) -> String:
@@ -138,4 +138,8 @@ func _migrate(save: Dictionary) -> Dictionary:
 		# v14 (week 31): host standing per life. Nothing to convert: a life
 		# without standing uses its factions' attitudes to its host type.
 		save.save_version = 14
+	if save.save_version == 14:
+		# v15 (week 32): the fragment's legend with each faction.
+		save.world["legend"] = {}
+		save.save_version = 15
 	return save

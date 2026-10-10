@@ -291,15 +291,11 @@ Original plan:
 | Neutral | One for one. |
 | Friendly | One for one, plus an extra ware if you have room. |
 
-### Legend standing (planned, week 32)
+### Legend standing (week 32)
 
-```
-standing(faction, player) =
-    host_standing[faction]                   # this body only
-  + legend_standing[faction] * senses(faction)  # the fragment, if they can sense it
-```
+`WorldData.legend` (faction id -> -100..100) is what each faction knows of the fragment, across every body; it is saved and never reset. `record_deed()` moves it by half the deed. `standing(f)` = `host_standing(f) + legend_standing(f) * senses_fragment` (Choir 0.9, Flesh-Tenders 0). Deeds that people remember are events logged with `log_deed()`, which also adds the event id to the current `LifeRecord.deed_event_ids`: `resident_attacked` (once per site per life), `resident_killed`, `boss_slain` (in `Legend.FAMOUS`: everyone remembers it, and in `Legend.GOOD`: they are glad of it). `Legend.recognition(data, f)` turns the latest remembered deed from an earlier body into a line ("Two bodies ago, you killed Belet at Sinewhearth. We have not forgiven it."); `Talk` sets `recognized` / `recognition` for speakers whose faction senses the fragment (>= 0.5), and resident.dialogue says it after the greeting.
 
-`senses` is 1.0 for priests, nerve-dwellers and heart factions, 0.0 for most others. Rumors can slowly move host standing for non-sensing factions when your current host matches a known description.
+Rumors can slowly move host standing for non-sensing factions when your current host matches a known description. (Not built yet.)
 
 ## Mutations
 
