@@ -11,8 +11,13 @@ const RESIDENT := preload("res://data/dialogue/resident.dialogue")
 ## `speaker` is the node talking (for the scene tree). The balloon goes on
 ## the root, not Dialogue Manager's "current scene", so it works wherever
 ## the game runs.
-static func start(speaker: Node, speaker_name: String, faction_id: StringName, rng_seed: int) -> Talk:
+## `place` and `bribe_cost`: the speaker guards a place and takes bribes (week 36).
+static func start(speaker: Node, speaker_name: String, faction_id: StringName, rng_seed: int, place := "", bribe_cost := 0) -> Talk:
 	var talk := Talk.new(WorldState.data, speaker_name, faction_id, rng_seed)
+	talk.offer_bribe(place, bribe_cost)
+	talk.bribed.connect(func():
+		EventBus.ichor_changed.emit()
+		Sfx.play(&"pickup"))
 	talk.traded.connect(func():
 		EventBus.inventory_changed.emit()
 		Sfx.play(&"pickup")

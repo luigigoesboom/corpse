@@ -13,6 +13,12 @@ Next:
 
 ---
 
+## Week 36: non-combat options (2026-10-10)
+Done: sneaking (Ctrl: crouched, slow, dim, silent) against guards that look and listen: they see what is in front of them (worse in the dark, better by a fire), hear you walk or swing, and show "?" then "!". Hostile settlements now only fight once they notice you, so you can slip through one. A Choir watch now guards the shaft down to the deep: two sentries on the far lip, a bone grate over the gap, a latch on the near lip lit by a brazier. Only the Choir's friends pass. Otherwise: wait until they look away and sneak to the latch, or talk to a sentry and pay 20 ichor, or offer enough at the altar to become a friend, or fight. Walk straight in and they warn you, then draw on you. Creatures leave carcasses you can eat for a heart and a drop of ichor. tests/test_stealth.gd checks both done-when ways (sneak, bribe) plus the warning and the grate. The spitter moved up to a ledge so it does not shoot the sentries.
+Found on the way: sentries left of the gap could never be sneaked past (anyone going into the shaft walks into their view), so they moved to the far side; a creature hitting a resident raised the alarm against the player (now only the player's hits do); brushing past a guard in firelight was instant (touch ignores light now).
+Not done: sentries walk without physics, so when alarmed they can hover over an open grate; sneak has no art of its own (the body just lowers); noise is not shown.
+Next: week 37, milestone 4: place the Gullet Matron in world.png, bug fixing, a 5-life playtest.
+
 ## Week 35: murals and lore objects (2026-10-10)
 Done: every settlement has a mural of its people's past, painted in their own medium (the Choir's gold leaf and bile on rib, the Tenders' stitched gut-lining, bone cuttings, soot on hide); every ruin keeps its fallen people's mural and a bone tablet about how the place began and ended. Each mural shows up to four moments, always including how the people began, and different murals of one people show different moments. Reading one (E, page by page in the dialogue balloon) teaches what it shows; the new History tab lays out everything you know per people, by year, so the Choir's schism on one wall and its wars on another make one story. Save version 18. tests/test_lore.gd.
 Not done: murals are drawn in code (four painted panels); murals do not lie yet (a people painting its defeats as victories would be fun later); nothing reacts to what you know.

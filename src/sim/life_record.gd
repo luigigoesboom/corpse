@@ -30,6 +30,9 @@ var deed_event_ids: Array = []
 ## (WorldData.standing()). Fresh for every host; the fragment's legend is
 ## separate (week 32).
 var standing: Dictionary = {}
+## Places whose guards this host bribed to look away (week 36): key -> true.
+## Hurting one of them ends it.
+var bribes: Dictionary = {}
 ## What became of the body: intact, scavenged (Aftermath), or claimed by a
 ## faction (week 33, CorpseFate): enshrined, studied, eaten, looted.
 var corpse_state: StringName = &"intact"
@@ -54,7 +57,7 @@ func is_alive() -> bool:
 
 func to_dict() -> Dictionary:
 	return {
-		"host_type": host_type, "host_name": host_name, "origin": origin, "standing": standing.duplicate(),
+		"host_type": host_type, "host_name": host_name, "origin": origin, "standing": standing.duplicate(), "bribes": bribes.duplicate(),
 		"start_year": start_year, "death_year": death_year, "seconds_alive": seconds_alive,
 		"death_position": death_position, "killed_by": killed_by,
 		"carried_items": carried_items.duplicate(), "carried_mutations": carried_mutations.duplicate(),
@@ -69,6 +72,7 @@ static func from_dict(d: Dictionary) -> LifeRecord:
 	var life := LifeRecord.new()
 	life.host_type = d.get("host_type", &"colonist")
 	life.standing = d.get("standing", {}).duplicate()
+	life.bribes = d.get("bribes", {}).duplicate()
 	life.host_name = d.get("host_name", "")
 	life.origin = d.get("origin", "")
 	life.start_year = int(d.get("start_year", 0))

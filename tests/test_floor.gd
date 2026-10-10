@@ -32,6 +32,8 @@ func run() -> void:
 	for node in world.get_node("Entities").get_children():
 		if node is CharacterBody2D:
 			continue  # Falls onto the floor by itself, checked below.
+		if node.has_method("bars_player"):
+			continue  # A guard post sits over the gap it guards.
 		var pos: Vector2 = node.position
 		if map.is_solid(_tile(pos - Vector2(0, sink + 1))):
 			continue  # Hangs from a ceiling.

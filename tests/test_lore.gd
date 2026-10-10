@@ -42,14 +42,18 @@ func run() -> void:
 		var ruin = null
 		for template in game._entities.templates():
 			if template.get_meta(&"entity_key", "") == key:
-				await goto(template.position + Vector2(0, -36), 40)
-				ruin = entity(key)
+				await goto(template.position + Vector2(0, -36), 10)
+				for wait in 120:  # Until its chunk has streamed in.
+					ruin = entity(key)
+					if ruin:
+						break
+					await physics_frame
 		if ruin == null or ruin.site == null:
 			continue
 		for piece in ruin.get_children().filter(func(n): return n.has_method("event_ids")):
 			pieces += 1
 			data.learn(piece.event_ids())
-	check(pieces == 4, "each ruin has a mural and a bone tablet (%d pieces)" % pieces)
+	check(pieces == 4, "each ruin has a mural and a bone tablet (%d pieces, paused %s)" % [pieces, get_root().get_tree().paused])
 
 	# Pieced together: several peoples, each in order, across centuries.
 	var known: Dictionary = Lore.known_by_people(data)

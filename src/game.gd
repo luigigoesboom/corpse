@@ -85,7 +85,7 @@ func _on_world_loaded() -> void:
 		# A new world, or a save from before week 26: give it a past (D-025).
 		HistorySim.run(data)
 		FactionTerritory.apply_territory(data)
-	SiteSeeder.fill_slots(data, _entities.templates().filter(func(t): return t is Settlement))
+	SiteSeeder.fill_slots(data, _entities.templates().filter(func(t): return t is Settlement and not t is GuardPost))
 	SiteSeeder.fill_ruin_slots(data, _entities.templates().filter(func(t): return t is RuinSite))
 	ItemDb.set_generated(ArtifactText.item_defs(data))  # Artifacts work like items.
 	if data.current_life() == null:
@@ -129,7 +129,7 @@ func _ground_below(point: Vector2) -> Vector2:
 func _pass_time() -> void:
 	var places := {}  # Where factions lay the bodies they carry home (week 33).
 	for template in _entities.templates():
-		if template is Settlement:
+		if template is Settlement and not template is GuardPost:
 			places[EntityLayer.key_of(template)] = template.body_spot()
 	var report := Aftermath.run(WorldState.data, places)
 	_entities.rebuild()
@@ -200,6 +200,7 @@ func _apply_host(host: HostDef) -> void:
 
 ## Kills by the player count toward the current life's deeds, and give ichor.
 func _on_entity_killed(entity: Node) -> void:
+	_leave_carcass(entity)
 	var health := entity.get_node_or_null("Health") as Health
 	if health and health.last_hit_source == &"player":
 		var kind := CombatRules.kind_of(entity)
@@ -232,3 +233,14 @@ func _on_boon_bought(id: StringName) -> void:
 		_player.health.max_health += 1
 		_player.health.set_current(_player.health.current + 1)
 	EventBus.notify.emit("The fragment grows: %s" % Boons.display_name(id))
+
+
+## Dead creatures leave something to eat for a while (week 36).
+func _leave_carcass(entity: Node) -> void:
+	var kind := CombatRules.kind_of(entity)
+	if not Ichor.CREATURE_VALUES.has(kind) or kind == &"gullet_matron":
+		return
+	var carcass := Carcass.new()
+	carcass.kind = kind
+	carcass.position = _ground_below(entity.global_position + Vector2(0, -10))
+	add_child(carcass)

@@ -89,6 +89,10 @@ var _dodge_timer := 0.0
 var _dodge_cooldown_timer := 0.0
 var _dodge_dir := 1.0
 var _was_on_floor := true
+## Stealth (week 36): seconds left of a loud moment (a swing, a roll, a hard
+## landing, a jump) that guards can hear from further away.
+var _loud := 0.0
+var _base_light_energy := 1.0
 ## Hides the host while it lies dead (its Corpse is drawn instead).
 var body_hidden := false
 
@@ -102,11 +106,19 @@ var body_hidden := false
 @onready var sprite: LayeredSprite = $Visual/Sprite
 
 
+## Stealth (week 36).
+const SNEAK_SPEED_SCALE := 0.4
+const SNEAK_VISIBILITY := 0.3
+const WATCH_LIGHT_BOOST := 2.5
+const STEP_NOISE := 110.0
+const LOUD_NOISE := 220.0
+
 var _base_run_speed := 0.0
 
 
 func _ready() -> void:
 	_base_run_speed = run_speed
+	_base_light_energy = $Light.energy
 	_recalculate_jump()
 	add_to_group("player")
 	health.hurt.connect(_on_hurt)
@@ -146,12 +158,18 @@ func _physics_process(delta: float) -> void:
 	if is_on_floor() and not _was_on_floor and fall_speed > 300.0:
 		_dust.restart()
 		Sfx.play(&"land")
+		_loud = 0.5
 	_was_on_floor = is_on_floor()
 
 	if has_control:
 		_handle_attack()
 		_handle_items()
 	_visual.scale.x = _facing
+	# Sneaking: a lower, dimmer body (week 36).
+	_loud = maxf(0.0, _loud - delta)
+	var sneaking := is_sneaking()
+	_visual.scale.y = move_toward(_visual.scale.y, 0.88 if sneaking else 1.0, delta * 2.0)
+	$Light.energy = move_toward($Light.energy, _base_light_energy * (0.3 if sneaking else 1.0), delta * 3.0)
 
 
 func _process(delta: float) -> void:
@@ -262,6 +280,7 @@ func _handle_attack() -> void:
 		_attack_timer = attack_active_time
 		_attack_cooldown_timer = attack_cooldown
 		Sfx.play(&"swing")
+		_loud = 0.5
 
 
 func _on_hurt(amount: int, from: Vector2, knockback: float) -> void:
@@ -287,6 +306,31 @@ func is_clinging() -> bool:
 
 
 ## 1 = facing right, -1 = facing left.
+## Stealth (week 36): holding sneak on the ground, not rolling.
+func is_sneaking() -> bool:
+	return not _dead and is_on_floor() and not is_dodging() and Input.is_action_pressed("sneak")
+
+
+## How far away guards hear the host right now, in px (0 = silent).
+func noise_radius() -> float:
+	if _dead:
+		return 0.0
+	if _loud > 0.0:
+		return LOUD_NOISE
+	if is_sneaking() or not is_on_floor() or absf(velocity.x) < 30.0:
+		return 0.0
+	return STEP_NOISE
+
+
+## How easy the host is to see: dim when sneaking, bright in a watch light.
+func visibility() -> float:
+	var seen := SNEAK_VISIBILITY if is_sneaking() else 1.0
+	for light in get_tree().get_nodes_in_group(&"watch_lights"):
+		if light.global_position.distance_to(global_position) < light.radius:
+			return seen * WATCH_LIGHT_BOOST
+	return seen
+
+
 func facing() -> float:
 	return _facing
 
@@ -360,6 +404,7 @@ func _try_dodge(input_dir: float) -> void:
 	_dodge_timer = dodge_time
 	_dodge_cooldown_timer = dodge_time + dodge_cooldown
 	health.grant_invulnerability(dodge_invulnerable_time)
+	_loud = 0.5
 	_attack_hitbox.deactivate()
 	_slash.visible = false
 	_dust.restart()
@@ -380,7 +425,8 @@ func _apply_run(input_dir: float, delta: float) -> void:
 		rate = ground_decel if input_dir == 0.0 or turning else ground_accel
 	else:
 		rate = air_decel if input_dir == 0.0 else air_accel
-	velocity.x = move_toward(velocity.x, input_dir * run_speed, rate * delta)
+	var top := run_speed * (SNEAK_SPEED_SCALE if is_sneaking() else 1.0)
+	velocity.x = move_toward(velocity.x, input_dir * top, rate * delta)
 
 
 func _apply_jump() -> void:
@@ -389,6 +435,7 @@ func _apply_jump() -> void:
 			velocity.y = _jump_velocity
 			_dust.restart()
 			Sfx.play(&"jump")
+			_loud = 0.3
 			_consume_jump()
 		elif _wall_coyote_timer > 0.0:
 			velocity = Vector2(_wall_normal_x * wall_jump_push, _jump_velocity * wall_jump_height_ratio)

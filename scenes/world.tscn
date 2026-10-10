@@ -14,6 +14,7 @@
 [ext_resource type="Script" path="res://src/world/ruin_site.gd" id="13_ruin"]
 [ext_resource type="PackedScene" path="res://src/world/heart_root.tscn" id="14_root"]
 [ext_resource type="PackedScene" path="res://src/world/ichor_clot.tscn" id="15_clot"]
+[ext_resource type="Script" path="res://src/world/guard_post.gd" id="16_post"]
 
 [node name="World" type="Node2D"]
 
@@ -133,7 +134,7 @@ position = Vector2(6500, 3878)
 position = Vector2(7700, 3878)
 
 [node name="SpitterChamber" parent="Entities" instance=ExtResource("9_spitter")]
-position = Vector2(4080, 3200)
+position = Vector2(3920, 2816)
 
 [node name="SpitterCavern" parent="Entities" instance=ExtResource("9_spitter")]
 position = Vector2(7500, 2400)
@@ -202,3 +203,8 @@ amount = 12
 [node name="ClotUpperTunnel" parent="Entities" instance=ExtResource("15_clot")]
 position = Vector2(5300, 838)
 amount = 10
+
+[node name="ShaftWatch" type="Node2D" parent="Entities"]
+position = Vector2(4224, 3206)
+script = ExtResource("16_post")
+width = 320.0

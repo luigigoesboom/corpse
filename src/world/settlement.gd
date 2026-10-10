@@ -18,6 +18,8 @@ const RESIDENT := preload("res://src/actors/npcs/colony_npc.tscn")
 ## Standing lost for hitting a resident, and for killing one.
 const HURT_DEED := -60
 const KILL_DEED := -100
+## Ichor a hostile settlement's guard takes to look away, plus half how much they hate you.
+const BRIBE_BASE := 30
 ## Room left at each end, in px.
 const EDGE := 12.0
 
@@ -125,14 +127,53 @@ func _process(delta: float) -> void:
 		bark_near(player.global_position)
 
 
-## Its people are hostile to the current host: guards fight, others flee.
+## Its people are hostile to the current host: guards fight, others flee
+## (once they notice you, week 36). A bribe makes them look away.
 func is_hostile() -> bool:
-	return site != null and WorldState.data != null and Standing.tier(WorldState.data.standing(site.faction)) == Standing.HOSTILE
+	return site != null and WorldState.data != null and Standing.tier(WorldState.data.standing(site.faction)) == Standing.HOSTILE 		and not _bribed()
 
 
-## A resident was hit. By the player, that is a deed against its people.
+## Whether residents look out for the player (week 36 perception).
+func watches_player() -> bool:
+	return is_hostile()
+
+
+## What a guard says while it bars your way (guard posts).
+func warning_line() -> String:
+	return "Halt."
+
+
+## [place key, ichor] a guard here would take to look away; cost 0 = none.
+func bribe_offer() -> Array:
+	if site == null or not is_hostile():
+		return ["", 0]
+	return [site.id, BRIBE_BASE + absi(WorldState.data.standing(site.faction)) / 2]
+
+
+func _bribed() -> bool:
+	var life := WorldState.data.current_life()
+	return life != null and life.bribes.has(_place_key())
+
+
+func _place_key() -> String:
+	return site.id if site else ""
+
+
+## Everyone here notices the player at once (someone was attacked).
+func raise_alarm() -> void:
+	for npc in residents:
+		npc.alert()
+
+
+## A resident was hit. By the player, that is a deed against its people,
+## and ends any bribe.
 func resident_hurt(npc: ColonyNpc) -> void:
-	if npc.health.last_hit_source == &"player" and not npc.health.is_dead():
+	if npc.health.last_hit_source != &"player":
+		return  # A creature's doing: nothing to hold against the host.
+	if WorldState.data.current_life():
+		WorldState.data.current_life().bribes.erase(_place_key())
+	raise_alarm()
+	if not npc.health.is_dead():
 		_remember_attack()
 		_deed(HURT_DEED)
 

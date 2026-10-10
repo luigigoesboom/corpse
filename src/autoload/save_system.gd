@@ -14,7 +14,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 18
+const SAVE_VERSION := 19
 
 
 func slot_path(slot: int) -> String:
@@ -153,4 +153,7 @@ func _migrate(save: Dictionary) -> Dictionary:
 	if save.save_version == 17:
 		# v18 (week 35): events read on murals. Nothing to convert.
 		save.save_version = 18
+	if save.save_version == 18:
+		# v19 (week 36): bribes per life. Nothing to convert.
+		save.save_version = 19
 	return save

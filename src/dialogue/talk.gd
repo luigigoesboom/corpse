@@ -30,6 +30,16 @@ var can_trade := false
 var has_payment := false
 var offer_text := ""
 var trade_done_text := ""
+## Bribes (week 36): the speaker guards a place you are kept out of (a guard
+## post, or a settlement hostile to you), and would look away for ichor.
+signal bribed
+var offers_bribe := false
+var bribe_cost := 0
+var bribe_text := ""
+var halt_text: String:
+	get: return "You are not one of the faithful. You do not pass." if not hostile else "You should not be here. Give me a reason not to call the others."
+## Key of the guarded place (a GuardPost's entity key, or a site id).
+var place := ""
 
 var _data: WorldData
 var _faction: StringName
@@ -59,6 +69,29 @@ func _init(data: WorldData, speaker_name: String, faction_id: StringName, rng_se
 	farewell = _pick(_def.farewells if _def else [], "Go well.")
 	creed = _creed()
 	_set_up_barter()
+
+
+## Sets up a bribe for the place this speaker guards (Conversation calls it).
+## `cost` 0 = there is nothing to bribe for.
+func offer_bribe(place_key: String, cost: int) -> void:
+	place = place_key
+	bribe_cost = cost
+	offers_bribe = cost > 0 and place_key != "" and _data.current_life() != null and not _data.current_life().bribes.has(place_key)
+
+
+var can_bribe: bool:
+	get: return offers_bribe and _data.ichor >= bribe_cost
+
+
+func bribe() -> void:
+	if not can_bribe:
+		bribe_text = "Not for that little."
+		return
+	_data.add_ichor(-bribe_cost)
+	_data.current_life().bribes[place] = true
+	offers_bribe = false
+	bribe_text = _pick(["I see nothing. Go, and quickly.", "The ichor is the god's. You were never here.", "Fine. I was looking the other way anyway."], "Go.")
+	bribed.emit()
 
 
 ## Something that happened, as this speaker would tell it. Never the same

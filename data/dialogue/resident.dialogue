@@ -7,9 +7,22 @@
 {{npc}}: {{greeting}}
 if recognized
 	{{npc}}: {{recognition}}
+if offers_bribe
+	=> guarded
 if hostile
 	=> END
 => menu
+
+~ guarded
+{{npc}}: {{halt_text}}
+- Offer {{bribe_cost}} ichor to look away. [if can_bribe /]
+	do bribe()
+	{{npc}}: {{bribe_text}}
+	=> END
+- Talk instead. [if not hostile /]
+	=> menu
+- Leave.
+	=> END
 
 ~ menu
 - What news?
