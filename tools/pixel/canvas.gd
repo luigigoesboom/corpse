@@ -233,8 +233,8 @@ func _in_front(a: int, b: int) -> bool:
 
 func _shade(s: Dictionary, n: Vector3, x: int, y: int, id: int) -> Color:
 	var r: Array = pal.ramp(s.ramp)
-	var lo: int = s.opts.get("lo", 0)
-	var hi: int = s.opts.get("hi", r.size() - 1)
+	var hi: int = mini(s.opts.get("hi", r.size() - 1), r.size() - 1)
+	var lo: int = mini(s.opts.get("lo", 0), hi)
 	var t: float
 	if s.opts.get("flat", false):
 		var above = y > 0 and _ids[(y - 1) * width + x] == id

@@ -111,6 +111,10 @@ Making a new thing: copy the nearest recipe, change the shapes and poses, run wi
 
 **Tiles.** `recipes/tiles.gd` draws the cobble rock and paved floors once per kind, each in its own 7-step ramp (`flesh`, `rock_bile`, `rock_bruise`, `rock_bone`, `rock_rot`), stacked as 4 x 5 blocks in `gut_tiles.png`, and copies the flesh tiles' collision and occluders to every kind's rows in `gut_tileset.tres`. A cell stores tile and kind in one byte (`ChunkData.cell_of()`, `tile_of()`, `kind_of()`).
 
+**Backdrop.** `recipes/backdrop.gd` draws three seamless layers (assets/art/backdrop): far muscle-fibre walls, mid rib arches / flesh pillars / membranes, near dark tendrils and a vessel. `assets/shaders/backdrop.gdshader` scrolls them at 0.12 / 0.3 / 0.55 of the camera, dims them (`brightness`) and multiplies a `tint` that `src/world/backdrop.gd` eases toward the kinds of rock painted around the camera.
+
+**Props and items.** `recipes/props.gd` redraws every prop in the frame its scene already uses (`FRAMES`: size, floor point, which of body / glow / cloth the scene shows), the code-drawn objects at their fixed sizes, the brazier flame strip, and the item icons. The scenes did not change; to give a prop a bigger frame, change its `FRAMES` entry and the matching Sprite2D offsets in its scene.
+
 **Dressing.** The stuff on the rock: `recipes/dressing.gd` draws, per kind, 6 floor things, 6 ceiling things, 6 wall things (and their mirror) and 6 inlays (buried in the rock, drawn dark) in `dressing.png`, plus 4 big floor and 4 big ceiling pieces (64 px) in `dressing_big.png`, each with a glow sheet. `ChunkDressing` (src/world/chunks) places them on every built chunk from a hash of each tile's position, so a place always looks the same: densities and offsets are constants at its top. Only a view, never saved.
 
 ## Props and items (week 39 art pass)

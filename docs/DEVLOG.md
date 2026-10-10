@@ -13,6 +13,10 @@ Next:
 
 ---
 
+## Art program, part 5: backdrop, props, a click fix (2026-10-11)
+Done: closing a conversation with the left mouse button also swung the sword (the click was still "just pressed" when the game unpaused) and could hit the person you were talking to; the player now ignores attack after a conversation or menu closes until the button is let go (test in test_combat). The backdrop is drawn by the art program: three seamless parallax layers of the inside of a body (fibre walls with veins; dim rib arches, flesh pillars, membranes; near silhouettes), dimmed and tinted by the kind of rock around the camera. Every prop, world object and item icon is redrawn by recipes/props.gd in its old frame, so no scene changed. The starter kinds painting no longer splashes the deep's purple onto the chapel floor.
+Everything visible in the Gut now comes from tools/pixel.
+
 ## Art program, part 4: kinds of rock and dressing (2026-10-11)
 Done: five kinds of rock (flesh, bile, bruise, bone, rot), each the same cobble-and-paved-floor drawing in its own ramp with dither; painted in a new data/maps/tiles.png (world.png untouched), starter painting puts bruise in the deep, bile in the east cavern, bone in the upper tunnel, rot round the chamber ruin. The developer then said colors were not the problem: the caves looked sterile, there was not enough stuff. So: dressing. Per kind, things on floors (cilia, teeth, polyps, pustules, crystals, shards, mushrooms, maggots), from ceilings (tendrils, drips, sacs, stalactites, roots, spores), on walls (veins, teeth, ribs, shelf fungus), buried in the rock (veins, ribs, cysts, curled dead things), and rarer big pieces (tendril curtains, tumours, rib arches, bile spires, a giant glowing mushroom). Placed per chunk from a hash of each tile, so it is the same every time, nothing saved. First pass was too small and sparse; now denser, bigger, with inlays and big pieces.
 Not done: the backdrop behind the caves is still plain blobs; props and items still use the week 39 art.

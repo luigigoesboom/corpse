@@ -142,3 +142,8 @@ Columns: 8
 124  82  44	Rot rock mid
 164 114  62	Rot rock light
 204 152  94	Rot rock highlight
+# ramp tint
+120 120 120	Tint dark (cloth, tinted in game)
+170 170 170	Tint
+214 214 214	Tint light
+245 245 245	Tint highlight
