@@ -16,6 +16,7 @@
 [ext_resource type="PackedScene" path="res://src/world/ichor_clot.tscn" id="15_clot"]
 [ext_resource type="Script" path="res://src/world/guard_post.gd" id="16_post"]
 [ext_resource type="PackedScene" path="res://src/actors/bosses/gullet_matron.tscn" id="17_matron"]
+[ext_resource type="Script" path="res://src/world/key_cache.gd" id="18_cache"]
 
 [node name="World" type="Node2D"]
 
@@ -171,7 +172,7 @@ script = ExtResource("13_ruin")
 width = 420.0
 
 [node name="ChoirAltar" parent="Entities" instance=ExtResource("14_root")]
-position = Vector2(3760, 3206)
+position = Vector2(3680, 3206)
 keeper = &"choir_of_waking"
 
 [node name="WildRoot" parent="Entities" instance=ExtResource("14_root")]
@@ -190,7 +191,7 @@ position = Vector2(4400, 3878)
 amount = 25
 
 [node name="ClotDeepEast" parent="Entities" instance=ExtResource("15_clot")]
-position = Vector2(7700, 3878)
+position = Vector2(7930, 3878)
 amount = 30
 
 [node name="ClotLowLedge" parent="Entities" instance=ExtResource("15_clot")]
@@ -211,4 +212,14 @@ script = ExtResource("16_post")
 width = 320.0
 
 [node name="GulletMatron" parent="Entities" instance=ExtResource("17_matron")]
-position = Vector2(6900, 3860)
+position = Vector2(7400, 3860)
+
+[node name="MatronNest" type="Area2D" parent="Entities"]
+position = Vector2(7740, 3878)
+script = ExtResource("18_cache")
+
+[node name="ChoirReliquary" type="Area2D" parent="Entities"]
+position = Vector2(3450, 3206)
+script = ExtResource("18_cache")
+place = "choir_reliquary"
+keeper = &"choir_of_waking"

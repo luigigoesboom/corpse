@@ -36,6 +36,47 @@ signal bribed
 var offers_bribe := false
 var bribe_cost := 0
 var bribe_text := ""
+## The heart-key (week 38): this speaker's people keep the Gut's key.
+var key_here := false
+var key_price := ValveKeys.CHOIR_PRICE
+var key_text := ""
+signal key_changed
+
+var can_ask_key: bool:
+	get: return key_here and Standing.tier(standing) == Standing.FRIENDLY
+
+var can_buy_key: bool:
+	get: return key_here and not hostile and _data.ichor >= key_price
+
+
+## They trust you: they give it.
+func ask_key() -> void:
+	if not can_ask_key or not ValveKeys.take(_data, ValveKeys.GUT, ValveKeys.CHOIR_RELIQUARY):
+		key_text = "Not now." if can_ask_key else "The key is not for you."
+		return
+	key_here = false
+	key_text = "It has waited for you. Take it to the heart, and do not lose it again."
+	_data.log_deed(&"key_given", [_faction, _host_name()], {"key": ValveKeys.GUT})
+	key_changed.emit()
+
+
+## They do not trust you, but ichor is the god's own blood.
+func buy_key() -> void:
+	if not can_buy_key or not ValveKeys.take(_data, ValveKeys.GUT, ValveKeys.CHOIR_RELIQUARY):
+		key_text = "No."
+		return
+	_data.add_ichor(-key_price)
+	key_here = false
+	key_text = "The god's blood for the god's key. A fair price, they say. I am not sure."
+	_data.log_deed(&"key_bought", [_faction, _host_name()], {"key": ValveKeys.GUT, "ichor": key_price})
+	key_changed.emit()
+
+
+func _host_name() -> String:
+	var life := _data.current_life()
+	return life.host_name if life else "a stranger"
+
+
 var halt_text: String:
 	get: return "You are not one of the faithful. You do not pass." if not hostile else "You should not be here. Give me a reason not to call the others."
 ## Key of the guarded place (a GuardPost's entity key, or a site id).
@@ -69,6 +110,7 @@ func _init(data: WorldData, speaker_name: String, faction_id: StringName, rng_se
 	farewell = _pick(_def.farewells if _def else [], "Go well.")
 	creed = _creed()
 	_set_up_barter()
+	key_here = faction_id == &"choir_of_waking" and ValveKeys.lies_at(data, ValveKeys.GUT, ValveKeys.CHOIR_RELIQUARY)
 
 
 ## Sets up a bribe for the place this speaker guards (Conversation calls it).

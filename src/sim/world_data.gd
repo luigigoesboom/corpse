@@ -64,6 +64,9 @@ var boons: Dictionary = {}
 var kept_graft: Dictionary = {}
 ## Events the fragment has read on murals and tablets (week 35): id -> true.
 var known_events: Dictionary = {}
+## Valve keys lying at a hand-made place (week 38): key id -> place id,
+## "" while the key is an item somewhere (pockets, a body, the floor).
+var key_places: Dictionary = {}
 
 
 static func create(seed_value: int) -> WorldData:
@@ -369,7 +372,7 @@ func to_dict() -> Dictionary:
 		"sites": sites.values().map(func(site): return site.to_dict()),
 		"artifacts": artifacts.values().map(func(artifact): return artifact.to_dict()),
 		"legend": legend.duplicate(),
-		"ichor": ichor, "ichor_banked": ichor_banked, "boons": boons.duplicate(), "kept_graft": kept_graft.duplicate(), "known_events": known_events.duplicate(),
+		"ichor": ichor, "ichor_banked": ichor_banked, "boons": boons.duplicate(), "kept_graft": kept_graft.duplicate(), "known_events": known_events.duplicate(), "key_places": key_places.duplicate(),
 	}
 
 
@@ -403,6 +406,7 @@ static func from_dict(d: Dictionary) -> WorldData:
 	data.boons = d.get("boons", {}).duplicate()
 	data.kept_graft = d.get("kept_graft", {}).duplicate()
 	data.known_events = d.get("known_events", {}).duplicate()
+	data.key_places = d.get("key_places", {}).duplicate()
 	data._fit_inventory()
 	return data
 

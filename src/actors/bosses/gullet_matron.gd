@@ -42,6 +42,8 @@ const LEECH := preload("res://src/actors/creatures/gut_leech.tscn")
 @export var display_name := "The Gullet Matron"
 ## The fight starts when the player comes this close.
 @export var wake_range := 420.0
+## How much closer a sneaking host can get before she wakes.
+const SNEAK_WAKE_SCALE := 0.35
 @export var move_speed := 70.0
 @export var lunge_speed := 640.0
 @export var slam_jump_speed := 760.0
@@ -108,7 +110,9 @@ func _physics_process(delta: float) -> void:
 		velocity.y += _gravity * delta
 	match state:
 		State.DORMANT:
-			if _player and global_position.distance_to(_player.global_position) < wake_range:
+			# A sneaking host can creep much closer before she stirs (week 38).
+			var sneaking: bool = _player != null and _player.has_method("is_sneaking") and _player.is_sneaking()
+			if _player and global_position.distance_to(_player.global_position) < wake_range * (SNEAK_WAKE_SCALE if sneaking else 1.0):
 				_enter(State.INTRO)
 		State.INTRO:
 			_visual.position.y = lerpf(70.0, 0.0, clampf(state_time / 1.2, 0.0, 1.0))

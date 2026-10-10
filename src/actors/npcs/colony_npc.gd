@@ -183,6 +183,10 @@ func _perceive(delta: float, player: Node2D, watching: bool) -> void:
 	_mark.add_theme_color_override(&"font_color", Color(1, 0.35, 0.3) if noticed else Color(1, 0.9, 0.5))
 
 
+func facing() -> float:
+	return _facing
+
+
 ## Notices the player at once (an alarm was raised).
 func alert() -> void:
 	awareness = 1.0

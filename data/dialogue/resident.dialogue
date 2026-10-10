@@ -39,6 +39,21 @@ if hostile
 			{{npc}}: {{trade_done_text}}
 		- Not now.
 	=> menu
+- The heart-key. [if key_here /]
+	=> key
 - Farewell.
 	{{npc}}: {{farewell}}
 	=> END
+
+~ key
+{{npc}}: The key of the Gut's valve. It sleeps in our reliquary until the heart calls for it.
+- Give it to me. The heart is calling. [if can_ask_key /]
+	do ask_key()
+	{{npc}}: {{key_text}}
+	=> menu
+- I will pay {{key_price}} ichor for it. [if can_buy_key /]
+	do buy_key()
+	{{npc}}: {{key_text}}
+	=> menu
+- Never mind.
+	=> menu

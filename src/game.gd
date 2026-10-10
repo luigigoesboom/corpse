@@ -88,6 +88,7 @@ func _on_world_loaded() -> void:
 	SiteSeeder.fill_slots(data, _entities.templates().filter(func(t): return t is Settlement and not t is GuardPost))
 	SiteSeeder.fill_ruin_slots(data, _entities.templates().filter(func(t): return t is RuinSite))
 	ItemDb.set_generated(ArtifactText.item_defs(data))  # Artifacts work like items.
+	ValveKeys.place_at_start(data)  # Week 38: history decides who holds the Gut's key.
 	if data.current_life() == null:
 		data.start_life(&"colonist")  # Saves from before week 21 have no lives.
 	$UI.close_all()

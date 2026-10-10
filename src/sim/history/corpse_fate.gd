@@ -49,6 +49,7 @@ static func claim(data: WorldData, index: int, faction: StringName, fate: String
 	var details := {"fate": fate, "faction": faction}
 	life.corpse_state = fate
 	life.corpse_faction = faction
+	ValveKeys.reclaim_from_body(data, life, faction)  # Week 38: they know a heart-key when they see one.
 	match fate:
 		&"enshrined", &"studied":
 			var already := data.lives.filter(func(l): return l.corpse_site == site.id).size()

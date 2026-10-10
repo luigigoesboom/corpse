@@ -286,6 +286,17 @@ A `HeartRoot` (src/world) banks it: interact opens data/dialogue/heart_root.dial
 | wider_choice | 40 | `Game.rebirth_options()`: 4 hosts |
 | lasting_graft | 60 | `end_life()` keeps the first mutation slot in `kept_graft`; the next host is born with it |
 
+## Valve keys (week 38)
+
+A valve key is an item (`valve_key_gut`), so it is carried, dropped, left on a corpse and reclaimed like anything else, and never rots on the floor. While nobody carries it, it lies at a hand-made place: `WorldData.key_places[key]` = a place id (`ValveKeys.CHOIR_RELIQUARY`, `ValveKeys.MATRON_NEST`), "" while it is an item. A `KeyCache` under Entities with that `place` shows it and gives it (E). `ValveKeys.place_at_start()` runs when a world loads: a Choir with two or more wonders or prophets in its past keeps the Gut key in its reliquary (`key_kept`), otherwise it lies in the Gullet Matron's nest (`key_swallowed`).
+
+| Held by | Ways to get it |
+|---|---|
+| The Choir (reliquary in the chapel) | Ask as a friend (`Talk.ask_key()`); pay `ValveKeys.CHOIR_PRICE` ichor (`buy_key()`); steal it from the reliquary: unseen, nobody knows (`key_stolen`, seen false); seen by a resident (in front, in reach for your visibility), it is a -100 deed and the chapel raises the alarm. |
+| The Gullet Matron (nest at the east end of the deep) | Kill her; or come down the east cavern and sneak: she wakes at 35% of her range for a sneaking host. |
+
+Between lives, a people who sense the fragment and claim a body carrying a key take it to their reliquary (`ValveKeys.reclaim_from_body()`, `key_taken`): keys can be lost across lives (roadmap week 77 builds on this).
+
 ## Between lives (week 37)
 
 `Aftermath.apply()` now: rolls the gap, then `HistorySim.between_lives(data, years)` runs the same yearly simulation as worldgen for those years (with `protect_slots` on: sites in a hand-made slot cannot be taken, razed or abandoned, and peoples living in one do not fall), then `DeedEchoes.apply()` turns the last life's deeds into events with visible effects, then CorpseFate, scavengers, creatures returning (never bosses, `Aftermath.BOSSES`) and dropped items. The time screen hints at the biggest change involving a people you can meet ("While you were gone: ...") and at each echo.

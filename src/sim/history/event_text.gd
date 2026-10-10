@@ -110,6 +110,20 @@ static func describe(event: EventRecord, data: WorldData) -> String:
 			text = "%d pilgrims came to %s to kneel before the body of %s." % [d.get("count", 0), site, event.actors[1] if event.actors.size() > 1 else "a host"]
 		&"shrine_desecrated":
 			text = "%s, their shrine at %s robbed, trusted nobody after." % [a, site]
+		&"key_kept":
+			text = "%s found a key of the heart and kept it in the reliquary at %s." % [a, site]
+		&"key_swallowed":
+			text = "A key of the heart sank into the deep, and the Gullet Matron made her nest around it."
+		&"key_found":
+			text = "%s, a host, took the key of the heart from the Matron's nest." % (event.actors[0] if event.actors.size() > 0 else "Someone")
+		&"key_stolen":
+			text = "%s, a host, stole the key of the heart from %s%s." % [event.actors[1] if event.actors.size() > 1 else "Someone", a, "" if d.get("seen", false) else ", and nobody saw"]
+		&"key_given":
+			text = "%s gave the key of the heart to %s, a host they trusted." % [a, event.actors[1] if event.actors.size() > 1 else "a stranger"]
+		&"key_bought":
+			text = "%s sold the key of the heart to %s, a host, for %d ichor." % [a, event.actors[1] if event.actors.size() > 1 else "a stranger", d.get("ichor", 0)]
+		&"key_taken":
+			text = "%s took the key of the heart from the body of %s and carried it home." % [a, event.actors[1] if event.actors.size() > 1 else "a host"]
 		&"corpse_rotted":
 			text = "The body of %s rotted further." % (event.actors[0] if event.actors.size() > 0 else "someone")
 		&"creatures_returned":

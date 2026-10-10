@@ -15,6 +15,10 @@ const RESIDENT := preload("res://data/dialogue/resident.dialogue")
 static func start(speaker: Node, speaker_name: String, faction_id: StringName, rng_seed: int, place := "", bribe_cost := 0) -> Talk:
 	var talk := Talk.new(WorldState.data, speaker_name, faction_id, rng_seed)
 	talk.offer_bribe(place, bribe_cost)
+	talk.key_changed.connect(func():
+		EventBus.inventory_changed.emit()
+		EventBus.ichor_changed.emit()
+		Sfx.play(&"pickup"))
 	talk.bribed.connect(func():
 		EventBus.ichor_changed.emit()
 		Sfx.play(&"pickup"))

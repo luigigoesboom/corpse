@@ -14,7 +14,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 20
+const SAVE_VERSION := 21
 
 
 func slot_path(slot: int) -> String:
@@ -159,4 +159,8 @@ func _migrate(save: Dictionary) -> Dictionary:
 	if save.save_version == 19:
 		# v20 (week 37): offerings per life. Nothing to convert.
 		save.save_version = 20
+	if save.save_version == 20:
+		# v21 (week 38): where the valve keys lie. Nothing to convert: a world
+		# without key places gets them from its history when it loads.
+		save.save_version = 21
 	return save

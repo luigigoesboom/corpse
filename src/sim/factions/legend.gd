@@ -42,6 +42,8 @@ static func recognition(data: WorldData, faction: StringName) -> String:
 			what = "you killed %s at %s" % [event.data.get("victim", "one of us"), place]
 		&"resident_attacked":
 			what = "you drew our blood at %s" % place
+		&"key_stolen":
+			what = "you stole the heart-key from us"
 		&"shrine_robbed":
 			what = "you robbed the body we laid in our shrine at %s" % place
 		&"boss_slain":

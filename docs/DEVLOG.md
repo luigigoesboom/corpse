@@ -13,6 +13,12 @@ Next:
 
 ---
 
+## Week 38: the Gut valve key (2026-10-10)
+Done: the first key of the heart, a ring of grown bone. History decides who holds it: a Choir that found relics or had prophets keeps it in a reliquary in its chapel; otherwise it sank into the deep and the Gullet Matron nested around it, at the far east end of the tunnel. The Choir's key: ask for it as their friend, buy it for 100 ichor, or steal it from the reliquary (sneak and wait until nobody faces you; seen, it is theft and the chapel turns on you). The Matron's key: kill her, or come down the east cavern and sneak to the nest; she sleeps through a sneaking host until 35% of her wake range. Die with it and it lies on your body; if the Choir claims that body, they carry the key back to their reliquary. tests/test_valve_key.gd covers all five ways and the loss. The altar moved off the mural, the Matron sits by her nest. Save version 21.
+Also: tests/test_settlements.gd watched residents for half a game-minute and sometimes nobody chose to work in a small camp; now a full minute.
+Not done: nothing opens with the key yet (the heart, weeks 77+); the reliquary and nest are drawn in code.
+Next: week 39, art pass 1.
+
 ## Fix: placed creatures drawn twice (2026-10-10)
 The developer saw the Matron and leeches look "a frame behind". Cause: EntityLayer copies each hand-placed entity from a template that had already run _ready(), and duplicate() copied the sprites LayeredSprite builds at runtime; the copy then built its own, so every placed creature drew a stale frozen body under the live one. EntityLayer now drops ownerless (runtime-built) nodes from each copy. tests/test_creatures.gd checks one body per creature.
 

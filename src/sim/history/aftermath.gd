@@ -131,7 +131,7 @@ static func _creatures_return(data: WorldData, strength: float, rng: RandomNumbe
 static func _dropped_items_vanish(data: WorldData, strength: float, rng: RandomNumberGenerator, _report: Dictionary) -> void:
 	for chunk in data.chunk_diffs.keys():
 		for record in data.items_in_chunk(chunk).duplicate():
-			if String(record.item).begins_with("artifact_"):
+			if String(record.item).begins_with("artifact_") or ValveKeys.is_key(record.item):
 				continue  # One of a kind: they do not rot away.
 			if rng.randf() < strength * 0.5:
 				data.remove_dropped_item(chunk, record.id)

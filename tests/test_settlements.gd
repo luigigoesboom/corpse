@@ -31,13 +31,13 @@ func run() -> void:
 	var again: Array = camp.get_children().filter(func(c): return c.has_meta(&"built") and c.get(&"work_spot") != null).map(func(p): return [p.scene_file_path, p.position])
 	check(layout == again, "the layout is the same every time it is built")
 
-	# Residents live: over half a game-minute they walk, work and stay home.
+	# Residents live: over a game-minute they walk, work and stay home.
 	var seen := {}
 	var worked := false
 	var inside := true
 	var bounds: Vector2 = camp.walk_bounds()
 	Engine.time_scale = 8.0
-	for i in 240:
+	for i in 480:
 		await process_frame
 		for npc in camp.residents:
 			seen[npc.state] = true

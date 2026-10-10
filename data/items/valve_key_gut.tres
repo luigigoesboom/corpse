@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://src/items/item_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"valve_key_gut"
+display_name = "Valve Key of the Gut"
+description = "A ring of grown bone the size of a fist, its inner edge wet and ridged like a mouth. One of the keys that seal the heart. It beats when you hold it near the floor."
+color = Color(1, 0.42, 0.3, 1)
