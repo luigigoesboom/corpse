@@ -74,7 +74,7 @@ Naming: `snake_case` for files and folders, `PascalCase` for `class_name`.
 | `WorldState` | Holds the current `WorldData`. Single source of truth for the sim. |
 | `SaveSystem` | Serializes `WorldData` to `user://` and back. Owns versioning and migration. |
 | `GameClock` | Current year, in-life time, triggers time skips. (Not created yet.) |
-| `Sfx` | Placeholder sound effects generated in code; `Sfx.play(&"hit", position)`. |
+| `Sfx` | Sound effects; `Sfx.play(&"hit", position)`. Plays assets/audio/sfx/<name>.wav if present (copied from the licensed pack by tools/copy_sfx.sh, not in git), else a sound generated in code. |
 
 Keep autoloads small. If one passes 300 lines, split it.
 

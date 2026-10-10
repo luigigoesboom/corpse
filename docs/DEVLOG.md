@@ -13,6 +13,30 @@ Next:
 
 ---
 
+## Week 25: milestone 3 playtest (2026-10-10)
+The developer played the new build. Notes, in their words where possible, and what was done:
+
+**Good.** The 2.5D, Blasphemous-like view: "i like the isometric view". It reads better than the flat view and is the direction.
+
+**Problems found and fixed.**
+- *Camera too bouncy when stopping.* Measured on rendered frames: the view led by velocity, kept sliding after a stop, then swung back across the screen for a second. Now it leads by facing direction, so stopping settles once and only turning pans it.
+- *Movement jittery.* Measured: the world scrolled smoothly but the player wobbled 1 px back and forth (92 reversals in 1.6 s of running), because camera and player were rounded to pixels separately with a fractional gap. The camera now keeps a whole-pixel gap to the player: 0 wobbles. tests/perf_render.gd now reads back real frames and checks both running and stopping.
+- *Movement stiff.* The run cycle now plays at the speed the host actually moves (no foot sliding while speeding up or skidding). Speeds and jump are unchanged so far; tune after more play.
+- *The character should have a dodge.* Ground roll on Shift / LB with invulnerability, cooldown and jump-cancel (D-024), placeholder animation, tests/test_dodge.gd.
+- *Inventory UX terrible, needs tabs.* Rebuilt: Pockets (grid + details + what eating does, including what it would replace), Body (host and each slot's part, key and effect), Lives (every host, where its body lies and what is still on it). Q / E or LB / RB switch tabs, Enter eats, X drops, a key-hint bar at the bottom, opaque styled panel.
+- *Maybe shadows.* Soft ground shadows under characters, creatures, NPCs and items, fading with height. Easy to remove per scene if they do not fit.
+
+**Not fixed yet.**
+- *Text needs a better font.* Needs a pixel font file; the developer picks one (or approves a download), then it goes in assets/fonts and the theme.
+- *Some sprites do not fit the view.* All current sprites are programmer placeholders (tent, fungus, items, NPC capsules, 48 px creatures next to 64 px hosts). The real fix is the art; until then, shadows help ground them.
+
+**The loop itself.** Developer: "finding old body feels good". The corpse retrieval part of the loop works; nothing in the die / time passes / new host cycle was called busywork. Font: m5x7 (CC0) added at 16 px, crisp at 640 x 360.
+
+## Sound pack (2026-10-10)
+Done: 9 of the 12 game sounds now come from Ovani's Sound FX Starter Pack Vol. 1 (swing, hit, hurt, die, enemy_die, pickup, eat, spit, dash); jump, land and the fly's buzz stay generated. The license allows game use but not sharing the original files, and the repo is public, so the pack and the copies are gitignored; `tools/copy_sfx.sh` holds the mapping and recreates the copies, `Sfx` falls back to generated sounds without them. `.gdignore` in the pack folder keeps Godot from importing all 145 files.
+Not done: sounds were picked by name and length, not by ear; volumes are guesses.
+Next: developer listens and swaps any that do not fit (edit the map in tools/copy_sfx.sh, rerun it).
+
 ## Blasphemous-like view (2026-10-10)
 Done: D-023. Base resolution 640 x 360. Phantom Camera wired up: `GameCamera` (Camera2D + PhantomCameraHost + PhantomCamera2D in SIMPLE follow with offset, damping, horizontal lookahead; noise emitter for shake); the player stands low on screen and the view swings down when falling fast; the player no longer owns a camera, `teleport()` emits `teleported`. Hosts regenerated at 64 x 64 (drawn about 56 px), player capsule 52 px, hitboxes, sockets, slash and corpse scaled. Tiles v4: textured cobble ground everywhere, 12 px paved floor face, `FLOOR_SINK` 6, occluders 12 px in on floors; gut_tiles.aseprite and colonist.aseprite rebuilt. UI: 10 px theme with anti-aliasing off, every screen shrunk and checked in screenshots. Acid spit aims slightly down (the mouth is higher now). Render check: the smoothness test now models the interpolated camera too; 0 zig-zags, 165 fps.
 Not done: creatures still 48 px; no pixel font yet; movement speeds untuned for the closer view.

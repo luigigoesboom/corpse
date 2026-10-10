@@ -11,6 +11,6 @@ description = "A blade of divine bone pushing out of the forearm. Dash through t
 slot = "arm"
 ability = ExtResource("2_ability")
 part_frames_dir = "res://assets/art/mutations/bone_spur"
-control_hint = "L / Shift"
+control_hint = "L"
 part_color = Color(0.92, 0.88, 0.76, 1)
 part_polygon = PackedVector2Array(-2, -3, 16, -1, -2, 3)

@@ -16,8 +16,8 @@
 
 -- Same speeds as SpriteSheets.FPS in src/actors/components/sprite_sheets.gd.
 local FPS = { idle = 5, run = 10, move = 8, jump = 8, fall = 8, cling = 6,
-  windup = 8, attack = 16, hurt = 10, die = 8 }
-local ORDER = { "idle", "run", "move", "jump", "fall", "cling", "windup", "attack", "hurt", "die" }
+  windup = 8, attack = 16, hurt = 10, die = 8, dodge = 14 }
+local ORDER = { "idle", "run", "move", "jump", "fall", "cling", "dodge", "windup", "attack", "hurt", "die" }
 
 local fs = app.fs
 local root = fs.currentPath

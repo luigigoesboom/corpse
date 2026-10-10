@@ -114,6 +114,11 @@ Format: ID, date, decision, why, what it rules out.
 - Why: the developer wanted the point of view and style of Blasphemous: bigger tiles and characters on screen, less empty rock below the floor. 640 x 360 is also an exact integer scale on 1080p (3x), 1440p (4x, which 960 x 540 was not) and 4K (6x).
 - Trade-offs: about 20 x 11 tiles on screen (was 30 x 17): less of the world visible at once. 2-tile tunnels are now tight. Creatures stay 48 px for now and look smaller next to the host. 10 px text with the default font is small; a pixel font would fix it (assets/fonts).
 
+**D-024 Dodge roll; Shift is dodge** (2026-10-10, from the week 25 playtest)
+- What: a ground roll on Shift / LB: about 100 px in 0.32 s, hits ignored for the first 0.26 s, 0.45 s cooldown, jump cancels it into a fast jump. The arm ability (Bone Spur) moves to L / RB only. In menus, Q / E and LB / RB switch inventory tabs, X / pad X drops.
+- Why: the developer found movement stiff and wanted a dodge; it is also the systemic answer to a hit you can see coming, which fits loose combat (D-018).
+- Consequences: every host needs a `dodge` animation (placeholders generated); mutation overlays too.
+
 ---
 
 ## Open questions

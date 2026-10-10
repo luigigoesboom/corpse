@@ -18,6 +18,12 @@ signal animation_finished(animation: StringName)
 @export_dir var glow_frames_dir: String
 ## Shifts every frame, e.g. (0, -24) so a 48 px frame stands on the node's origin.
 @export var frame_offset := Vector2.ZERO
+## Playback speed (1 = the speed in SpriteSheets.FPS). Layers follow the body.
+var speed_scale := 1.0:
+	set(value):
+		speed_scale = value
+		if _body:
+			_body.speed_scale = value
 
 const UNSHADED := preload("res://assets/materials/unshaded.tres")
 

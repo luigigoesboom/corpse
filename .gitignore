@@ -14,3 +14,9 @@
 Thumbs.db
 *.tmp
 .vscode/
+
+# Licensed sound pack: usable in the game, but the original files must not be
+# shared, and this repo is public. tools/copy_sfx.sh copies the used sounds.
+/Sound FX Starter Pack Vol. 1/
+/assets/audio/sfx/*.wav
+/assets/audio/sfx/*.wav.import

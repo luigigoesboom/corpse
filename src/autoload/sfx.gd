@@ -1,17 +1,21 @@
 extends Node
-## Placeholder sound effects, generated in code (no audio files yet).
+## Sound effects.
 ##
 ##   Sfx.play(&"hit")                  plays everywhere
 ##   Sfx.play(&"hit", global_position) quieter the further it is from the camera
 ##
-## Each sound is a short recipe below (a pitch sweep and/or noise). Replace a
-## recipe with a real file later: put an AudioStream in _streams under the same
-## name and nothing else changes.
+## A sound plays assets/audio/sfx/<name>.wav if that file exists (copied from
+## the licensed sound pack by tools/copy_sfx.sh, not in git), otherwise its
+## generated placeholder: a short recipe below (a pitch sweep and/or noise).
 
 const RATE := 22050
 const VOICES := 8
 ## Sounds further than this from the screen center are not played.
 const HEARING_RANGE := 900.0
+const FILE_DIR := "res://assets/audio/sfx/"
+## Volume (dB) for sounds played from files; others default to FILE_VOLUME.
+const FILE_VOLUMES := {&"swing": -10.0, &"pickup": -8.0, &"spit": -8.0, &"dash": -10.0, &"eat": -8.0}
+const FILE_VOLUME := -6.0
 
 ## name: [seconds, start Hz, end Hz, noise amount 0..1, wave ("sine"/"square"), volume dB]
 const RECIPES := {
@@ -27,9 +31,11 @@ const RECIPES := {
 	&"dash": [0.16, 400.0, 900.0, 0.9, "sine", -18.0],
 	&"enemy_die": [0.35, 220.0, 50.0, 0.7, "square", -12.0],
 	&"buzz": [0.20, 180.0, 200.0, 0.2, "square", -24.0],
+	&"dodge": [0.18, 320.0, 120.0, 0.9, "sine", -16.0],
 }
 
 var _streams := {}
+var _volumes := {}
 var _players: Array[AudioStreamPlayer] = []
 var _next := 0
 
@@ -37,7 +43,13 @@ var _next := 0
 func _ready() -> void:
 	process_mode = PROCESS_MODE_ALWAYS
 	for id in RECIPES:
-		_streams[id] = _make(RECIPES[id])
+		var path := FILE_DIR + String(id) + ".wav"
+		if ResourceLoader.exists(path):
+			_streams[id] = load(path)
+			_volumes[id] = FILE_VOLUMES.get(id, FILE_VOLUME)
+		else:
+			_streams[id] = _make(RECIPES[id])
+			_volumes[id] = RECIPES[id][5]
 	for i in VOICES:
 		var player := AudioStreamPlayer.new()
 		add_child(player)
@@ -47,7 +59,7 @@ func _ready() -> void:
 func play(id: StringName, at := Vector2.INF) -> void:
 	if not _streams.has(id):
 		return
-	var volume: float = RECIPES[id][5] if RECIPES.has(id) else 0.0
+	var volume: float = _volumes[id]
 	if at != Vector2.INF:
 		var camera := get_viewport().get_camera_2d()
 		if camera:

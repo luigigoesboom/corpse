@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://src/actors/components/hurtbox.gd" id="3_hurtbox"]
 [ext_resource type="Script" path="res://src/actors/components/layered_sprite.gd" id="4_sprite"]
 [ext_resource type="Script" path="res://src/mutations/mutation_host.gd" id="5_mutations"]
+[ext_resource type="Script" path="res://src/actors/components/ground_shadow.gd" id="91_shadow"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(16, 30)
@@ -16,6 +17,10 @@ size = Vector2(22, 36)
 collision_layer = 8
 collision_mask = 1
 script = ExtResource("1_spitter")
+
+[node name="Shadow" type="Node2D" parent="."]
+script = ExtResource("91_shadow")
+width = 20.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -15)

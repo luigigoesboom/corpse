@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://src/actors/components/hurtbox.gd" id="3_hurtbox"]
 [ext_resource type="Script" path="res://src/actors/components/hitbox.gd" id="4_hitbox"]
 [ext_resource type="Script" path="res://src/actors/components/layered_sprite.gd" id="10_sprite"]
+[ext_resource type="Script" path="res://src/actors/components/ground_shadow.gd" id="91_shadow"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(36, 18)
@@ -22,6 +23,10 @@ size = Vector2(28, 20)
 collision_layer = 8
 collision_mask = 1
 script = ExtResource("1_leech")
+
+[node name="Shadow" type="Node2D" parent="."]
+script = ExtResource("91_shadow")
+width = 36.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -9)

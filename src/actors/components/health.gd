@@ -27,6 +27,11 @@ func _physics_process(delta: float) -> void:
 	_invulnerable_timer -= delta
 
 
+## Ignores hits for `seconds` (a dodge roll). Does not shorten a longer one.
+func grant_invulnerability(seconds: float) -> void:
+	_invulnerable_timer = maxf(_invulnerable_timer, seconds)
+
+
 func is_invulnerable() -> bool:
 	return invulnerable or _invulnerable_timer > 0.0
 

@@ -12,6 +12,7 @@ extends Marker2D
 
 func _ready() -> void:
 	gizmo_extents = 24.0
+	add_to_group(&"spawn_points")  # The inventory's Lives tab names places by them.
 
 
 func allows(host_type: StringName) -> bool:

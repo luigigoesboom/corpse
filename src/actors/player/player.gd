@@ -12,6 +12,7 @@ extends CharacterBody2D
 ## - Variable height: letting go of jump early cuts the jump short.
 ## - Heavier gravity when falling, so jumps feel snappy instead of floaty.
 ## - Wall cling: push into a wall in the air to slide down slowly, jump to kick off.
+## - Dodge: a quick roll along the ground; hits are ignored for most of it.
 ##
 ## The camera is not part of the player: a GameCamera in the scene follows it.
 
@@ -55,6 +56,15 @@ signal teleported
 ## Which input uses the ability in each body slot.
 const ABILITY_ACTIONS := {"mouth": &"ability_mouth", "arm": &"ability_arm", "back": &"jump"}
 
+@export_group("Dodge")
+## Start speed of the roll; it eases out towards the end.
+@export var dodge_speed := 400.0
+@export var dodge_time := 0.32
+## Hits are ignored for this long from the start of the roll.
+@export var dodge_invulnerable_time := 0.26
+## Wait after a roll before the next one.
+@export var dodge_cooldown := 0.45
+
 @export_group("Combat")
 ## How long the attack hitbox stays on, and the time between attacks.
 @export var attack_active_time := 0.1
@@ -75,6 +85,9 @@ var _attack_cooldown_timer := 0.0
 var _hurt_timer := 0.0
 var _dead := false
 var _facing := 1.0
+var _dodge_timer := 0.0
+var _dodge_cooldown_timer := 0.0
+var _dodge_dir := 1.0
 var _was_on_floor := true
 ## Hides the host while it lies dead (its Corpse is drawn instead).
 var body_hidden := false
@@ -111,9 +124,18 @@ func _physics_process(delta: float) -> void:
 	_tick_timers(delta)
 	_update_wall_state(input_dir)
 	_apply_gravity(delta)
-	_apply_run(input_dir, delta)
 	if has_control:
-		_apply_jump()
+		_try_dodge(input_dir)
+	if is_dodging():
+		_apply_dodge()
+		# Jumping out of a roll keeps its speed: a long, low jump.
+		if has_control and _jump_buffer_timer > 0.0 and _coyote_timer > 0.0:
+			_dodge_timer = 0.0
+			_apply_jump()
+	else:
+		_apply_run(input_dir, delta)
+		if has_control:
+			_apply_jump()
 	_mutations.physics_tick(delta)
 
 	var fall_speed := velocity.y
@@ -133,9 +155,14 @@ func _physics_process(delta: float) -> void:
 
 
 func _process(delta: float) -> void:
-	sprite.play(_pick_animation())
-	# Flicker while invulnerable after a hit.
-	_visual.visible = not body_hidden and (_dead or not health.is_invulnerable() or int(Time.get_ticks_msec() / 60) % 2 == 0)
+	var animation := _pick_animation()
+	sprite.play(animation)
+	# The run cycle follows the actual speed, so feet do not slide while
+	# speeding up or skidding to a stop.
+	sprite.speed_scale = clampf(absf(velocity.x) / run_speed, 0.5, 1.25) if animation == &"run" else 1.0
+	# Flicker while invulnerable after a hit (not during a dodge).
+	var flicker := health.is_invulnerable() and not is_dodging()
+	_visual.visible = not body_hidden and (_dead or not flicker or int(Time.get_ticks_msec() / 60) % 2 == 0)
 
 
 ## Which animation fits what the host is doing right now. Order matters:
@@ -145,6 +172,8 @@ func _pick_animation() -> StringName:
 		return &"die"
 	if _hurt_timer > 0.0:
 		return &"hurt"
+	if is_dodging():
+		return &"dodge"
 	if _attack_cooldown_timer > attack_cooldown - 0.18:
 		return &"attack"
 	if _clinging:
@@ -160,9 +189,13 @@ func is_dead() -> bool:
 	return _dead
 
 
-## True when the player is in control (alive, not reeling from a hit).
+## True when the player is in control (alive, not reeling from a hit, not rolling).
 func can_act() -> bool:
-	return not _dead and _hurt_timer <= 0.0
+	return not _dead and _hurt_timer <= 0.0 and not is_dodging()
+
+
+func is_dodging() -> bool:
+	return _dodge_timer > 0.0
 
 
 ## Mutation host interface (see MutationAbility): the player's abilities follow input.
@@ -223,7 +256,7 @@ func _handle_attack() -> void:
 	if _attack_timer <= 0.0 and _attack_hitbox.active:
 		_attack_hitbox.deactivate()
 		_slash.visible = false
-	if Input.is_action_just_pressed("attack") and _attack_cooldown_timer <= 0.0 and not _clinging:
+	if Input.is_action_just_pressed("attack") and _attack_cooldown_timer <= 0.0 and not _clinging and not is_dodging():
 		_attack_hitbox.activate()
 		_slash.visible = true
 		_attack_timer = attack_active_time
@@ -237,6 +270,7 @@ func _on_hurt(amount: int, from: Vector2, knockback: float) -> void:
 		away = -facing()
 	velocity = Vector2(away * knockback, -knockback * 0.6)
 	_hurt_timer = hurt_stun
+	_dodge_timer = 0.0
 	_attack_hitbox.deactivate()
 	_slash.visible = false
 	DamageNumber.spawn(get_parent(), global_position, amount, Color(1, 0.4, 0.4))
@@ -288,6 +322,8 @@ func _tick_timers(delta: float) -> void:
 	_attack_timer -= delta
 	_attack_cooldown_timer -= delta
 	_hurt_timer -= delta
+	_dodge_timer -= delta
+	_dodge_cooldown_timer -= delta
 	if Input.is_action_just_pressed("jump"):
 		_jump_buffer_timer = jump_buffer_time
 
@@ -311,6 +347,28 @@ func _apply_gravity(delta: float) -> void:
 	var g := _gravity if velocity.y < 0.0 else _gravity * fall_gravity_multiplier
 	var max_speed := wall_slide_speed if _clinging else max_fall_speed
 	velocity.y = minf(velocity.y + g * delta, max_speed)
+
+
+## Starts a roll on the ground: the way you push, or the way you face.
+func _try_dodge(input_dir: float) -> void:
+	if not Input.is_action_just_pressed("dodge") or _dodge_cooldown_timer > 0.0:
+		return
+	if not is_on_floor() or _clinging:
+		return
+	_dodge_dir = signf(input_dir) if input_dir != 0.0 else _facing
+	_facing = _dodge_dir
+	_dodge_timer = dodge_time
+	_dodge_cooldown_timer = dodge_time + dodge_cooldown
+	health.grant_invulnerability(dodge_invulnerable_time)
+	_attack_hitbox.deactivate()
+	_slash.visible = false
+	_dust.restart()
+	Sfx.play(&"dodge")
+
+
+func _apply_dodge() -> void:
+	var t := 1.0 - _dodge_timer / dodge_time  # 0 at the start, 1 at the end.
+	velocity.x = _dodge_dir * dodge_speed * (1.0 - 0.6 * t * t)
 
 
 func _apply_run(input_dir: float, delta: float) -> void:

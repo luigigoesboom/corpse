@@ -43,47 +43,87 @@ func run() -> void:
 	check(spikes < n / 200, "fewer than 0.5% of frames are spikes")
 
 
-## Runs right for 2.5 s and tracks where the player is drawn on screen. With
-## physics interpolation the camera keeps the drawn player steady; without it
-## (60 physics steps on a faster screen) it zig-zags back and forth.
-## The renderer draws interpolated nodes between their last two physics
-## positions; the GameCamera's Camera2D is one of them (Phantom Camera moves it
-## in physics frames), so both are modelled the same way here.
+## Runs right, then stops, and tracks where the player is actually drawn:
+## a magenta marker on the player and a row of them in the world are found in
+## every rendered frame (read back from the screen, so interpolation, camera
+## damping and pixel snapping are all included).
+## Running: the player must not wobble back and forth on screen (it did, 1 px,
+## when camera and player were rounded to pixels separately).
+## Stopping: the view must settle without swinging back (it bounced when the
+## camera led by velocity).
 func _check_running_is_smooth() -> void:
-	player.teleport(Vector2(300, 3178))
-	await wait_frames(30)
-	var interpolated: bool = ProjectSettings.get_setting("physics/common/physics_interpolation")
-	var camera: Camera2D = get_viewport_camera()
-	var camera_interpolated: bool = camera.is_physics_interpolated_and_enabled()
-	var track := {"prev": player.global_position, "cur": player.global_position,  # Lambdas copy plain locals.
-		"cam_prev": camera.get_screen_center_position(), "cam_cur": camera.get_screen_center_position()}
-	var follow := func():
-		track.prev = track.cur
-		track.cur = player.global_position
-		track.cam_prev = track.cam_cur
-		track.cam_cur = camera.get_screen_center_position()
-	physics_frame.connect(follow)
+	player.teleport(Vector2(400, 3170))
+	await wait_frames(60)
+	var unshaded := load("res://assets/materials/unshaded.tres")
+	var markers: Array[Node] = []
+	for i in 13:
+		var dot := ColorRect.new()
+		dot.color = Color.MAGENTA
+		dot.size = Vector2(2, 2)
+		dot.z_index = 100
+		dot.material = unshaded
+		if i == 0:
+			dot.position = Vector2(0, -40)  # Above the player's head.
+			player.add_child(dot)
+		else:
+			dot.position = Vector2(300 + i * 100, 3100)  # A row in the world.
+			game.add_child(dot)
+		markers.append(dot)
+	await wait_frames(3)
+	var samples := []  # [ms, player screen x, world row phase]
 	Input.action_press("move_right")
-	var xs: Array[float] = []
 	var start := Time.get_ticks_msec()
-	while Time.get_ticks_msec() - start < 2500:
+	while Time.get_ticks_msec() - start < 3500:
 		await process_frame
-		# Interpolation on: drawn between the last two physics positions. Off: drawn where it is.
-		var f := Engine.get_physics_interpolation_fraction()
-		var drawn: Vector2 = track.prev.lerp(track.cur, f) if interpolated else player.global_position
-		var view: Vector2 = track.cam_prev.lerp(track.cam_cur, f) if camera_interpolated else camera.get_screen_center_position()
-		xs.append(drawn.x - view.x)
+		var ms := Time.get_ticks_msec() - start
+		if ms > 2000 and Input.is_action_pressed("move_right"):
+			Input.action_release("move_right")
+		var found := _find_markers(root.get_texture().get_image())
+		if found.size() == 2:
+			samples.append([ms, found[0], found[1]])
 	Input.action_release("move_right")
-	physics_frame.disconnect(follow)
-	var steady := xs.slice(xs.size() / 2)
-	var reversals := 0
-	for i in range(2, steady.size()):
-		var a: float = steady[i - 1] - steady[i - 2]
-		var b: float = steady[i] - steady[i - 1]
-		if a * b < 0.0 and absf(a) > 0.25 and absf(b) > 0.25:
-			reversals += 1
-	check(reversals < steady.size() / 20, "running looks smooth on screen (%d zig-zags in %d frames, camera interpolated: %s)" % [reversals, steady.size(), camera_interpolated])
+	for dot in markers:
+		dot.queue_free()
+	var running := samples.filter(func(s): return s[0] > 300 and s[0] < 1900).map(func(s): return s[1])
+	var stopping := samples.filter(func(s): return s[0] > 2000).map(func(s): return s[1])
+	var wobbles := _reversals(running)
+	check(running.size() > 60 and wobbles < running.size() / 20, "running: the player is steady on screen (%d wobbles in %d frames)" % [wobbles, running.size()])
+	var swings := _reversals(stopping)
+	check(stopping.size() > 60 and swings <= 3, "stopping: the view settles without swinging back (%d reversals)" % swings)
 
 
-func get_viewport_camera() -> Camera2D:
-	return root.get_viewport().get_camera_2d()
+## Screen x of the player marker and of the leftmost world marker, from the
+## magenta pixels in a frame. The world row is the y with the most of them.
+func _find_markers(img: Image) -> Array:
+	var by_row := {}
+	for y in img.get_height():
+		for x in img.get_width():
+			var c := img.get_pixel(x, y)
+			if c.r > 0.85 and c.b > 0.85 and c.g < 0.2:
+				if not by_row.has(y):
+					by_row[y] = []
+				by_row[y].append(x)
+	if by_row.is_empty():
+		return []
+	var world_y: int = by_row.keys().reduce(func(a, b): return a if by_row[a].size() >= by_row[b].size() else b)
+	var player_x := -1
+	for y in by_row:
+		if absi(y - world_y) > 3:
+			player_x = by_row[y].min()
+	if player_x < 0:
+		return []
+	return [player_x, by_row[world_y].min()]
+
+
+## How often a sequence turns around (ignoring frames where it stands still).
+func _reversals(xs: Array) -> int:
+	var last_step := 0
+	var count := 0
+	for i in range(1, xs.size()):
+		var step: int = signi(xs[i] - xs[i - 1])
+		if step == 0:
+			continue
+		if last_step != 0 and step != last_step:
+			count += 1
+		last_step = step
+	return count

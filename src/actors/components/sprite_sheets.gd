@@ -12,7 +12,7 @@ extends RefCounted
 
 const FPS := {
 	&"idle": 5.0, &"run": 10.0, &"move": 8.0, &"jump": 8.0, &"fall": 8.0, &"cling": 6.0,
-	&"windup": 8.0, &"attack": 16.0, &"hurt": 10.0, &"die": 8.0,
+	&"windup": 8.0, &"attack": 16.0, &"hurt": 10.0, &"die": 8.0, &"dodge": 14.0,
 }
 const DEFAULT_FPS := 8.0
 const ONE_SHOT: Array[StringName] = [&"windup", &"attack", &"hurt", &"die"]

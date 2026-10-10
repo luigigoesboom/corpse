@@ -7,7 +7,8 @@ extends Node2D
 ##
 ## Framing (D-023): the target stands low on screen, like Blasphemous, so most
 ## of the view is the space you move through rather than the rock under your
-## feet. Falling fast swings the view down to show where you will land.
+## feet. The view leads the way the target faces. Falling fast swings the view
+## down to show where you will land.
 ## Phantom Camera concepts: the PhantomCamera2D decides where the view should
 ## be (follow mode, offset, damping, lookahead); the host moves the real
 ## Camera2D there every physics frame.
@@ -30,9 +31,12 @@ const SHAKE_LAYER := 1
 ## Damping per axis in seconds: higher is lazier. Vertical is lazier so small
 ## jumps do not bob the whole view.
 @export var damping := Vector2(0.12, 0.22)
-## Seconds of horizontal movement the view leads by (velocity based).
-@export var lookahead_time := 0.3
-@export var lookahead_max_speed := 260.0
+## How far the view leads in the direction the target faces, in px. Facing
+## based, not velocity based: stopping does not swing the view back (that read
+## as bouncing); only turning around pans it across.
+@export var lead := 48.0
+## How fast the lead pans across when turning, in px/s.
+@export var lead_speed := 150.0
 
 var pcam: Node2D
 var camera: Camera2D
@@ -40,6 +44,8 @@ var _shake: Node
 
 
 func _ready() -> void:
+	# After the PhantomCameraHost (300) has placed the camera this physics step.
+	process_physics_priority = 301
 	camera = Camera2D.new()
 	camera.name = "Camera2D"
 	# Physics interpolation is on (project setting): the camera must move in
@@ -55,11 +61,8 @@ func _ready() -> void:
 	pcam.follow_offset = Vector2(0, -framing_height)
 	pcam.follow_damping = true
 	pcam.follow_damping_value = damping
-	pcam.lookahead = true
-	pcam.lookahead_time = Vector2(lookahead_time, 0.0)
-	pcam.lookahead_max = true
-	pcam.lookahead_max_value = Vector2(lookahead_max_speed, 0.0)
-	pcam.snap_to_pixel = true  # Whole pixels, so pixel art does not shimmer.
+	# No snap_to_pixel: see _physics_process for how the camera stays on the
+	# pixel grid relative to the target instead.
 	pcam.noise_emitter_layer = SHAKE_LAYER
 	if target:
 		pcam.global_position = target.global_position + pcam.follow_offset
@@ -84,14 +87,24 @@ func _physics_process(delta: float) -> void:
 		return
 	var velocity: Vector2 = target.get(&"velocity")
 	var height := fall_framing_height if velocity.y > fall_look_speed else framing_height
+	var facing: float = target.call(&"facing") if target.has_method(&"facing") else 1.0
 	var offset: Vector2 = pcam.follow_offset
+	offset.x = move_toward(offset.x, facing * lead, lead_speed * delta)
 	offset.y = move_toward(offset.y, -height, framing_speed * delta)
 	pcam.follow_offset = offset
+	# Keep the camera a whole number of pixels away from the target. The
+	# project snaps 2D transforms to pixels, rounding target and camera
+	# separately; with a fractional gap between them the two roundings
+	# disagreed now and then and the player wobbled 1 px while running
+	# (measured on rendered frames). A whole-pixel gap rounds the same way.
+	var gap := camera.global_position - target.global_position
+	camera.global_position = target.global_position + gap.round()
 
 
 ## Jumps straight to the target, skipping damping (after a teleport, a load).
 func snap() -> void:
-	pcam.follow_offset = Vector2(0, -framing_height)
+	var facing: float = target.call(&"facing") if target and target.has_method(&"facing") else 1.0
+	pcam.follow_offset = Vector2(facing * lead, -framing_height)
 	pcam.teleport_position()
 	camera.reset_physics_interpolation()
 
