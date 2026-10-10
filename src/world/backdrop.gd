@@ -1,8 +1,54 @@
 extends CanvasLayer
-## Feeds the camera position to the backdrop shader every frame.
+## Feeds the backdrop shader every frame: where the camera is, how big the
+## view is, and a tint for the kind of rock around the camera (D-028), eased
+## so walking from flesh into bile slowly turns the back wall green.
+
+const TINTS := {
+	&"flesh": Color(1.0, 1.0, 1.0),
+	&"bile": Color(0.72, 1.0, 0.5),
+	&"bruise": Color(0.72, 0.58, 1.15),
+	&"bone": Color(0.9, 0.86, 0.82),
+	&"rot": Color(1.0, 0.78, 0.5),
+}
+## How fast the tint follows the camera (per second).
+const EASE := 1.2
+
+var _kinds: Image
+var _tint := Color.WHITE
 
 
-func _process(_delta: float) -> void:
+func _ready() -> void:
+	if FileAccess.file_exists(WorldMap.KINDS_PATH) or ResourceLoader.exists(WorldMap.KINDS_PATH):
+		_kinds = WorldMap.read_image(WorldMap.KINDS_PATH)
+
+
+func _process(delta: float) -> void:
 	var camera := get_viewport().get_camera_2d()
-	if camera:
-		$Wall.material.set_shader_parameter("camera_position", camera.get_screen_center_position())
+	if camera == null:
+		return
+	var centre := camera.get_screen_center_position()
+	var material: ShaderMaterial = $Wall.material
+	material.set_shader_parameter("camera_position", centre)
+	material.set_shader_parameter("screen_size", get_viewport().get_visible_rect().size)
+	_tint = _tint.lerp(_target_tint(centre), clampf(delta * EASE, 0.0, 1.0))
+	material.set_shader_parameter("tint", Vector3(_tint.r, _tint.g, _tint.b))
+
+
+## The average tint of the kinds of rock painted around a point.
+func _target_tint(at: Vector2) -> Color:
+	if _kinds == null:
+		return Color.WHITE
+	var sum := Color(0, 0, 0)
+	var tile := Vector2i((at / ChunkData.TILE_PX).floor())
+	var n := 0
+	for dy in range(-8, 9, 4):
+		for dx in range(-12, 13, 4):
+			sum += TINTS[ChunkData.KINDS[_kind_at(tile + Vector2i(dx, dy))]]
+			n += 1
+	return sum / n
+
+
+func _kind_at(tile: Vector2i) -> int:
+	if tile.x < 0 or tile.y < 0 or tile.x >= _kinds.get_width() or tile.y >= _kinds.get_height():
+		return 0
+	return WorldMap.kind_of_color(_kinds.get_pixelv(tile))

@@ -28,6 +28,8 @@ const BAYER := [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
 var width: int
 var height: int
 var pal: RefCounted
+## Off for backgrounds: no silhouette outlines and no lines between shapes.
+var outlines := true
 
 var _shapes: Array = []
 var _details: Array = []  # [Vector2i, Color, glow]
@@ -148,7 +150,7 @@ func render() -> Dictionary:
 				glow.set_pixel(x, y, pal.step(_shapes[gid].ramp, -1))
 	# Lines where a shape lies behind another.
 	var lines: Array = []
-	for y in height:
+	for y in (height if outlines else 0):
 		for x in width:
 			var id = _ids[y * width + x]
 			if id < 0 or not _shapes[id].opts.get("line", true):
@@ -166,7 +168,7 @@ func render() -> Dictionary:
 	# Outline: selective on the lit side, near-black elsewhere.
 	var outline: Color = pal.outline()
 	var marks: Array = []
-	for y in height:
+	for y in (height if outlines else 0):
 		for x in width:
 			if _ids[y * width + x] >= 0:
 				continue

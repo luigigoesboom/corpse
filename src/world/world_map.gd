@@ -40,7 +40,12 @@ static func load_from(path: String = DEFAULT_PATH) -> WorldMap:
 func kind_at(tile: Vector2i) -> int:
 	if kinds == null or tile.x < 0 or tile.y < 0 or tile.x >= kinds.get_width() or tile.y >= kinds.get_height():
 		return 0
-	var c := kinds.get_pixelv(tile)
+	return kind_of_color(kinds.get_pixelv(tile))
+
+
+## The kind a painted color means (index into ChunkData.KINDS): transparent
+## is flesh, otherwise the nearest of KIND_PAINT.
+static func kind_of_color(c: Color) -> int:
 	if c.a < 0.5:
 		return 0
 	var best := 0
