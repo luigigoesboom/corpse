@@ -10,17 +10,17 @@
 [ext_resource type="Script" path="res://src/actors/components/layered_sprite.gd" id="8_sprite"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
-radius = 10.0
-height = 44.0
+radius = 12.0
+height = 52.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_reach"]
-size = Vector2(72, 56)
+size = Vector2(88, 72)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hurt"]
-size = Vector2(18, 40)
+size = Vector2(26, 52)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
-size = Vector2(44, 32)
+size = Vector2(64, 46)
 
 [sub_resource type="Gradient" id="Gradient_dust"]
 colors = PackedColorArray(0.75, 0.5, 0.5, 0.8, 0.75, 0.5, 0.5, 0)
@@ -42,31 +42,32 @@ shape = SubResource("CapsuleShape2D_body")
 material = ExtResource("7_unshaded")
 script = ExtResource("8_sprite")
 body_frames_dir = "res://assets/art/hosts/colonist"
+frame_offset = Vector2(0, -6)
 
 [node name="Sockets" type="Node2D" parent="Visual"]
 
 [node name="socket_head" type="Marker2D" parent="Visual/Sockets"]
-position = Vector2(0, -22)
+position = Vector2(0, -41)
 
 [node name="socket_mouth" type="Marker2D" parent="Visual/Sockets"]
-position = Vector2(9, -10)
+position = Vector2(13, -23)
 
 [node name="socket_back" type="Marker2D" parent="Visual/Sockets"]
-position = Vector2(-9, -6)
+position = Vector2(-13, -18)
 
 [node name="socket_arm" type="Marker2D" parent="Visual/Sockets"]
-position = Vector2(8, 2)
+position = Vector2(12, -6)
 
 [node name="socket_belly" type="Marker2D" parent="Visual/Sockets"]
-position = Vector2(9, 8)
+position = Vector2(13, 3)
 
 [node name="Slash" type="Polygon2D" parent="Visual"]
 material = ExtResource("7_unshaded")
 color = Color(1, 0.95, 0.85, 0.85)
-polygon = PackedVector2Array(14, -22, 32, -16, 44, -2, 42, 12, 30, 16, 36, 4, 34, -8, 24, -16)
+polygon = PackedVector2Array(20, -32, 46, -23, 64, -3, 61, 17, 44, 23, 52, 6, 49, -12, 35, -23)
 
 [node name="AttackHitbox" type="Area2D" parent="Visual"]
-position = Vector2(32, -2)
+position = Vector2(46, -3)
 collision_layer = 16
 collision_mask = 0
 script = ExtResource("4_hitbox")
@@ -102,14 +103,14 @@ shape = SubResource("RectangleShape2D_reach")
 
 [node name="Light" type="PointLight2D" parent="."]
 shadow_enabled = true
-position = Vector2(0, -6)
+position = Vector2(0, -9)
 color = Color(1, 0.86, 0.72, 1)
 energy = 0.8
 texture = ExtResource("6_light")
 texture_scale = 3.0
 
 [node name="Dust" type="CPUParticles2D" parent="."]
-position = Vector2(0, 22)
+position = Vector2(0, 26)
 emitting = false
 amount = 10
 lifetime = 0.45
@@ -134,7 +135,7 @@ lifetime = 12.0
 preprocess = 12.0
 local_coords = false
 emission_shape = 3
-emission_rect_extents = Vector2(700, 400)
+emission_rect_extents = Vector2(420, 260)
 direction = Vector2(0, -1)
 spread = 180.0
 gravity = Vector2(0, -2)
@@ -143,10 +144,3 @@ initial_velocity_max = 10.0
 scale_amount_min = 1.0
 scale_amount_max = 2.0
 color_ramp = SubResource("Gradient_spores")
-
-[node name="Camera2D" type="Camera2D" parent="."]
-position_smoothing_enabled = true
-position_smoothing_speed = 5.0
-drag_vertical_enabled = true
-drag_top_margin = 0.15
-drag_bottom_margin = 0.1

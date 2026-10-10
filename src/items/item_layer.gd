@@ -78,7 +78,7 @@ func _drop_position() -> Vector2:
 	var wall := space.intersect_ray(PhysicsRayQueryParameters2D.create(center, front, 1))
 	var from := center if wall else front
 	var floor_hit := space.intersect_ray(PhysicsRayQueryParameters2D.create(from, from + Vector2(0, 4000), 1))
-	return floor_hit.position if floor_hit else from + Vector2(0, 22)
+	return floor_hit.position if floor_hit else from + Vector2(0, 26)  # The host's feet.
 
 
 func _on_pickup_requested(item: Node) -> void:

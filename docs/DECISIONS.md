@@ -89,7 +89,7 @@ Format: ID, date, decision, why, what it rules out.
 - Why: the developer preferred the loose arena after playing both. Fits pillar 4 (many answers to one problem).
 - Consequences: friendly fire becomes the default in the world; tuning favors readable but not twitchy enemies; precision platforming stays in movement, not in combat.
 
-**D-019 Base resolution 960 x 540** (2026-10-10, replaces the resolution part of D-014)
+**D-019 Base resolution 960 x 540** (2026-10-10, replaces the resolution part of D-014; replaced by D-023)
 - What: the game renders at 960 x 540 (was 1280 x 720). Tiles stay 32 px; about 30 x 17 tiles on screen.
 - Why: the developer wanted the view slightly zoomed in, and 960 x 540 scales by exactly 2 on 1080p (and 4 on 4K), so pixels stay even. 1280 x 720 scaled by 1.5 on 1080p, which made pixels uneven and camera motion steppy. A Camera2D zoom would have brought uneven pixels back.
 - Trade-off: less of the world visible at once. 1440p scales by 2.67 (uneven), acceptable.
@@ -103,6 +103,16 @@ Format: ID, date, decision, why, what it rules out.
 - What: each death rolls a time gap tier (a few days / some months / years / decades). The tier sets a strength 0..1 and advances the year. A short list of aftermath rules applies at that strength: old bodies get scavenged and their mutations rot (the newest body always keeps something), killed creatures may be replaced, dropped items may vanish, and the death plus what happened is written to an event log. The player sees "N years later" and a hint or two, not a list.
 - Why: keeps the pitch (every death moves history forward) without simulating years: nothing ages, the hand-placed world stays hand-placed, and each system opts in with its own small rule. Phase 4 factions add rules instead of a calendar sim.
 - Rules out: year-by-year simulation between lives, for now.
+
+**D-022 Floors have a 2.5D top face** (2026-10-10; face depth and sink changed by D-023: 12 px and 6 px)
+- What: tiles with air above show a top face along their top 6 px, lighter than the side, like Blasphemous. Walls and ceilings stay flat. Floor collision starts `ChunkData.FLOOR_SINK` (4) px below the tile's top edge, so characters stand in the face instead of on its back edge. Hand-placed floor things go at tile top + 4.
+- Why: gives the flat side view depth and makes floors read as walkable surfaces at a glance, at the cost of one face per up-open tile.
+- Consequences: tile art reserves the top 6 px of up-open tiles for the face. Ledges are 4 px lower to land on and 1-tile platforms 4 px thinner; jump heights are unchanged. Anything placed by raycast (corpses, dropped items) needs no change.
+
+**D-023 Blasphemous-like view: 640 x 360, 64 px hosts, low camera, stone ground** (2026-10-10, replaces D-019; changes D-022's numbers)
+- What: the game renders at 640 x 360 (was 960 x 540). Hosts are 64 x 64 frames, drawn about 56 px tall (was 48 / 41), collision capsule 52 px. The camera is Phantom Camera (`GameCamera`, src/camera): the player stands at about 77% of the screen height, the view leads horizontally with movement, swings down when falling fast, damped; shake is a Phantom Camera noise emitter. Floors have a 12 px top face (was 6) and `FLOOR_SINK` is 6 (was 4); all rock gets a textured cobble fill instead of fading to black. UI: 10 px text, anti-aliasing off, layouts shrunk to fit.
+- Why: the developer wanted the point of view and style of Blasphemous: bigger tiles and characters on screen, less empty rock below the floor. 640 x 360 is also an exact integer scale on 1080p (3x), 1440p (4x, which 960 x 540 was not) and 4K (6x).
+- Trade-offs: about 20 x 11 tiles on screen (was 30 x 17): less of the world visible at once. 2-tile tunnels are now tight. Creatures stay 48 px for now and look smaller next to the host. 10 px text with the default font is small; a pixel font would fix it (assets/fonts).
 
 ---
 

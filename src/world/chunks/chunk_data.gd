@@ -20,6 +20,12 @@ const OPEN_UP := 1
 const OPEN_RIGHT := 2
 const OPEN_DOWN := 4
 const OPEN_LEFT := 8
+## Floors (D-022, D-023): a tile with air above has a 12 px top face drawn
+## along its top edge, and its collision starts this many px lower, so feet
+## stand in the middle of the face instead of on its back edge. Things placed
+## by hand on a floor go at the tile's top edge + FLOOR_SINK; things placed
+## by raycast land there anyway.
+const FLOOR_SINK := 6
 
 var coord: Vector2i
 ## SIZE * SIZE cells, row by row. Index with index_of(x, y).

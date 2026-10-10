@@ -3,6 +3,7 @@
 [ext_resource type="TileSet" path="res://assets/art/tiles/test_tileset.tres" id="1_tiles"]
 [ext_resource type="PackedScene" path="res://src/actors/player/player.tscn" id="2_player"]
 [ext_resource type="Script" path="res://src/debug/debug_overlay.gd" id="3_overlay"]
+[ext_resource type="PackedScene" path="res://src/camera/game_camera.tscn" id="90_camera"]
 
 [node name="TestRoom" type="Node2D"]
 
@@ -12,6 +13,9 @@ tile_set = ExtResource("1_tiles")
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 position = Vector2(208, 522)
+
+[node name="GameCamera" parent="." node_paths=PackedStringArray("target") instance=ExtResource("90_camera")]
+target = NodePath("../Player")
 
 [node name="DebugOverlay" type="CanvasLayer" parent="." node_paths=PackedStringArray("player")]
 script = ExtResource("3_overlay")

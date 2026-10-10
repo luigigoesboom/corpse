@@ -34,7 +34,6 @@ func _ready() -> void:
 	WorldState.set_data(data)
 	_player.health.max_health = player_health
 	_player.respawn($PlayerSpawn.global_position)
-	_player.get_node("Camera2D").reset_smoothing()
 	$UI/HUD.bind_health(_player.health)
 	EventBus.entity_killed.connect(_on_enemy_killed)
 	EventBus.hit_landed.connect(_on_hit_landed)

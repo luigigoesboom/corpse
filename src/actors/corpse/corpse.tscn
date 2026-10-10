@@ -20,7 +20,7 @@ shape = SubResource("RectangleShape2D_reach")
 
 [node name="Sprite" type="Node2D" parent="Visual"]
 script = ExtResource("2_sprite")
-frame_offset = Vector2(0, -24)
+frame_offset = Vector2(0, -32)
 
 [node name="Prompt" type="Label" parent="."]
 material = ExtResource("3_unshaded")
@@ -30,5 +30,5 @@ offset_right = 110.0
 offset_bottom = -26.0
 horizontal_alignment = 1
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 4
+theme_override_constants/outline_size = 3
 text = "E: search the body"

@@ -12,6 +12,11 @@ extends CharacterBody2D
 ## - Variable height: letting go of jump early cuts the jump short.
 ## - Heavier gravity when falling, so jumps feel snappy instead of floaty.
 ## - Wall cling: push into a wall in the air to slide down slowly, jump to kick off.
+##
+## The camera is not part of the player: a GameCamera in the scene follows it.
+
+## Emitted by teleport(): the camera should jump here instead of panning.
+signal teleported
 
 @export_group("Run")
 @export var run_speed := 240.0
@@ -73,9 +78,6 @@ var _facing := 1.0
 var _was_on_floor := true
 ## Hides the host while it lies dead (its Corpse is drawn instead).
 var body_hidden := false
-## Screen shake strength in pixels; fades out by itself.
-var _shake := 0.0
-var _look := Vector2.ZERO
 
 @onready var health: Health = $Health
 @onready var _visual: Node2D = $Visual
@@ -83,7 +85,6 @@ var _look := Vector2.ZERO
 @onready var _attack_hitbox: Hitbox = $Visual/AttackHitbox
 @onready var _slash: Node2D = $Visual/Slash
 @onready var _mutations: MutationHost = $Mutations
-@onready var _camera: Camera2D = $Camera2D
 @onready var _dust: CPUParticles2D = $Dust
 @onready var sprite: LayeredSprite = $Visual/Sprite
 
@@ -135,17 +136,6 @@ func _process(delta: float) -> void:
 	sprite.play(_pick_animation())
 	# Flicker while invulnerable after a hit.
 	_visual.visible = not body_hidden and (_dead or not health.is_invulnerable() or int(Time.get_ticks_msec() / 60) % 2 == 0)
-	# Look ahead: the camera leans the way you face, and down when falling fast.
-	var look := Vector2(_facing * 40.0, clampf(velocity.y * 0.08, -12.0, 56.0))
-	_look = _look.lerp(look, minf(1.0, delta * 2.5))
-	# Shake: a random jolt each frame, whole pixels so pixel art stays crisp.
-	var jolt := Vector2(randf_range(-1, 1), randf_range(-1, 1)) * _shake
-	_camera.offset = (_look + jolt).round()
-	_shake = move_toward(_shake, 0.0, delta * 40.0)
-
-
-func shake(strength: float) -> void:
-	_shake = maxf(_shake, strength)
 
 
 ## Which animation fits what the host is doing right now. Order matters:
@@ -221,12 +211,12 @@ func respawn(at: Vector2) -> void:
 
 ## Moves instantly. Physics interpolation (project setting) draws movement
 ## smoothly between physics steps; after a jump across the map it must be
-## told not to slide there.
+## told not to slide there. The GameCamera listens to `teleported` and jumps too.
 func teleport(at: Vector2) -> void:
 	global_position = at
 	velocity = Vector2.ZERO
 	reset_physics_interpolation()
-	_camera.reset_smoothing()
+	teleported.emit()
 
 
 func _handle_attack() -> void:

@@ -17,7 +17,7 @@ var _label := Label.new()
 func _ready() -> void:
 	layer = 100
 	_label.position = Vector2(8, 48)  # Below the HUD health pips.
-	_label.add_theme_constant_override("outline_size", 6)
+	_label.add_theme_constant_override("outline_size", 4)
 	_label.add_theme_color_override("font_outline_color", Color.BLACK)
 	add_child(_label)
 	visible = false

@@ -2,9 +2,11 @@ class_name CombatFeel
 extends Node
 ## Makes hits feel like hits: a sound, screen shake, and hitstop (the world
 ## freezes for a few hundredths of a second when a blow lands).
-## Put one in any scene with combat and point it at the player.
+## Put one in any scene with combat and point it at the player and the camera.
 
 @export var player: Node2D
+## Shaken on every hit (a GameCamera; optional).
+@export var camera: Node2D
 ## Tests turn this off: the freeze slows the frames they count.
 @export var hitstop_enabled := true
 @export var hitstop_on_enemy := 0.045
@@ -27,8 +29,8 @@ func _exit_tree() -> void:
 func _on_hit_landed(target: Node, _amount: int) -> void:
 	var on_player := target == player
 	Sfx.play(&"hurt" if on_player else &"hit", target.global_position)
-	if player:
-		player.shake(shake_on_player if on_player else shake_on_enemy)
+	if camera:
+		camera.shake(shake_on_player if on_player else shake_on_enemy)
 	if hitstop_enabled:
 		_hitstop(hitstop_on_player if on_player else hitstop_on_enemy)
 

@@ -3,8 +3,10 @@ extends MutationAbility
 
 const PROJECTILE := preload("res://src/mutations/acid_projectile.tscn")
 const COOLDOWN := 0.7
-## Mostly flat, so it hits small crawlers instead of arcing over them.
-const SPEED := Vector2(420, -40)
+## Mostly flat and a little downward: the host's mouth is about 49 px above
+## its feet (64 px hosts, D-023), and the glob should drop onto small crawlers
+## like the Gut Leech (21 px tall) instead of flying over them.
+const SPEED := Vector2(420, 30)
 
 var _cooldown := 0.0
 

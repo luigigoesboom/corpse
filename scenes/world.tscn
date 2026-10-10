@@ -51,35 +51,35 @@ host_types = Array[StringName]([&"antibody", &"pilgrim"])
 script = ExtResource("2_entities")
 
 [node name="FleshTender" parent="Entities" instance=ExtResource("3_npc")]
-position = Vector2(1280, 3200)
+position = Vector2(1280, 3206)
 npc_name = "Flesh-Tender"
 
 [node name="ChoirAcolyte" parent="Entities" instance=ExtResource("3_npc")]
-position = Vector2(3200, 3200)
+position = Vector2(3200, 3206)
 npc_name = "Choir Acolyte"
 
 [node name="ShaftHermit" parent="Entities" instance=ExtResource("3_npc")]
-position = Vector2(5280, 832)
+position = Vector2(5280, 838)
 npc_name = "Shaft Hermit"
 
 [node name="LostPilgrim" parent="Entities" instance=ExtResource("3_npc")]
-position = Vector2(7360, 3872)
+position = Vector2(7360, 3878)
 npc_name = "Lost Pilgrim"
 
 [node name="BileBulb" parent="Entities" instance=ExtResource("4_item")]
-position = Vector2(992, 3200)
+position = Vector2(992, 3206)
 item_id = &"bile_bulb"
 
 [node name="BoneShard" parent="Entities" instance=ExtResource("4_item")]
-position = Vector2(736, 3104)
+position = Vector2(736, 3110)
 item_id = &"bone_shard"
 
 [node name="BreathSac" parent="Entities" instance=ExtResource("4_item")]
-position = Vector2(3904, 2240)
+position = Vector2(3904, 2246)
 item_id = &"breath_sac"
 
 [node name="TrainingDummy" parent="Entities" instance=ExtResource("5_dummy")]
-position = Vector2(1760, 3200)
+position = Vector2(1760, 3206)
 
 [node name="LeechChamber" parent="Entities" instance=ExtResource("6_leech")]
 position = Vector2(2600, 3200)
@@ -91,13 +91,13 @@ position = Vector2(6000, 832)
 position = Vector2(7100, 3872)
 
 [node name="FleshTenderCamp" parent="Entities" instance=ExtResource("8_camp")]
-position = Vector2(1150, 3200)
+position = Vector2(1150, 3206)
 
 [node name="Fungus1" parent="Entities" instance=ExtResource("7_fungus")]
-position = Vector2(320, 3200)
+position = Vector2(320, 3206)
 
 [node name="Fungus2" parent="Entities" instance=ExtResource("7_fungus")]
-position = Vector2(1560, 3200)
+position = Vector2(1560, 3206)
 
 [node name="Fungus3" parent="Entities" instance=ExtResource("7_fungus")]
 position = Vector2(600, 2624)
@@ -108,10 +108,10 @@ position = Vector2(1200, 2624)
 hanging = true
 
 [node name="Fungus5" parent="Entities" instance=ExtResource("7_fungus")]
-position = Vector2(2350, 3200)
+position = Vector2(2350, 3206)
 
 [node name="Fungus6" parent="Entities" instance=ExtResource("7_fungus")]
-position = Vector2(3500, 3200)
+position = Vector2(3500, 3206)
 
 [node name="Fungus7" parent="Entities" instance=ExtResource("7_fungus")]
 position = Vector2(2700, 1600)
@@ -122,23 +122,23 @@ position = Vector2(3800, 1600)
 hanging = true
 
 [node name="Fungus9" parent="Entities" instance=ExtResource("7_fungus")]
-position = Vector2(3400, 2912)
+position = Vector2(3400, 2918)
 
 [node name="Fungus10" parent="Entities" instance=ExtResource("7_fungus")]
 position = Vector2(5400, 576)
 hanging = true
 
 [node name="Fungus11" parent="Entities" instance=ExtResource("7_fungus")]
-position = Vector2(5800, 832)
+position = Vector2(5800, 838)
 
 [node name="Fungus12" parent="Entities" instance=ExtResource("7_fungus")]
-position = Vector2(4400, 3872)
+position = Vector2(4400, 3878)
 
 [node name="Fungus13" parent="Entities" instance=ExtResource("7_fungus")]
-position = Vector2(6500, 3872)
+position = Vector2(6500, 3878)
 
 [node name="Fungus14" parent="Entities" instance=ExtResource("7_fungus")]
-position = Vector2(7700, 3872)
+position = Vector2(7700, 3878)
 
 [node name="SpitterChamber" parent="Entities" instance=ExtResource("9_spitter")]
 position = Vector2(3700, 3200)

@@ -88,8 +88,6 @@ func _on_world_loaded() -> void:
 		_player.health.set_current(saved_health)
 	_entities.rebuild()
 	_chunks.reset()
-	# Jump the camera straight there instead of smoothly panning across the map.
-	_player.get_node("Camera2D").reset_smoothing()
 
 
 func _on_player_health_changed(current: int, max_value: int) -> void:
@@ -113,7 +111,7 @@ func _on_player_died() -> void:
 func _ground_below(point: Vector2) -> Vector2:
 	var query := PhysicsRayQueryParameters2D.create(point, point + Vector2(0, 2000), 1)
 	var hit := get_world_2d().direct_space_state.intersect_ray(query)
-	return hit.position if hit else point + Vector2(0, 22)
+	return hit.position if hit else point + Vector2(0, 26)  # The host's feet.
 
 
 ## Time passes (D-021): roll the gap, apply the aftermath, then rebuild what
@@ -168,7 +166,6 @@ func _start_next_life(option: Dictionary = {}) -> void:
 		data.graft(slot, host.start_mutations[slot])
 	_player.apply_host(host)
 	_player.respawn(option.get("position", _world.get_node("PlayerSpawn").global_position))
-	_player.get_node("Camera2D").reset_smoothing()
 	$UI.close_all()
 	EventBus.inventory_changed.emit()
 	EventBus.mutations_changed.emit()

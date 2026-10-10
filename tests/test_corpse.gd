@@ -23,7 +23,7 @@ func run() -> void:
 	await create_timer(1.5).timeout
 	check(corpses.corpse_count() == 1, "the body appears where the host died")
 	var corpse = corpses.get_child(0)
-	check(is_equal_approx(corpse.position.y, 3200.0), "the body lies on the floor, not in the air")
+	check(is_equal_approx(corpse.position.y, 3200.0 + ChunkData.FLOOR_SINK), "the body lies on the floor, not in the air")
 	check(not player.get_node("Visual").visible, "the dying host is replaced by its body")
 
 	game.get_node("UI").death_screen.wake_pressed.emit({})  # Skips time passing (tested in test_aftermath).

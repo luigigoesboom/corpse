@@ -1,0 +1,26 @@
+GIMP Palette
+Name: CORPSE Gut (starter)
+Columns: 6
+#
+# Starter palette for the Gut: the colors the placeholders use, grouped
+# dark to light. Trim it, change it, add to it; aim for about 10-16 in the end.
+ 30  15  18	Outline / near-black
+ 74  15  22	Deep red / mouth
+107  70  86	Rag
+ 77  49  64	Rag shadow
+185 143 120	Skin shadow
+227 196 168	Skin
+ 85  98  42	Leech shadow
+122 138  58	Leech
+167 176  96	Leech belly
+127 154  34	Bile shadow
+184 212  58	Bile
+232 245 144	Bile glow
+185 171 136	Bone shadow
+238 228 200	Bone
+184 111 128	Lung shadow
+227 154 168	Lung
+ 98  51  65	Bulb shadow
+138  74  90	Bulb
+255 224 102	Glow: eyes
+255  74  74	Glow: red eyes

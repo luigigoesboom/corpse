@@ -27,7 +27,7 @@ func run() -> void:
 	await process_frame
 	screen.get_node("%DropButton").pressed.emit()
 	await process_frame
-	check(items.get_child_count() == 1 and is_equal_approx(items.get_child(0).position.y, 3200.0), "a dropped item lands on the floor")
+	check(items.get_child_count() == 1 and is_equal_approx(items.get_child(0).position.y, 3200.0 + ChunkData.FLOOR_SINK), "a dropped item lands on the floor")
 	await ui_action("inventory")
 	check(not screen.visible and not paused, "closing the inventory unpauses")
 

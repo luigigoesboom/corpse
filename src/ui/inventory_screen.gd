@@ -2,7 +2,7 @@ extends Control
 ## The pockets (grid of slots, details, Eat / Drop) and the host's body slots.
 ## Works with mouse, keyboard (arrows + Enter) and gamepad (d-pad + A).
 
-const SLOT_SIZE := Vector2(78, 78)
+const SLOT_SIZE := Vector2(54, 54)
 
 var _selected := 0
 var _slots: Array[Button] = []

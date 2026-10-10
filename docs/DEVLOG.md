@@ -13,6 +13,21 @@ Next:
 
 ---
 
+## Blasphemous-like view (2026-10-10)
+Done: D-023. Base resolution 640 x 360. Phantom Camera wired up: `GameCamera` (Camera2D + PhantomCameraHost + PhantomCamera2D in SIMPLE follow with offset, damping, horizontal lookahead; noise emitter for shake); the player stands low on screen and the view swings down when falling fast; the player no longer owns a camera, `teleport()` emits `teleported`. Hosts regenerated at 64 x 64 (drawn about 56 px), player capsule 52 px, hitboxes, sockets, slash and corpse scaled. Tiles v4: textured cobble ground everywhere, 12 px paved floor face, `FLOOR_SINK` 6, occluders 12 px in on floors; gut_tiles.aseprite and colonist.aseprite rebuilt. UI: 10 px theme with anti-aliasing off, every screen shrunk and checked in screenshots. Acid spit aims slightly down (the mouth is higher now). Render check: the smoothness test now models the interpolated camera too; 0 zig-zags, 165 fps.
+Not done: creatures still 48 px; no pixel font yet; movement speeds untuned for the closer view.
+Next: play it and tune feel (run speed, camera damping, framing height in the GameCamera inspector), then draw.
+
+## Floors with a top face (2026-10-10)
+Done: D-022. The 8 tiles with air above got a Blasphemous-style top face in the placeholder sheet (walls, ceilings and deep rock pixel-identical to before); `gut_tiles.aseprite`'s placeholder layer matches the PNG. Floor collision on those tiles lowered 4 px (`ChunkData.FLOOR_SINK`). 18 hand-placed floor things in world.tscn moved down 4 px (ceiling fungus untouched). New `tests/test_floor.gd`: tileset collision, every placed thing, the player, a leech, a spitter and a corpse all on the floor line. All tests pass.
+Not done: Real tile art (the placeholder face is programmer art).
+Next: Draw the Gut tiles over it.
+
+## Art tools (2026-10-10)
+Done: Aseprite built from source (needed Smart App Control off and VS 2022 moved off the LTSC 17.8 channel: the prebuilt Skia needs MSVC 14.40+). `tools/aseprite/make_source.lua` builds tagged starter files from the placeholder strips; `tools/aseprite/export.lua` writes them back as strips (body, glow, mutation layers). Round trip checked: all 44 leech and colonist strips come back pixel-identical. `gut_leech.aseprite`, `colonist.aseprite` and the starter `gut.gpl` palette are in assets/art/_source. Phantom Camera addon added (not wired up yet). Tiles: `gut_tiles.aseprite` with an open-sides guide layer exports tile by tile into `gut_tiles.png` (now the tileset texture); `scenes/tools/tile_preview.tscn` shows all 18 tiles joined, lit by a mouse light when run.
+Not done: Any real art. Week 25 playtest.
+Next: Draw the Gut tiles, then the Gut Leech (settle palette and outlines, Q-004), then the colonist.
+
 ## Bug fixes from playing (2026-10-10)
 - Running jitter: physics runs 60 steps a second, the developer's screen 165 frames, so the drawn player zig-zagged against the smoothed camera (measured: +2.6 / -1.5 px per frame). Fixed with physics interpolation (project setting); `Player.teleport()` resets it after jumps across the map. Now under 0.15 px per frame. The `--render` test checks it.
 - Leech flipping left and right under a player above it: a 12 px dead zone, and after 2.5 s out of reach it gives up and ignores the player for 3 s. test_ai.gd reproduces the old behaviour (66 flips in 5 s) and checks the fix (0). Bile Spitter got the same dead zone.
