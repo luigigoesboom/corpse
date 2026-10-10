@@ -52,8 +52,23 @@ func rebuild() -> void:
 		if WorldState.data.removed_entities.has(key):
 			continue
 		var entity := template.duplicate() as Node2D
+		_drop_runtime_children(entity)
 		entity.set_meta(&"entity_key", key)
 		_buckets.get_or_add(ChunkData.world_to_chunk(entity.position), []).append(entity)
+
+
+## The templates ran _ready() once (in world.tscn, before attach()), so they
+## hold nodes their scripts built at runtime (a LayeredSprite's frames, a
+## MutationHost's parts). duplicate() copies those too, and the copy's own
+## _ready() builds them again: two bodies, the stale one a frame behind.
+## Runtime-built nodes have no owner; scene nodes do. Drop the ownerless ones.
+static func _drop_runtime_children(node: Node) -> void:
+	for child in node.get_children():
+		if child.owner == null:
+			node.remove_child(child)
+			child.free()
+		else:
+			_drop_runtime_children(child)
 
 
 ## Detached nodes are not in the tree, so Godot will not free them with the

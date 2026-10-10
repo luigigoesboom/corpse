@@ -13,6 +13,9 @@ Next:
 
 ---
 
+## Fix: placed creatures drawn twice (2026-10-10)
+The developer saw the Matron and leeches look "a frame behind". Cause: EntityLayer copies each hand-placed entity from a template that had already run _ready(), and duplicate() copied the sprites LayeredSprite builds at runtime; the copy then built its own, so every placed creature drew a stale frozen body under the live one. EntityLayer now drops ownerless (runtime-built) nodes from each copy. tests/test_creatures.gd checks one body per creature.
+
 ## Week 37: milestone 4 (2026-10-10)
 Done: the Gullet Matron lives in the deep tunnel below the Choir's watch (placed in world.tscn; world.png is untouched, the tunnel is already a flat pit 4000 px long) and stays dead once killed (worth about 75 ichor down there). Between lives, history now runs year by year for the whole gap (wars, raids, disasters, prophets), with the places you can visit protected, and the last life's deeds echo: kill a chorister and the Choir swears vengeance on that host's name; offer ichor and their chapel fills up; kill the Matron and the Flesh-Tenders send settlers into the deep; leave a body in the Choir's shrine and pilgrims come to it every gap; rob a shrine and its keepers turn bitter. The time screen says what changed. Fixed: boss brood left marks in removed_entities and floated around after her chunk unloaded.
 

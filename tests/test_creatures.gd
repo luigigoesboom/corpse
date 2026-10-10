@@ -10,6 +10,11 @@ func run() -> void:
 	# watch in week 36): stand in sight and get spat at.
 	await goto(Vector2(3800, 2794), 30)
 	var spitter = entity("SpitterChamber")
+	# Hand-placed creatures are copies of templates that already ran _ready():
+	# runtime-built nodes must not be copied along (a second, stale body
+	# drawn a frame behind the real one).
+	var sprite = spitter.get_node("Visual/Sprite")
+	check(sprite.get_child_count() == 1 + sprite._layers.size(), "a placed creature draws one body, not a stale copy too (%d sprites)" % sprite.get_child_count())
 	check(spitter.get_node("Mutations").ability(&"acid_gland") != null, "the spitter has the same Acid Gland ability as the player")
 	await goto(Vector2(3790, 2794), 1)
 	var hp: int = player.health.current
