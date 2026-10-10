@@ -4,8 +4,7 @@ extends RefCounted
 ## Writes assets/art/creatures/<kind>/<kind>_<anim>.png and the glowing parts
 ## (eyes, glands) to <kind>/glow/<kind>_glow_<anim>.png.
 
-const Canvas := preload("res://tools/pixel/canvas.gd")
-const Sheet := preload("res://tools/pixel/sheet.gd")
+const Kit := preload("res://tools/pixel/kit.gd")
 
 const F := 48
 const GROUND := 46.5
@@ -18,20 +17,7 @@ static func make(pal, out: Array) -> void:
 
 
 static func _write(pal, out: Array, kind: String, anims: Dictionary, draw: Callable) -> void:
-	for anim in anims:
-		var bodies = []
-		var glows = []
-		for p in anims[anim]:
-			var c = Canvas.new(F, F, pal)
-			draw.call(c, pal, p)
-			var img: Dictionary = c.render()
-			bodies.append(img.body)
-			glows.append(img.glow)
-		var body = Sheet.strip(bodies)
-		var glow = Sheet.strip(glows)
-		Sheet.save(body, "res://assets/art/creatures/%s/%s_%s.png" % [kind, kind, anim])
-		Sheet.save(glow, "res://assets/art/creatures/%s/glow/%s_glow_%s.png" % [kind, kind, anim])
-		out.append({"name": "%s_%s" % [kind, anim], "body": body, "glow": glow})
+	Kit.write(pal, out, kind, anims, draw, F)
 
 
 # --- Gut Leech ----------------------------------------------------------------------

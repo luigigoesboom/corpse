@@ -111,11 +111,27 @@ Names after `--` are recipes (`tools/pixel/recipes/<name>.gd`, or `all`); `--pre
 | `rig.gd` | `ik()` (two-bone: knees and elbows from where hands and feet go), `reach()`, `turn()`. |
 | `sheet.gd` | `strip()`, `save()`, `preview()`. |
 | `recipes/swatch.gd` | Test card: spheres, tubes, slabs in every ramp. |
+| `kit.gd` | Creature parts and `write()` (see below). |
 | `recipes/creatures.gd` | Gut Leech (seamed segments, belly strip, ring mouth), Bile Spitter (stalk, dithered bulb, bile gland), Rot Fly (see-through wings). 48 px frames, glow strips in `glow/`. |
 | `recipes/matron.gd` | The Gullet Matron, 128 px: seven seamed segments, brood sacs, belly, glowing bile bladder, ring of teeth, four eyes. |
 | `recipes/hosts.gd` | One skeleton for every humanoid; looks (colonist, pilgrim, antibody, tender, chorister) dress it; poses are hand and foot targets; the mutation overlays (acid gland, bone spur, lung sac) are drawn on the same joints. |
 
-Making a new thing: copy the nearest recipe, change the shapes and poses, run with `--preview`, look, repeat. `tests/test_art.gd` checks that everything the program makes stays in the palette.
+Making a new thing: copy the nearest recipe, change the shapes and poses, run with `--preview`, look, repeat. `tests/test_art.gd` checks that everything the program makes stays in the palette. `--gif` also writes every animation as an animated GIF (`tools/pixel/preview/<anim>.gif`, 4x), for devlogs.
+
+## A new creature in an afternoon (week 45)
+
+```
+Godot --headless --path . --script res://tools/creature/new_creature.gd -- <kind> <walker|flyer|floater|rooted>
+Godot --headless --path . --import
+```
+
+`new_creature.gd` writes three files and never overwrites: `tools/pixel/recipes/creature_<kind>.gd` (its look, a placeholder body to start from), `src/actors/creatures/<kind>.gd` (its AI: a whole state machine for that behaviour, extending `Creature`) and `<kind>.tscn` (health, hurtbox, contact and melee hitboxes, sprite, sight), draws the placeholder frames, and prints what is left: draw it, tune it, give it an ichor value, place it, give it sounds. The behaviours: **walker** (wanders, chases, rears up, lunges), **flyer** (hovers, stalks from above, dives), **floater** (drifts toward you, swells, lashes out), **rooted** (waits, strikes what comes in reach).
+
+`tools/pixel/kit.gd` holds the parts creatures are made of: `write()` (renders every pose and saves the strips and glow strips), `sac()` (soft see-through bladders with bent veins), `chain()` + `wave()` (tails, tentacles, worms, swaying), `legs()` (IK), `wing()`, `cilia()`, `eyes()`, `mouth()`, and `placeholder()`. `Creature` (src/actors/creatures/creature.gd) is the shared body: the script fills in `think()` and `animation()`; finding the player, gravity, hurt flash, damage numbers, death, drops, fading and `entity_killed` are done. The Puffsac (recipe `creature_puffsac.gd`) was made this way.
+
+## Devlog clips (week 45)
+
+In a debug build, **F12** starts recording the game's own 640 x 360 picture at 15 frames a second (at most 12 s) and F12 again writes it as a GIF to `user://captures/` (on Windows `%APPDATA%\Godot\app_userdata\Corpse\captures`); it says where when it is done. `GifWriter` (src/debug) is a plain GIF89a encoder: exact colors when a clip has 256 or fewer, else a median-cut palette.
 
 ## Kinds of rock and dressing (D-028)
 

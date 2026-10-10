@@ -142,6 +142,11 @@ Format: ID, date, decision, why, what it rules out.
 - Also: the game will not be on Steam. Roadmap week 45 (Steam page) becomes art-program work; the store-page weeks are reworded.
 - Roadmap: an art-program interlude now, before week 40.
 
+**D-029 The Lungs before onboarding and playtests** (2026-10-11, after week 41)
+- What: the developer asked to go on with week 45 and the next region (the Lungs, weeks 45-52) now. Weeks 42 (onboarding), 43 (playtests) and 44 (vertical slice milestone) wait until after the Lungs.
+- Why: more content first; teaching and playtesting one region would have to be redone once there are two.
+- Consequences: the Gut is not formally signed off as a vertical slice. Onboarding should be built once the Wound / Gut / Lungs start is settled.
+
 ---
 
 ## Open questions

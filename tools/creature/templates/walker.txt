@@ -1,0 +1,71 @@
+extends Creature
+## {{title}}: (what it is, where it lives, how to beat it). Made with
+## tools/creature/new_creature.gd as a walker; its look is
+## tools/pixel/recipes/creature_{{kind}}.gd.
+##
+##   WANDER   walk one way, turn at walls and ledges
+##   CHASE    saw the player: walk at it
+##   WINDUP   close enough: stop and rear up (the tell)
+##   ATTACK   lunge with the Attack hitbox on
+##   RECOVER  a moment to punish it
+
+enum State { WANDER, CHASE, WINDUP, ATTACK, RECOVER }
+
+@export var walk_speed := 50.0
+@export var chase_speed := 110.0
+@export var attack_range := 56.0
+@export var windup_time := 0.45
+@export var lunge_speed := 300.0
+@export var recover_time := 0.6
+
+@onready var _ledge: RayCast2D = $Visual/LedgeCheck
+
+
+func think(delta: float) -> void:
+	match state:
+		State.WANDER:
+			if is_on_wall() or (is_on_floor() and not _ledge.is_colliding()):
+				turn()
+			velocity.x = dir * walk_speed
+			if sees_player(-1.0, 120.0):
+				enter(State.CHASE)
+		State.CHASE:
+			if not player_alive() or to_player().length() > lose_range:
+				enter(State.WANDER)
+				return
+			face(to_player().x)
+			velocity.x = dir * chase_speed if _ledge.is_colliding() else 0.0
+			if absf(to_player().x) < attack_range and absf(to_player().y) < 48.0:
+				enter(State.WINDUP)
+		State.WINDUP:
+			velocity.x = move_toward(velocity.x, 0.0, 900.0 * delta)
+			if state_time > windup_time:
+				velocity.x = dir * lunge_speed
+				strike(0.2)
+				enter(State.ATTACK)
+		State.ATTACK:
+			if state_time > 0.25:
+				enter(State.RECOVER)
+		State.RECOVER:
+			velocity.x = move_toward(velocity.x, 0.0, 900.0 * delta)
+			if state_time > recover_time:
+				enter(State.CHASE)
+
+
+func animation() -> StringName:
+	if is_dead():
+		return &"die"
+	if hurt_time > 0.0:
+		return &"hurt"
+	match state:
+		State.WINDUP:
+			return &"windup"
+		State.ATTACK:
+			return &"attack"
+		State.WANDER, State.CHASE:
+			return &"move"
+	return &"idle"
+
+
+func hurt(_amount: int, from: Vector2, knockback: float) -> void:
+	velocity.x = signf(global_position.x - from.x) * knockback * 0.5

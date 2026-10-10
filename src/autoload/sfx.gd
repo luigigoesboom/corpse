@@ -31,6 +31,7 @@ const SOUNDS := {
 	&"squelch": [-12.0, 1.0, &"SFX"],
 	&"matron_roar": [-2.0, 0.55, &"SFX"], &"matron_slam": [-4.0, 0.8, &"SFX"], &"matron_lunge": [-6.0, 0.9, &"SFX"],
 	&"matron_hurt": [-8.0, 0.75, &"SFX"], &"matron_die": [-2.0, 0.8, &"SFX"], &"matron_phase": [-4.0, 0.8, &"SFX"],
+	&"puffsac_swell": [-12.0, 1.0, &"SFX"], &"puffsac_burst": [-6.0, 1.0, &"SFX"],
 	# The world.
 	&"alert": [-12.0, 1.0, &"SFX"], &"alarm": [-8.0, 0.8, &"SFX"], &"grate": [-8.0, 0.8, &"SFX"],
 	&"latch": [-10.0, 1.0, &"SFX"], &"ichor": [-12.0, 0.7, &"SFX"], &"bank": [-6.0, 0.85, &"UI"],

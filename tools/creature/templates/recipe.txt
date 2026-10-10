@@ -1,0 +1,31 @@
+extends RefCounted
+## {{title}}'s look (D-028, week 45): made by tools/creature/new_creature.gd
+## with the placeholder body from the kit. Replace Look.draw with the real
+## creature, then run
+##   Godot --headless --path . --script res://tools/pixel/run.gd -- creature_{{kind}} --preview --gif
+## Frames are {{size}} x {{size}}, facing right, {{anchor}}.
+
+const Kit := preload("res://tools/pixel/kit.gd")
+
+const F := {{size}}
+
+
+static func make(pal, out: Array) -> void:
+	Kit.write(pal, out, "{{kind}}", anims(), Callable(Look, "draw"), F)
+
+
+## Animation -> poses. Each pose is a dictionary Look.draw reads.
+static func anims() -> Dictionary:
+	return {
+		"idle": [{"t": 0.0}, {"t": 0.5}],
+		"move": [{"t": 0.0, "push": -1.0}, {"t": 0.25}, {"t": 0.5, "push": 1.0}, {"t": 0.75}],
+		"windup": [{"swell": 1.0, "push": -1.0}, {"swell": 2.0, "push": -2.0}],
+		"attack": [{"push": 3.0, "open": 1.0}, {"push": 1.5, "open": 0.6}],
+		"hurt": [{"hurt": true}],
+		"die": [{"fall": 0.4}, {"fall": 0.7}, {"fall": 1.0}],
+	}
+
+
+class Look:
+	static func draw(c, pal, p: Dictionary) -> void:
+		Kit.placeholder(c, pal, p, F)

@@ -5,6 +5,11 @@ Three lines a week minimum. Newest at the top.
 Template:
 
 ```
+## Week 45 (2026-10-11)
+Done: D-029: on to the Lungs (weeks 45-52) before onboarding and playtests. Creature kit: `tools/pixel/kit.gd` (sacs, chains, waves, IK legs, wings, cilia, eyes, mouths, a placeholder body, `write()`), the Gut creatures' recipe uses it with byte-identical output. `tools/creature/new_creature.gd` makes a working creature (recipe, AI script, scene) as a walker, flyer, floater or rooted thing; `Creature` base class. First one made with it: the Puffsac, a drifting lung lobe that swells and bursts (hurts everything near it; pop it from afar or roll away from the fuse), with sounds and a spore cloud. Devlog clips: F12 records a GIF (`GifRecorder`, `GifWriter`), and `run.gd --gif` writes every animation as a GIF. A v22 save fixture (tests/fixtures) for week 46's migration check.
+Not done: The Puffsac has nowhere to live yet (the Lungs are week 47); it is only in the tests.
+Next: Week 46, refactor: regions as data, rock kinds in one table, the old save still loading.
+
 ## Map shaping and minimap (2026-10-11)
 Done: world.png reshaped from data/maps/_source/world_painted.png by tools/map/shape_world.gd (caves instead of boxes, a ledged shaft up to a new cave above the camp, a hollow; tests/test_map.gd climbs it). Minimap top right: what you have seen, walls in their rock color, marks for settlements, the guard post, ruins, heart-roots and (with the boon) your last body. Seen tiles are saved (version 22).
 Not done: No full-screen map yet (M is still the debug map). Teleports reveal only where you land.

@@ -100,6 +100,18 @@ func _one_shots() -> void:
 	s = Synth.new(4.0, 24); s.noise(0.0, 4.0, 0.5, 400.0, 1.5, 1.0); s.tone(0.0, 4.0, 41, 41, 0.4, "sine", 1.5, 1.0); _done(s, "years", false, 0.7)
 	s = Synth.new(1.8, 25); s.tone(0.0, 0.8, 110, 110, 0.5, "saw", 0.08, 1.0); s.tone(0.7, 1.8, 147, 147, 0.5, "saw", 0.08, 1.2); s.soften(900.0); _done(s, "discover", false, 0.6)
 
+	# The Lungs (week 45 on).
+	s = Synth.new(0.9, 40)
+	s.tone(0.0, 0.9, 120, 260, 0.35, "saw", 0.4, 0.4)  # Skin stretching.
+	s.noise(0.0, 0.9, 0.3, 1200.0, 0.5, 0.6)
+	for i in 4:
+		s.squelch(0.15 + i * 0.18, 0.12, 0.25, 1.4 + i * 0.2)
+	_done(s, "puffsac_swell", false, 0.6)
+	s = Synth.new(0.9, 41)
+	s.noise(0.0, 0.08, 1.0, 6000.0, 0.001, 4.0)  # The pop.
+	s.tone(0.0, 0.15, 180, 60, 0.7, "sine", 0.001, 3.0)
+	s.noise(0.05, 0.9, 0.45, 2600.0, 0.02, 1.4)  # Spores hissing out.
+	_done(s, "puffsac_burst", false, 0.9)
 
 func _ui() -> void:
 	var s

@@ -1,0 +1,67 @@
+extends Creature
+## {{title}}: (what it is, where it lives, how to beat it). Made with
+## tools/creature/new_creature.gd as a floater; its look is
+## tools/pixel/recipes/creature_{{kind}}.gd.
+##
+##   DRIFT    bob around its home, look for the player
+##   FOLLOW   saw the player: drift slowly toward it
+##   WINDUP   close: stop and swell (the tell)
+##   ATTACK   lash out with the Attack hitbox on
+##   REST     a pause before it follows again
+
+enum State { DRIFT, FOLLOW, WINDUP, ATTACK, REST }
+
+@export var speed := 45.0
+@export var attack_range := 64.0
+@export var windup_time := 0.7
+
+var _home := Vector2.ZERO
+
+
+func setup() -> void:
+	_home = position
+
+
+func think(delta: float) -> void:
+	var want := Vector2.ZERO
+	match state:
+		State.DRIFT:
+			want = (_home + Vector2(sin(state_time * 0.7) * 24.0, sin(state_time * 1.1) * 10.0) - position) * 1.2
+			if sees_player():
+				enter(State.FOLLOW)
+		State.FOLLOW:
+			if not player_alive() or to_player().length() > lose_range:
+				enter(State.DRIFT)
+				return
+			face(to_player().x)
+			want = to_player().limit_length(speed)
+			if to_player().length() < attack_range:
+				enter(State.WINDUP)
+		State.WINDUP:
+			if state_time > windup_time:
+				strike(0.2)
+				enter(State.ATTACK)
+		State.ATTACK:
+			if state_time > 0.3:
+				enter(State.REST)
+		State.REST:
+			if state_time > 1.0:
+				enter(State.FOLLOW)
+	velocity = velocity.lerp(want, minf(1.0, delta * 3.0))
+
+
+func animation() -> StringName:
+	if is_dead():
+		return &"die"
+	if hurt_time > 0.0:
+		return &"hurt"
+	match state:
+		State.WINDUP:
+			return &"windup"
+		State.ATTACK:
+			return &"attack"
+	return &"idle"
+
+
+func hurt(_amount: int, from: Vector2, knockback: float) -> void:
+	velocity = (global_position - from).normalized() * knockback * 0.6

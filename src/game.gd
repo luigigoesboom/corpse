@@ -7,6 +7,10 @@ extends Node2D
 ## that should differ per save (history, later).
 @export var new_world_seed := 0
 
+## Creatures that leave nothing to eat: a boss's body is a set piece, a
+## burst Puffsac is a cloud.
+const NO_CARCASS := [&"gullet_matron", &"puffsac"]
+
 @onready var _player: Player = $Player
 @onready var _chunks: ChunkManager = $ChunkManager
 @onready var _world: Node2D = $World
@@ -35,6 +39,10 @@ func _ready() -> void:
 	var ambience := Ambience.new()  # The Gut's background sound (week 40).
 	ambience.name = "Ambience"
 	add_child(ambience)
+	if OS.is_debug_build():
+		var recorder := GifRecorder.new()  # F12: devlog clips (week 45).
+		recorder.name = "GifRecorder"
+		add_child(recorder)
 	if WorldState.data:
 		# "Continue" in the main menu already loaded a save.
 		_on_world_loaded()
@@ -253,10 +261,11 @@ func _on_boon_bought(id: StringName) -> void:
 	EventBus.notify.emit("The fragment grows: %s" % Boons.display_name(id))
 
 
-## Dead creatures leave something to eat for a while (week 36).
+## Dead creatures leave something to eat for a while (week 36), except
+## the NO_CARCASS kinds.
 func _leave_carcass(entity: Node) -> void:
 	var kind := CombatRules.kind_of(entity)
-	if not Ichor.CREATURE_VALUES.has(kind) or kind == &"gullet_matron":
+	if not Ichor.CREATURE_VALUES.has(kind) or kind in NO_CARCASS:
 		return
 	var carcass := Carcass.new()
 	carcass.kind = kind

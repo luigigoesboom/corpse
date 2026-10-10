@@ -271,6 +271,12 @@ Uses the Dialogue Manager addon (Nathan Hoad, v4; plugin and its `DialogueManage
 - **Rumors**: `Rumors` (src/sim/history) weighs events (recent, about the speaker's people, at places you can walk to, and above all host deaths), picks one, and tells it with how long ago, the event's sentence from `EventText` (so it matches the log), and the speaker's stance (pride, grief, spite). Fragment-sensing speakers recognize the player in rumors of a host's death.
 - **Barter**: FactionDef `wares` (what they give) and `wants` (what they take; `&"artifact"` = any artifact), one for one.
 
+## Creatures from week 45 on
+
+New creatures extend `Creature` (src/actors/creatures/creature.gd): the script fills in `think(delta)` (one physics frame of AI, with its own `State` enum in `state`) and `animation()`; the base finds the player, applies gravity (0 for flyers), shows the hurt flash and damage numbers, and on death stops the hitboxes, drops `drop_item`, fades and emits `entity_killed`. Helpers: `enter()`, `face()`, `turn()`, `sees_player(within, max_dy)`, `to_player()`, `strike(seconds)` (the melee Hitbox at Visual/Attack). `tools/creature/new_creature.gd` writes a working creature (recipe, script, scene) for one of four behaviours; see ART_PIPELINE.md. Kinds that leave no carcass: `Game.NO_CARCASS`.
+
+**Puffsac** (the Lungs): a floater that drifts toward the host, swells (0.8 s, the tell) and bursts: its Attack ring (62 px, 2 damage) hurts everything, other creatures too; a `SporeCloud` shows the reach. One hit pops it, but then it bursts after `fuse_time` (0.35 s); a pop by the host counts as the host's kill.
+
 ## Bosses (D-026)
 
 `GulletMatron` (src/actors/bosses) is a CharacterBody2D with one state machine: DORMANT -> INTRO -> STALK <-> WINDUP -> ACTIVE -> RECOVER, plus STAGGER, PHASE_SHIFT (once, at half health: faster windups and rests, brood unlocked, bigger volleys) and DEAD. Attacks are a data table (`ATTACKS`: windup / active / recover seconds, distance band, phase, weight); she picks by distance and weight, never the same attack three times running, and reacts faster to a player hugging her (favouring the tail sweep). Spawned hazards (bile_glob -> bile_puddle, shockwave) live beside her and exclude her Hurtbox; with friendly fire on they hurt her brood. `telegraph_left()` exposes the windup for bots and tests. EventBus: `boss_engaged` (shows `BossBar` in the HUD), `boss_defeated`, `shake_requested` (GameCamera shakes). On death she drops loot through `item_drop_requested`, logs `boss_slain`, and emits `entity_killed`. Tests may opt into fixed frames with a `## run-with: --fixed-fps 60` line (tests/run_tests.sh), so long fights run faster than real time.
@@ -389,6 +395,7 @@ Original plan:
 - Debug map: painted map with loaded chunks, player, sites, corpses.
 - History log viewer: scroll the event log in game.
 - Console: `teleport x y`, `skip_years n`, `give_mutation id`, `kill_player`.
+- F12 (debug builds, week 45): record a GIF clip (`GifRecorder`, `GifWriter` in src/debug) to user://captures.
 
 ## Testing
 
