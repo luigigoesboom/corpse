@@ -79,12 +79,13 @@ func run() -> void:
 	await wait_frames(10)
 	check(state.data.site_in_slot("ChamberRuin") != null and state.data.artifacts.size() >= 1, "and its ruins and artifacts are filled in")
 
-	# Some histories end with fewer ruins than there are ruin slots (seed
-	# 205895 has none): the slots still get one, older than the history.
-	var bare := WorldData.create(205895)
+	# Some histories end with fewer ruins than there are ruin slots (seed 3
+	# has one since D-033; it was seed 205895 with none before): every slot
+	# still gets one, older than the history if need be.
+	var bare := WorldData.create(3)
 	bare.year = HistorySim.YEARS
 	HistorySim.run(bare)
-	check(bare.sites.values().filter(func(s): return s.kind == &"ruin" and s.region == &"gut").is_empty(), "seed 205895's history leaves no ruins in the Gut")
+	check(bare.sites.values().filter(func(s): return s.kind == &"ruin" and s.region == &"gut").size() < 2, "seed 3's history leaves fewer ruins in the Gut than it has ruin slots")
 	var slots: Array = game._entities.templates().filter(func(t): return "width" in t and t.has_method("story_text") and WorldMap.region_of(t.position) == &"gut")
 	load("res://src/world/site_seeder.gd").fill_ruin_slots(bare, slots)
 	var filled := 0

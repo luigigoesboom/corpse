@@ -46,8 +46,8 @@ static func region_of_kind(kind: StringName) -> StringName:
 ## How likely a killed creature of this kind is to come back (0..1).
 static func return_chance(data: WorldData, kind: StringName) -> float:
 	var region := region_of_kind(kind)
-	if region == &"":
-		return 1.0
+	if region == &"" or not data.fauna.has(String(region)):
+		return 1.0  # Not counted (a world without numbers yet): as before.
 	var n := count(data, region, kind)
 	if n < CAP * GONE:
 		return 0.0

@@ -482,7 +482,7 @@ lair_name = "the Black Gut"
 kinds = Array[StringName]([&"gut_leech", &"rot_fly"])
 
 [node name="LairChokingComb" type="Node2D" parent="Entities"]
-position = Vector2(13136, 998)
+position = Vector2(13136, 1030)
 script = ExtResource("29_lair")
 lair_name = "the Choking Comb"
 kinds = Array[StringName]([&"puffsac", &"bellows_ray"])
@@ -494,7 +494,7 @@ lair_name = "the Pleural Sink"
 kinds = Array[StringName]([&"cilia_lasher", &"bellows_ray"])
 
 [node name="LairWindwardLedge" type="Node2D" parent="Entities"]
-position = Vector2(11216, 1606)
+position = Vector2(11216, 3366)
 script = ExtResource("29_lair")
-lair_name = "the Windward Ledge"
+lair_name = "the Bellows Pit"
 kinds = Array[StringName]([&"bellows_ray", &"puffsac"])

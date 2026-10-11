@@ -54,7 +54,7 @@ func build() -> void:
 static func grow(c: Node2D, beast: BeastData) -> void:
 	var health := c.get_node("Health") as Health
 	health.max_health = ceili(health.max_health * Beasts.stat(beast, "hp", 3.0))
-	var size := Beasts.stat(beast, "scale", 1.2)
+	var size := Beasts.stat(beast, "scale", 1.35)
 	c.scale = Vector2(size, size)
 	var speed := Beasts.stat(beast, "speed", 1.0)
 	var sight := Beasts.stat(beast, "sight", 1.0)
@@ -82,6 +82,7 @@ static func grow(c: Node2D, beast: BeastData) -> void:
 	label.position = Vector2(-120, -78)
 	label.scale = Vector2.ONE / size
 	label.name = "BeastName"
+	label.material = preload("res://assets/materials/unshaded.tres")  # Readable in the dark.
 	c.add_child(label)
 
 
