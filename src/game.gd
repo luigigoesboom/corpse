@@ -39,6 +39,11 @@ func _ready() -> void:
 	EventBus.entity_killed.connect(_on_entity_killed)
 	EventBus.ichor_gained.connect(_on_ichor_gained)
 	EventBus.boon_bought.connect(_on_boon_bought)
+	var atmosphere := Atmosphere.new()  # Vignette, fog, grading, motes (atmosphere pass).
+	atmosphere.name = "Atmosphere"
+	atmosphere.shade = $Vignette/Shade
+	atmosphere.player = _player
+	add_child(atmosphere)
 	var breath := Breath.new()  # The god still breathes (week 52).
 	breath.name = "Breath"
 	add_child(breath)

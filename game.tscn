@@ -12,7 +12,7 @@
 [ext_resource type="PackedScene" path="res://src/ui/inventory_screen.tscn" id="9_inventory"]
 [ext_resource type="PackedScene" path="res://src/ui/pause_menu.tscn" id="10_pause"]
 [ext_resource type="PackedScene" path="res://scenes/backdrop.tscn" id="11_backdrop"]
-[ext_resource type="Shader" uid="uid://bbo5dfhifu62f" path="res://assets/shaders/vignette.gdshader" id="12_vignette"]
+[ext_resource type="Shader" path="res://assets/shaders/atmosphere.gdshader" id="12_vignette"]
 [ext_resource type="Script" uid="uid://cbffsgpumvr44" path="res://src/actors/components/combat_feel.gd" id="13_feel"]
 [ext_resource type="PackedScene" path="res://src/ui/death_screen.tscn" id="14_death"]
 [ext_resource type="Script" uid="uid://dk7xbvkru82dg" path="res://src/world/corpse_layer.gd" id="15_corpses"]
@@ -21,8 +21,6 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_vignette"]
 shader = ExtResource("12_vignette")
-shader_parameter/strength = 0.6
-shader_parameter/tint = Color(0.06, 0, 0.02, 1)
 
 [node name="Game" type="Node2D" unique_id=1284505815]
 script = ExtResource("0_game")
@@ -61,6 +59,7 @@ chunks = NodePath("../ChunkManager")
 entities = NodePath("../World/Entities")
 
 [node name="Vignette" type="CanvasLayer" parent="." unique_id=1055300746]
+layer = 3
 
 [node name="Shade" type="ColorRect" parent="Vignette" unique_id=1459396912]
 material = SubResource("ShaderMaterial_vignette")

@@ -52,6 +52,11 @@ func run() -> void:
 ## Stopping: the view must settle without swinging back (it bounced when the
 ## camera led by velocity).
 func _check_running_is_smooth() -> void:
+	# The plain picture: grading, grain and the colour fringe would move and
+	# recolour the magenta markers this reads.
+	var settings = autoload("Settings")
+	var atmosphere: float = settings.atmosphere
+	settings.atmosphere = 0.0
 	player.teleport(Vector2(400, 3170))
 	await wait_frames(60)
 	var unshaded := load("res://assets/materials/unshaded.tres")
@@ -82,6 +87,7 @@ func _check_running_is_smooth() -> void:
 		if found.size() == 2:
 			samples.append([ms, found[0], found[1]])
 	Input.action_release("move_right")
+	settings.atmosphere = atmosphere
 	for dot in markers:
 		dot.queue_free()
 	var running := samples.filter(func(s): return s[0] > 300 and s[0] < 1900).map(func(s): return s[1])

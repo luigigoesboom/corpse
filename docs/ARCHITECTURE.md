@@ -413,6 +413,14 @@ Original plan:
 - Grafting = instance the part scene, attach to the named socket on the host rig, add the ability node to the player.
 - Creatures use the exact same system, so any creature mutation can in theory be taken by the player.
 
+## Atmosphere (after week 52)
+
+`Atmosphere` (src/world/atmosphere.gd), added by Game, owns the air of the body; all of it is a view, none of it is saved:
+- **The picture's look**: game.tscn's Vignette layer (layer 3, above the world and the mist, under the UI at 10) draws `assets/shaders/atmosphere.gdshader` over the screen: grading per region (`LOOKS`: lift, gain, saturation; the Gut warm and sick, the Lungs pale and cold, eased by `WorldMap.region_share()`), a deep vignette in steps whose edge wanders with noise, beats with the god's heart (`heartbeat()`, 52 bpm, matching the ambience) and swells with the breath, a one-pixel colour fringe toward the edges, grain on the 640 x 360 pixel grid, and, when the host is down to two hearts and then one, the dark closing in red.
+- **Fog**: two CanvasLayers with `assets/shaders/fog.gdshader`: Fog (layer -5, between the back wall and the world: drifting banks, parallax 0.55, thicker in the Lungs and when they breathe in) and Mist (layer 2: a thin haze hugging the bottom of the screen in front of the playfield, drifting with the wind).
+- **Motes** (src/world/motes.gd): 80 specks and spores floating around the camera in the region's colours, flickering, carried by `Breath.wind_at()`.
+- **Settings**: Display tab "Atmosphere" (`Settings.atmosphere`, 0..1; 0 = the plain picture, no fog, no motes) and "Film grain". tests/perf_render.gd turns it off while it reads marker pixels.
+
 ## Minimap (after week 41)
 
 `WorldData.explored` keeps which tiles the player has seen: chunk -> a 512-byte bitset (one bit per tile), saved (version 22). `Minimap` (src/ui/minimap.gd, made by the HUD, top right) reveals about a screen around the host four times a second (`reveal(rect)`) and redraws 120 x 68 tiles around it, one pixel per tile: seen air dark red, walls next to air in their rock kind's color, everything else dark. Marks: settlements gold, the guard post orange, anything in group `minimap_marks` in its `minimap_color` meta (ruins grey, heart-roots red), the last body if the host has the sense_bodies boon. The game calls `HUD.bind_map(chunks, player)`.

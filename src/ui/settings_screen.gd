@@ -141,6 +141,18 @@ func _build_display() -> Control:
 	shake.value = Settings.screen_shake
 	shake.value_changed.connect(Settings.set_screen_shake)
 	_row(page, "Screen shake", shake)
+	var air := HSlider.new()
+	air.min_value = 0.0
+	air.max_value = 1.0
+	air.step = 0.1
+	air.value = Settings.atmosphere
+	air.value_changed.connect(Settings.set_atmosphere)
+	_row(page, "Atmosphere", air)
+	var grain := CheckBox.new()
+	grain.text = "Film grain"
+	grain.button_pressed = Settings.film_grain
+	grain.toggled.connect(Settings.set_film_grain)
+	_row(page, "Grain", grain)
 	return page
 
 

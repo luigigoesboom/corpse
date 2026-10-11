@@ -23,6 +23,9 @@ var volumes := {}  # bus -> 0..1
 var fullscreen := false
 ## 0 (no shake) .. 1 (full).
 var screen_shake := 1.0
+## Vignette, fog, grading, motes (src/world/atmosphere.gd): 0 (off) .. 1 (full).
+var atmosphere := 1.0
+var film_grain := true
 ## action -> serialized keyboard / mouse event (joypad events are kept as they are).
 var _bindings := {}
 var _defaults := {}  # action -> Array[InputEvent] from project.godot
@@ -46,6 +49,8 @@ func load_settings() -> void:
 		volumes[bus] = clampf(float(cfg.get_value("sound", String(bus), volumes[bus])), 0.0, 1.0)
 	fullscreen = bool(cfg.get_value("display", "fullscreen", fullscreen))
 	screen_shake = clampf(float(cfg.get_value("display", "screen_shake", screen_shake)), 0.0, 1.0)
+	atmosphere = clampf(float(cfg.get_value("display", "atmosphere", atmosphere)), 0.0, 1.0)
+	film_grain = bool(cfg.get_value("display", "film_grain", film_grain))
 	for action in REBINDABLE:
 		var saved = cfg.get_value("keys", String(action)) if cfg.has_section_key("keys", String(action)) else null
 		if saved is Dictionary:
@@ -58,6 +63,8 @@ func save_settings() -> void:
 		cfg.set_value("sound", String(bus), volumes[bus])
 	cfg.set_value("display", "fullscreen", fullscreen)
 	cfg.set_value("display", "screen_shake", screen_shake)
+	cfg.set_value("display", "atmosphere", atmosphere)
+	cfg.set_value("display", "film_grain", film_grain)
 	for action in _bindings:
 		cfg.set_value("keys", String(action), _bindings[action])
 	cfg.save(path)
@@ -90,6 +97,16 @@ func set_fullscreen(on: bool) -> void:
 
 func set_screen_shake(value: float) -> void:
 	screen_shake = clampf(value, 0.0, 1.0)
+	save_settings()
+
+
+func set_atmosphere(value: float) -> void:
+	atmosphere = clampf(value, 0.0, 1.0)
+	save_settings()
+
+
+func set_film_grain(on: bool) -> void:
+	film_grain = on
 	save_settings()
 
 

@@ -5,6 +5,11 @@ Three lines a week minimum. Newest at the top.
 Template:
 
 ```
+## Atmosphere pass (2026-10-11)
+Done: At the developer's request, much more atmosphere. A screen shader over the world: grading per region (the Gut warm and sick, the Lungs pale and cold), a big uneven vignette that beats with the god's heart and swells with the breath, a colour fringe at the edges, grain on the pixel grid, and the dark closing in red at one or two hearts. Fog banks drifting behind the playfield and a low mist in front of it, in the region's colours; 80 floating motes and spores riding the breath. A Display setting for Atmosphere strength (0 = off) and one for film grain. Frame time unchanged (median 6 ms). tests/test_atmosphere.gd.
+Not done: No light shafts or bloom yet. Judged from screenshots only: the developer should look at it moving and say what is too much.
+Next: The developer's call: the image-import tool (generated images pixelated into the palette), weeks 42-44 (onboarding, playtests), or the Bones.
+
 ## Week 52 (2026-10-11)
 Done: The breath (D-031): the Lungs breathe on a 20 s cycle and the wind follows hand-placed WindZones. The Bellows draw air up on the inhale (falls slow; a gliding Lung Sac rides the updraft up hundreds of px), the Trachea's exhale carries you up the windpipe and its inhale presses you down (a timed climb), walking into the Bronchus against the exhale is slow, Puffsacs and Rays drift, wind bones swing and click, streaks of air, a rushing layer, a great inhale and exhale sound, the back wall brightening as it fills. tests/test_breath.gd. This finishes the Lungs (weeks 45-52).
 Not done: The Kin say nothing about the breath beyond their barks; no HUD sign of the phase (sound and air only). Weeks 42-44 (onboarding, playtests) are still ahead (D-029). The developer asked for much more vignetting and atmosphere (shaders): next.
