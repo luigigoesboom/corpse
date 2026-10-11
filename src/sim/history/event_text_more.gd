@@ -25,4 +25,31 @@ static func describe(event: EventRecord, data: WorldData) -> String:
 				"Near %s the flesh blistered overnight into a field of rot." % place])
 		&"rot_sickness":
 			return EventText._one(pick, ["Rot sickness took %d in %s." % [d.get("dead", 0), site], "%s coughed grey for a season; %d died." % [site, d.get("dead", 0)]])
+		&"beast_arose", &"beast_raided", &"beast_slain", &"beast_slain_by_host", &"beast_died", &"beast_escaped":
+			return _beast(event, data, a, site, pick)
+	return ""
+
+
+static func _beast(event: EventRecord, data: WorldData, a: String, site: String, pick: int) -> String:
+	var beast: BeastData = data.beasts.get(str(event.data.get("beast", "")))
+	var who := beast.full_name() if beast else "a nameless beast"
+	var what := Beasts.describe(beast) if beast else "a beast"
+	var d := event.data
+	match event.type:
+		&"beast_arose":
+			return EventText._one(pick, ["Something grew too big in %s: %s, %s." % [d.get("place", "a dark fold"), who, what],
+				"%s, %s, made its lair in %s." % [who, what, d.get("place", "a dark fold")],
+				"People began to speak of %s, %s that lived in %s." % [who, what, d.get("place", "a dark fold")]])
+		&"beast_raided":
+			return EventText._one(pick, ["%s came out of the dark and killed %d of %s at %s." % [who, d.get("dead", 0), a, site],
+				"%s took %d people from %s." % [who, d.get("dead", 0), site],
+				"%s raided %s; %s buried %d." % [who, site, a, d.get("dead", 0)]])
+		&"beast_slain":
+			return EventText._one(pick, ["%s hunted down %s and killed it." % [a, who], "The hunters of %s brought back the head of %s." % [a, who]])
+		&"beast_slain_by_host":
+			return "%s, a host, killed %s." % [event.actors[0] if not event.actors.is_empty() else "Someone", who]
+		&"beast_died":
+			return EventText._one(pick, ["%s died, and nobody knows how." % who, "%s was found dead in its lair." % who])
+		&"beast_escaped":
+			return "%s hunted %s, but it slipped away." % [a, who]
 	return ""

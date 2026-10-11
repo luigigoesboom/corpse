@@ -49,6 +49,7 @@ static func apply(data: WorldData, tier_index: int, rng: RandomNumberGenerator, 
 	if not body.is_empty():  # The body rots on (D-033).
 		Rot.ensure(data, body)
 		happened.append_array(Rot.run(data, body, years, SeededRng.make([data.world_seed, "rot", data.lives.size()])))
+		happened.append_array(Beasts.between_lives(data, body.get("lairs", []), years, SeededRng.make([data.world_seed, "beasts", data.lives.size()])))
 	_hint_history(data, happened, report)
 	CorpseFate.apply(data, strength, rng, places, report)  # Factions first (week 33).
 	_scavenge_bodies(data, strength, rng, report)
@@ -71,7 +72,7 @@ static func _hint_history(data: WorldData, happened: Array, report: Dictionary) 
 	for site: SiteData in data.sites.values():
 		if site.slot != "" and site.is_lived_in():
 			known[site.faction] = true
-	for type in [&"war_declared", &"peace", &"site_taken", &"disaster", &"rot_spread", &"rot_receded", &"schism", &"prophet", &"wonder"]:
+	for type in [&"war_declared", &"peace", &"site_taken", &"disaster", &"rot_spread", &"rot_receded", &"beast_arose", &"beast_slain", &"beast_raided", &"schism", &"prophet", &"wonder"]:
 		for event in happened:
 			if event.type == type and event.actors.any(func(a): return known.has(StringName(str(a)))):
 				report.hints.append("While you were gone: %s" % EventText.describe(event, data))

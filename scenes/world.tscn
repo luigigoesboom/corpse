@@ -19,6 +19,7 @@
 [ext_resource type="Script" path="res://src/world/key_cache.gd" id="18_cache"]
 [ext_resource type="Script" path="res://src/world/landmark.gd" id="19_landmark"]
 [ext_resource type="Script" path="res://src/world/wind_zone.gd" id="28_wind"]
+[ext_resource type="Script" path="res://src/world/beast_lair.gd" id="29_lair"]
 [ext_resource type="PackedScene" path="res://src/props/lungs/cartilage_gate.tscn" id="20_gate"]
 [ext_resource type="PackedScene" path="res://src/props/lungs/hive_lantern.tscn" id="21_lantern"]
 [ext_resource type="PackedScene" path="res://src/props/lungs/pleura_curtain.tscn" id="22_curtain"]
@@ -449,3 +450,51 @@ item_id = &"second_heart"
 [node name="WindBladder" parent="Entities" instance=ExtResource("4_item")]
 position = Vector2(14032, 1638)
 item_id = &"wind_bladder"
+
+[node name="LairWeepingGallery" type="Node2D" parent="Entities"]
+position = Vector2(2896, 1766)
+script = ExtResource("29_lair")
+lair_name = "the Weeping Gallery"
+kinds = Array[StringName]([&"gut_leech", &"bile_spitter", &"rot_fly"])
+
+[node name="LairGallRoost" type="Node2D" parent="Entities"]
+position = Vector2(7216, 966)
+script = ExtResource("29_lair")
+lair_name = "the Gall Roost"
+kinds = Array[StringName]([&"bile_spitter", &"rot_fly"])
+
+[node name="LairSourHollow" type="Node2D" parent="Entities"]
+position = Vector2(6736, 2118)
+script = ExtResource("29_lair")
+lair_name = "the Sour Hollow"
+kinds = Array[StringName]([&"gut_leech", &"bile_spitter"])
+
+[node name="LairBladderPit" type="Node2D" parent="Entities"]
+position = Vector2(5712, 1670)
+script = ExtResource("29_lair")
+lair_name = "the Bladder Pit"
+kinds = Array[StringName]([&"gut_leech", &"rot_fly"])
+
+[node name="LairBlackGut" type="Node2D" parent="Entities"]
+position = Vector2(5136, 3878)
+script = ExtResource("29_lair")
+lair_name = "the Black Gut"
+kinds = Array[StringName]([&"gut_leech", &"rot_fly"])
+
+[node name="LairChokingComb" type="Node2D" parent="Entities"]
+position = Vector2(13136, 998)
+script = ExtResource("29_lair")
+lair_name = "the Choking Comb"
+kinds = Array[StringName]([&"puffsac", &"bellows_ray"])
+
+[node name="LairPleuralSink" type="Node2D" parent="Entities"]
+position = Vector2(15056, 3398)
+script = ExtResource("29_lair")
+lair_name = "the Pleural Sink"
+kinds = Array[StringName]([&"cilia_lasher", &"bellows_ray"])
+
+[node name="LairWindwardLedge" type="Node2D" parent="Entities"]
+position = Vector2(11216, 1606)
+script = ExtResource("29_lair")
+lair_name = "the Windward Ledge"
+kinds = Array[StringName]([&"bellows_ray", &"puffsac"])

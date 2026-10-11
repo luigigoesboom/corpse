@@ -151,6 +151,7 @@ func _on_world_loaded() -> void:
 	if Rot.ensure(data, body()):  # D-033: a new world (or an old save) rots in.
 		Rot.settle(data, body(), SeededRng.make([data.world_seed, "rot"]))
 	WorldMap.set_rot(data.rot, data.rot_width)
+	Beasts.seed_past(data, body().lairs, SeededRng.make([data.world_seed, "beasts"]))  # D-033
 	if data.current_life() == null:
 		data.start_life(&"colonist")  # Saves from before week 21 have no lives.
 	$UI.close_all()
@@ -275,6 +276,8 @@ func _apply_host(host: HostDef) -> void:
 func _on_entity_killed(entity: Node) -> void:
 	_leave_carcass(entity)
 	var health := entity.get_node_or_null("Health") as Health
+	if entity.has_meta(&"beast_id"):
+		BeastDeaths.died(WorldState.data, entity, health != null and health.last_hit_source == &"player")
 	if health and health.last_hit_source == &"player":
 		var kind := CombatRules.kind_of(entity)
 		WorldState.data.record_kill(kind)

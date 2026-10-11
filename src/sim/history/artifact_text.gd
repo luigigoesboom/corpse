@@ -14,6 +14,7 @@ const LOOKS := {
 	&"idol": "A crude figure of the god, worn smooth by hands.",
 	&"stone": "A flat stone with a name scratched into it, and a year.",
 	&"keepsake": "Old, handled, kept. Nobody throws a thing like this away.",
+	&"trophy": "Cut from a beast that had a name. It still smells of it, and people step aside.",
 }
 
 

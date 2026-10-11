@@ -8,7 +8,8 @@ extends RefCounted
 ##    "air": PackedByteArray (1 = the cell has open space),
 ##    "region": PackedByteArray (index into Regions.IDS),
 ##    "painted": PackedByteArray (rot painted in tiles.png, 0..255),
-##    "places": [{"kind": "settlement"|"ruin"|"landmark", "cell", "slot"|"name", "region"}]}
+##    "places": [{"kind": "settlement"|"ruin"|"landmark", "cell", "slot"|"name", "region"}],
+##    "lairs": [{"slot", "name", "region", "kinds"}] (BeastLair, for Beasts)}
 
 
 static func context(map: WorldMap, templates: Array, landmarks: Array) -> Dictionary:
@@ -40,9 +41,12 @@ static func context(map: WorldMap, templates: Array, landmarks: Array) -> Dictio
 			painted[i] = clampi(int(255.0 * rotten / maxf(1.0, rock) * 0.85), 0, 255)
 			var middle := Vector2i(cx * Rot.CELL + Rot.CELL / 2, cy * Rot.CELL + Rot.CELL / 2)
 			region[i] = maxi(0, Regions.IDS.find(WorldMap.region_at(middle)))
-	var ctx := {"w": size.x, "h": size.y, "air": air, "region": region, "painted": painted, "places": []}
+	var ctx := {"w": size.x, "h": size.y, "air": air, "region": region, "painted": painted, "places": [], "lairs": []}
 	for t in templates:
 		var place := {}
+		if t is BeastLair:
+			ctx.lairs.append({"slot": EntityLayer.key_of(t), "name": t.lair_name, "region": WorldMap.region_of(t.global_position), "kinds": Array(t.kinds)})
+			continue
 		if t is GuardPost:
 			continue
 		if t is Settlement:

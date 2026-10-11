@@ -77,6 +77,10 @@ var places_seen: Dictionary = {}
 ## by row, rot_width cells wide. Empty until the world layer sizes it.
 var rot := PackedByteArray()
 var rot_width := 0
+## Legendary beasts (D-033, Beasts): id -> BeastData, living and dead.
+var beasts: Dictionary = {}
+## Whether the beasts of the recent past were made (Beasts.seed_past()).
+var beasts_seeded := false
 
 
 static func create(seed_value: int) -> WorldData:
@@ -189,10 +193,11 @@ func reclaim_corpse(index: int) -> Dictionary:
 	return taken
 
 
-func log_event(type: StringName, actors: Array, details: Dictionary) -> EventRecord:
+## `at_year`: when it happened, if not this year (call sort_events() after).
+func log_event(type: StringName, actors: Array, details: Dictionary, at_year := -1) -> EventRecord:
 	var event := EventRecord.new()
 	event.id = new_id()
-	event.year = year
+	event.year = year if at_year < 0 else at_year
 	event.type = type
 	event.actors = actors
 	event.data = details
@@ -426,6 +431,7 @@ func to_dict() -> Dictionary:
 		"legend": legend.duplicate(),
 		"ichor": ichor, "ichor_banked": ichor_banked, "boons": boons.duplicate(), "kept_graft": kept_graft.duplicate(), "known_events": known_events.duplicate(), "key_places": key_places.duplicate(), "explored": explored.duplicate(true), "places_seen": places_seen.duplicate(),
 		"rot": rot.duplicate(), "rot_width": rot_width,
+		"beasts": beasts.values().map(func(b): return b.to_dict()), "beasts_seeded": beasts_seeded,
 	}
 
 
@@ -464,6 +470,10 @@ static func from_dict(d: Dictionary) -> WorldData:
 	data.places_seen = d.get("places_seen", {}).duplicate()
 	data.rot = PackedByteArray(d.get("rot", PackedByteArray()))
 	data.rot_width = int(d.get("rot_width", 0))
+	for beast_dict in d.get("beasts", []):
+		var beast := BeastData.from_dict(beast_dict)
+		data.beasts[beast.id] = beast
+	data.beasts_seeded = d.get("beasts_seeded", false)
 	data._fit_inventory()
 	return data
 

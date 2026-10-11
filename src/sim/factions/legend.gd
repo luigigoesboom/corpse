@@ -6,9 +6,9 @@ extends RefCounted
 ## earlier bodies and tells you so.
 
 ## Deeds everybody hears about, whoever they were done to.
-const FAMOUS := [&"boss_slain"]
+const FAMOUS := [&"boss_slain", &"beast_slain_by_host"]
 ## Deeds they are glad of; the rest are held against you.
-const GOOD := [&"boss_slain"]
+const GOOD := [&"boss_slain", &"beast_slain_by_host"]
 
 
 ## The latest deed from an earlier body that matters to `faction`:
