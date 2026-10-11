@@ -32,6 +32,20 @@ static func describe(event: EventRecord, data: WorldData) -> String:
 			if d.get("mood", &"") == &"spasm":
 				return EventText._one(pick, ["The body spasmed; %s shook for a minute." % where, "A spasm went through %s." % where])
 			return EventText._one(pick, ["A fever burned through %s." % where, "%s ran hot with the god's fever." % where.substr(0, 1).to_upper() + where.substr(1)])
+		&"people_migrated":
+			var b := EventText._faction(data, event.actors[1]) if event.actors.size() > 1 else "their people"
+			var to := "the Lungs" if d.get("to", &"") == &"lungs" else "the Gut"
+			return EventText._one(pick, ["%d of %s left down the vessels for %s and became %s, at %s." % [d.get("count", 0), b, to, a, site],
+				"Driven out, %d of %s went to %s. They call themselves %s now and live at %s." % [d.get("count", 0), b, to, a, site]])
+		&"kind_swarmed":
+			return EventText._one(pick, ["A swarm of %s fell on %s; %d died." % [Ecology.NAMES.get(d.get("kind", &""), "things"), site, d.get("dead", 0)],
+				"There were too many %s that year. They came into %s and took %d." % [Ecology.NAMES.get(d.get("kind", &""), "things"), site, d.get("dead", 0)]])
+		&"kind_vanished":
+			var where := "the Lungs" if d.get("region", &"") == &"lungs" else "the Gut"
+			return "Nobody in %s saw any %s for a long time after that." % [where, Ecology.NAMES.get(d.get("kind", &""), "of them")]
+		&"kind_returned":
+			var where := "the Lungs" if d.get("region", &"") == &"lungs" else "the Gut"
+			return "The %s came back to %s." % [Ecology.NAMES.get(d.get("kind", &""), "creatures"), where]
 		&"quest_done":
 			return "%s, a host, did what %s asked of them." % [event.actors[1] if event.actors.size() > 1 else "Someone", a]
 		&"leader_rose", &"leader_died", &"leader_overthrown", &"leader_deed", &"leader_killed":

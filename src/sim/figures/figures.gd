@@ -65,11 +65,19 @@ static func tick(data: WorldData, rng: RandomNumberGenerator) -> void:
 			_deed(data, faction, leader, rng)
 
 
-## The living leader of a people, or null.
+## The living leader of a people, or null. Remembered per world (not saved:
+## a meta on the WorldData), since history asks every year for every people.
 static func leader_of(data: WorldData, faction: StringName) -> FigureData:
+	var cache: Dictionary = data.get_meta(&"leaders", {})
+	var known: FigureData = cache.get(faction)
+	if known and known.is_alive() and data.figures.has(known.id):
+		return known
 	for f: FigureData in data.figures.values():
 		if f.faction == faction and f.role == &"leader" and f.is_alive():
+			cache[faction] = f
+			data.set_meta(&"leaders", cache)
 			return f
+	cache.erase(faction)
 	return null
 
 
@@ -135,6 +143,9 @@ static func _rise(data: WorldData, faction: FactionData, rng: RandomNumberGenera
 		if not &"cruel" in f.traits and not &"ambitious" in f.traits:
 			f.traits[0] = &"ambitious" if rng.randf() < 0.5 else &"cruel"
 	data.figures[f.id] = f
+	var cache: Dictionary = data.get_meta(&"leaders", {})
+	cache[faction.id] = f
+	data.set_meta(&"leaders", cache)
 	# Their nature bends their people while they lead.
 	for t in f.traits:
 		for field in TRAITS[t]:

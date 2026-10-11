@@ -88,6 +88,9 @@ var quests: Dictionary = {}
 ## The strain of the mutation in each body slot (D-033, MutationStrains):
 ## slot -> strain. Rolled whenever a mutation takes root.
 var strains: Dictionary = {}
+## How many of each creature kind live in each region (D-033, Ecology):
+## region -> kind -> count (0..Ecology.CAP).
+var fauna: Dictionary = {}
 
 
 static func create(seed_value: int) -> WorldData:
@@ -444,6 +447,7 @@ func to_dict() -> Dictionary:
 		"figures": figures.values().map(func(f): return f.to_dict()),
 		"quests": quests.values().map(func(q): return q.to_dict()),
 		"strains": strains.duplicate(),
+		"fauna": fauna.duplicate(true),
 	}
 
 
@@ -493,6 +497,7 @@ static func from_dict(d: Dictionary) -> WorldData:
 		var quest := QuestData.from_dict(quest_dict)
 		data.quests[quest.id] = quest
 	data.strains = d.get("strains", {}).duplicate()
+	data.fauna = d.get("fauna", {}).duplicate(true)
 	data._fit_inventory()
 	return data
 

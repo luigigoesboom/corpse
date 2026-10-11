@@ -50,6 +50,7 @@ static func apply(data: WorldData, tier_index: int, rng: RandomNumberGenerator, 
 		Rot.ensure(data, body)
 		happened.append_array(Rot.run(data, body, years, SeededRng.make([data.world_seed, "rot", data.lives.size()])))
 		happened.append_array(Beasts.between_lives(data, body.get("lairs", []), years, SeededRng.make([data.world_seed, "beasts", data.lives.size()])))
+		happened.append_array(Ecology.run(data, years, SeededRng.make([data.world_seed, "ecology", data.lives.size()]), _rot_by_region(data, body)))
 	Quests.check(data)  # Tasks nobody can finish any more fail (D-033).
 	_hint_history(data, happened, report)
 	CorpseFate.apply(data, strength, rng, places, report)  # Factions first (week 33).
@@ -57,6 +58,22 @@ static func apply(data: WorldData, tier_index: int, rng: RandomNumberGenerator, 
 	_creatures_return(data, strength, rng, report)
 	_dropped_items_vanish(data, strength, rng, report)
 	return report
+
+
+## The average rot of each region's open cells (for Ecology: rot flies).
+static func _rot_by_region(data: WorldData, body: Dictionary) -> Dictionary:
+	var sums := {}
+	var counts := {}
+	for i in mini(data.rot.size(), body.air.size()):
+		if not body.air[i]:
+			continue
+		var region: StringName = Regions.IDS[body.region[i]] if body.region[i] < Regions.IDS.size() else Regions.GUT
+		sums[region] = sums.get(region, 0.0) + data.rot[i] / 255.0
+		counts[region] = counts.get(region, 0) + 1
+	var out := {}
+	for region in sums:
+		out[region] = sums[region] / counts[region]
+	return out
 
 
 static func _last_dead(data: WorldData) -> LifeRecord:
@@ -73,7 +90,7 @@ static func _hint_history(data: WorldData, happened: Array, report: Dictionary) 
 	for site: SiteData in data.sites.values():
 		if site.slot != "" and site.is_lived_in():
 			known[site.faction] = true
-	for type in [&"war_declared", &"peace", &"site_taken", &"disaster", &"rot_spread", &"rot_receded", &"beast_arose", &"beast_slain", &"beast_raided", &"leader_overthrown", &"leader_rose", &"leader_deed", &"schism", &"prophet", &"wonder"]:
+	for type in [&"war_declared", &"peace", &"site_taken", &"disaster", &"rot_spread", &"rot_receded", &"beast_arose", &"beast_slain", &"beast_raided", &"leader_overthrown", &"leader_rose", &"leader_deed", &"people_migrated", &"kind_swarmed", &"kind_vanished", &"schism", &"prophet", &"wonder"]:
 		for event in happened:
 			if event.type == type and event.actors.any(func(a): return known.has(StringName(str(a)))):
 				report.hints.append("While you were gone: %s" % EventText.describe(event, data))
@@ -125,7 +142,8 @@ static func _creatures_return(data: WorldData, strength: float, rng: RandomNumbe
 	for key in data.removed_entities.keys():
 		var kind = data.removed_entities[key]
 		# Only creatures come back; picked-up items (&"item") and old saves (true) do not.
-		if kind is StringName and kind != &"item" and not kind in BOSSES and rng.randf() < strength:
+		# How likely depends on how many of its kind are left (Ecology, D-033).
+		if kind is StringName and kind != &"item" and not kind in BOSSES and rng.randf() < strength * Ecology.return_chance(data, kind):
 			data.removed_entities.erase(key)
 			returned.append(kind)
 	if not returned.is_empty():

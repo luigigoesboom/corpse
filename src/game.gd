@@ -54,6 +54,10 @@ func _ready() -> void:
 	moods.name = "BodyMoods"
 	moods.player = _player
 	add_child(moods)
+	var swarms := Swarms.new()  # Swarming creatures turn up (D-033).
+	swarms.name = "Swarms"
+	swarms.player = _player
+	add_child(swarms)
 	var ambience := Ambience.new()  # The Gut's background sound (week 40).
 	ambience.name = "Ambience"
 	add_child(ambience)
@@ -157,6 +161,7 @@ func _on_world_loaded() -> void:
 	WorldMap.set_rot(data.rot, data.rot_width)
 	Beasts.seed_past(data, body().lairs, SeededRng.make([data.world_seed, "beasts"]))  # D-033
 	Figures.ensure(data, SeededRng.make([data.world_seed, "figures", data.year]))
+	Ecology.ensure(data)
 	if data.current_life() == null:
 		data.start_life(&"colonist")  # Saves from before week 21 have no lives.
 	$UI.close_all()
@@ -287,6 +292,7 @@ func _on_entity_killed(entity: Node) -> void:
 		var kind := CombatRules.kind_of(entity)
 		WorldState.data.record_kill(kind)
 		Quests.on_kill(WorldState.data, kind)  # D-033
+		Ecology.on_kill(WorldState.data, kind)
 		var ichor := roundi(Ichor.for_kill(kind, entity.global_position) * BodyMoods.ichor_scale)  # A surge (D-033)
 		if ichor > 0:
 			WorldState.data.add_ichor(ichor)

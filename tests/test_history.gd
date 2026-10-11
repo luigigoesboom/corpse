@@ -28,9 +28,9 @@ func run() -> void:
 	for w in worlds:
 		var data: WorldData = w.data
 		var count := data.events.size()
-		# D-033: leaders, their deeds and their deaths fill the log too.
-		all_ok = all_ok and count >= 60 and count <= 1000 and w.ms < 2500
-		if count > 1000 or w.ms >= 2500:
+		# D-033: leaders, their deeds and deaths, migrations fill the log too.
+		all_ok = all_ok and count >= 60 and count <= 1500 and w.ms < 2500
+		if count > 1500 or w.ms >= 2500:
 			print("  %d events, %d ms" % [count, w.ms])
 		for id in [&"flesh_tenders", &"choir_of_waking"]:
 			var faction: FactionData = data.factions.get(id)
@@ -46,7 +46,7 @@ func run() -> void:
 			if "<null>" in line or "people_" in line or "site_" in line or "&\"" in line or "%" in line:
 				clean = false
 				print("  bad line: ", line)
-	check(all_ok, "each has 60-1000 events, takes under 2.5 s, and ends with both hand-made factions alive, at home, and big enough")
+	check(all_ok, "each has 60-1500 events, takes under 2.5 s, and ends with both hand-made factions alive, at home, and big enough")
 	check(ordered, "events are in order and none is in the future")
 	check(clean, "every event reads as a sentence (no ids, no format codes)")
 	var wanted := [&"people_arrived", &"faction_founded", &"site_founded", &"war_declared", &"peace", &"schism", &"disaster", &"faction_fell", &"wonder"]

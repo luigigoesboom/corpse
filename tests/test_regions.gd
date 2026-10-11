@@ -19,9 +19,12 @@ func run() -> void:
 			"a whole world's past has peoples and places in %s" % Regions.display_name(region))
 	check(HistorySim.regions_without_past(data).is_empty(), "every simulated region has its past")
 
-	# Nobody wars, trades or splits across regions.
+	# Nobody wars, trades or splits across regions; only migrations (D-033)
+	# join a people to the one they left.
 	var crossed := false
 	for e in data.events:
+		if e.type == &"people_migrated":
+			continue
 		var regions := {}
 		for actor in e.actors:
 			if data.factions.has(actor):

@@ -17,7 +17,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 29
+const SAVE_VERSION := 30
 const SLOTS := [1, 2, 3]
 
 
@@ -241,4 +241,8 @@ func _migrate(save: Dictionary) -> Dictionary:
 	if save.save_version == 28:
 		# v29 (D-033): mutation strains. Nothing to convert: missing is plain.
 		save.save_version = 29
+	if save.save_version == 29:
+		# v30 (D-033): creature populations. Nothing to convert: an old world's
+		# start at six in ten of the most each kind can be.
+		save.save_version = 30
 	return save

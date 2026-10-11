@@ -90,6 +90,7 @@ static func run_regions(data: WorldData, regions: Array, years := YEARS) -> void
 			founding.get_or_add(start + rng.randi_range(entry.from, entry.to), []).append(entry)
 		plans[r] = {"rng": rng, "founding": founding}
 	data.year = start
+	var moving := SeededRng.make([data.world_seed, "migration"])
 	for year in years:
 		data.year += 1
 		for r in plans:
@@ -101,6 +102,8 @@ static func run_regions(data: WorldData, regions: Array, years := YEARS) -> void
 			for entry in plans[r].founding.get(data.year, []):
 				_found_destined(data, rng, entry)
 			tick(data, rng)
+		if plans.size() > 1:
+			Migration.tick(data, moving)  # Peoples move between regions (D-033).
 	data.year = now
 	for r in plans:
 		region = r
@@ -123,11 +126,13 @@ static func between_lives(data: WorldData, years: int, rng: RandomNumberGenerato
 			rngs[r] = rng if r == Regions.GUT else SeededRng.make([data.world_seed, "between", r, now, data.lives.size()])
 	data.year = now - years
 	protect_slots = true
+	var moving := SeededRng.make([data.world_seed, "migration", now, data.lives.size()])
 	for i in years:
 		data.year += 1
 		for r in rngs:
 			region = r
 			tick(data, rngs[r])
+		Migration.tick(data, moving)  # D-033
 	protect_slots = false
 	region = Regions.GUT
 	data.year = now
