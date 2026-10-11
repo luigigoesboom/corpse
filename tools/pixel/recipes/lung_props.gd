@@ -19,6 +19,11 @@ const FRAMES := {
 	"pleura_curtain": [128, 180, 64, 0, "b"],
 	"aerie_nest": [112, 48, 56, 46, "bg"],
 	"wind_bones": [32, 96, 16, 0, "b"],
+	# The Bellows-Kin's settlement props (week 50), standing on the floor.
+	"kite_rack": [80, 72, 40, 70, "b"],
+	"breath_drum": [56, 48, 28, 46, "b"],
+	"membrane_hammock": [96, 56, 48, 54, "b"],
+	"windsock": [40, 96, 8, 94, "b"],
 }
 
 
@@ -161,6 +166,53 @@ class Draw:
 			var p = o + Vector2(rng.randf_range(-26, 26), rng.randf_range(-16, -8))
 			c.capsule(p, p + Vector2(rng.randf_range(-5, 5), rng.randf_range(-2, 2)), 1.2, 0.9, &"bone", {"lo": 2, "z": 2 + i * 0.01})
 		c.ellipse(o + Vector2(3, -12), 8, 3, &"glow_red", {"glow": true})
+
+	# --- the Bellows-Kin's camp (week 50) ---------------------------------------
+	## A frame of bone poles with kites of lung stretched to dry on it.
+	static func kite_rack(c, pal, o: Vector2, rng) -> void:
+		for x in [-30.0, 30.0]:
+			lumpy(c, o + Vector2(x, 0), o + Vector2(x * 0.9, -60), 2.6, 2.0, &"bone", rng, {"lo": 1})
+		lumpy(c, o + Vector2(-33, -56), o + Vector2(33, -58), 2.0, 2.0, &"bone", rng, {"lo": 1, "z": 1})
+		for k in 3:  # Kites hung by their spars, each a fan of ribbed sheet.
+			var top = o + Vector2(-20 + k * 20, -56)
+			for i in 6:
+				var t = i / 5.0
+				var a = top + Vector2(-8 + t * 16, 2)
+				var b = top + Vector2(-5 + t * 10 + rng.randf_range(-1, 1), 30 + sin(t * PI) * 6)
+				c.capsule(a, b, 1.8, 1.0, &"lung", {"alpha": 0.82, "dither": true, "lo": 0, "hi": 2, "z": 2 + k + i * 0.01, "line": false})
+			c.stroke(top + Vector2(0, 2), top + Vector2(0, 36), pal.step(&"bone", 1))
+
+	## A drum: a ring of bone with lung skin stretched over it, struck to
+	## keep time with the breath.
+	static func breath_drum(c, pal, o: Vector2, rng) -> void:
+		c.ellipse(o + Vector2(0, -16), 20, 15, &"wood", {"lo": 1, "dither": true})
+		c.ellipse(o + Vector2(0, -29), 19, 5, &"lung", {"lo": 1, "hi": 3, "z": 1})
+		for k in 6:  # Lacing.
+			var x = -16.0 + k * 6.4
+			c.stroke(o + Vector2(x, -27), o + Vector2(x * 0.9, -4), pal.step(&"kin", 1))
+		for side in [-1.0, 1.0]:  # Feet.
+			lumpy(c, o + Vector2(side * 14, -4), o + Vector2(side * 18, 0), 2.4, 2.0, &"bone", rng, {"lo": 1, "z": -1})
+		c.capsule(o + Vector2(22, -34), o + Vector2(14, -28), 1.4, 2.4, &"bone", {"lo": 1, "z": 2})  # A beater.
+
+	## A sling of membrane between two poles, sagging under its own weight.
+	static func membrane_hammock(c, pal, o: Vector2, rng) -> void:
+		for x in [-42.0, 42.0]:
+			lumpy(c, o + Vector2(x, 0), o + Vector2(x, -46), 2.4, 1.8, &"bone", rng, {"lo": 1})
+		var n = 14
+		for i in n + 1:
+			var t = float(i) / n
+			var p = o + Vector2(lerpf(-40, 40, t), -40 + sin(t * PI) * 18)
+			c.ellipse(p, 4.5, 3.0, &"lung", {"alpha": 0.85, "dither": true, "lo": 0, "hi": 2, "z": 1 + i * 0.01})
+		c.ellipse(o + Vector2(4, -26), 10, 3.5, &"kin", {"lo": 1, "z": 2})  # A blanket.
+
+	## A pole with a long tube of membrane that shows which way the breath blows.
+	static func windsock(c, pal, o: Vector2, rng) -> void:
+		lumpy(c, o, o + Vector2(1, -90), 2.2, 1.6, &"bone", rng, {"lo": 1})
+		var a = o + Vector2(2, -86)
+		for i in 8:
+			var t = float(i) / 7.0
+			var p = a + Vector2(4 + t * 24, 4 + t * t * 18)
+			c.ellipse(p, 3.5 - t * 1.5, 4.0 - t * 2.0, &"kin" if i % 2 == 0 else &"lung", {"lo": 1, "hi": 3, "z": 1 + i * 0.01})
 
 	# --- wind bones: chimes the breath plays (week 52) ---------------------------
 	static func wind_bones(c, pal, o: Vector2, rng) -> void:

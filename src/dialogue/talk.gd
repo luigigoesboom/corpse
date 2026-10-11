@@ -36,10 +36,18 @@ signal bribed
 var offers_bribe := false
 var bribe_cost := 0
 var bribe_text := ""
-## The heart-key (week 38): this speaker's people keep the Gut's key.
+## The heart-key (week 38): this speaker's people keep a key (the Choir
+## the Gut's, the Bellows-Kin the Lungs', week 51).
 var key_here := false
 var key_price := ValveKeys.CHOIR_PRICE
 var key_text := ""
+## What they say about the key they keep.
+var key_line := ""
+var _key: StringName = &""
+const KEY_LINES := {
+	&"valve_key_gut": "The key of the Gut's valve. It sleeps in our reliquary until the heart calls for it.",
+	&"valve_key_lungs": "The key of the Lungs. We fly it on a string at the top of the roost, where the breath can keep it cold.",
+}
 signal key_changed
 
 var can_ask_key: bool:
@@ -51,24 +59,24 @@ var can_buy_key: bool:
 
 ## They trust you: they give it.
 func ask_key() -> void:
-	if not can_ask_key or not ValveKeys.take(_data, ValveKeys.GUT, ValveKeys.CHOIR_RELIQUARY):
+	if not can_ask_key or not ValveKeys.take(_data, _key, ValveKeys.KEYS[_key].kept):
 		key_text = "Not now." if can_ask_key else "The key is not for you."
 		return
 	key_here = false
 	key_text = "It has waited for you. Take it to the heart, and do not lose it again."
-	_data.log_deed(&"key_given", [_faction, _host_name()], {"key": ValveKeys.GUT})
+	_data.log_deed(&"key_given", [_faction, _host_name()], {"key": _key})
 	key_changed.emit()
 
 
 ## They do not trust you, but ichor is the god's own blood.
 func buy_key() -> void:
-	if not can_buy_key or not ValveKeys.take(_data, ValveKeys.GUT, ValveKeys.CHOIR_RELIQUARY):
+	if not can_buy_key or not ValveKeys.take(_data, _key, ValveKeys.KEYS[_key].kept):
 		key_text = "No."
 		return
 	_data.add_ichor(-key_price)
 	key_here = false
 	key_text = "The god's blood for the god's key. A fair price, they say. I am not sure."
-	_data.log_deed(&"key_bought", [_faction, _host_name()], {"key": ValveKeys.GUT, "ichor": key_price})
+	_data.log_deed(&"key_bought", [_faction, _host_name()], {"key": _key, "ichor": key_price})
 	key_changed.emit()
 
 
@@ -110,7 +118,10 @@ func _init(data: WorldData, speaker_name: String, faction_id: StringName, rng_se
 	farewell = _pick(_def.farewells if _def else [], "Go well.")
 	creed = _creed()
 	_set_up_barter()
-	key_here = faction_id == &"choir_of_waking" and ValveKeys.lies_at(data, ValveKeys.GUT, ValveKeys.CHOIR_RELIQUARY)
+	_key = ValveKeys.kept_by(data, faction_id) if faction_id != &"" else &""
+	key_here = _key != &""
+	key_price = ValveKeys.price_of(_key)
+	key_line = KEY_LINES.get(_key, "")
 
 
 ## Sets up a bribe for the place this speaker guards (Conversation calls it).

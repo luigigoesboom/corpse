@@ -158,6 +158,11 @@ Columns: 8
 128 136 156	Cartilage mid
 170 178 196	Cartilage light
 214 220 232	Cartilage highlight
+# ramp kin
+ 52  62  84	Kin cloth deep
+ 86 104 132	Kin cloth shadow
+128 152 180	Kin cloth
+176 198 218	Kin cloth light
 # ramp tint
 120 120 120	Tint dark (cloth, tinted in game)
 170 170 170	Tint

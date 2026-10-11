@@ -111,11 +111,17 @@ static func describe(event: EventRecord, data: WorldData) -> String:
 		&"shrine_desecrated":
 			text = "%s, their shrine at %s robbed, trusted nobody after." % [a, site]
 		&"key_kept":
-			text = "%s found a key of the heart and kept it in the reliquary at %s." % [a, site]
+			if d.get("key", &"") == ValveKeys.LUNGS:
+				text = "%s caught a key of the heart on the wind and hung it high in their roost at %s." % [a, site]
+			else:
+				text = "%s found a key of the heart and kept it in the reliquary at %s." % [a, site]
+		&"key_nested":
+			text = "A key of the heart was carried up the windpipe into the High Aerie, and something made its nest around it."
 		&"key_swallowed":
 			text = "A key of the heart sank into the deep, and the Gullet Matron made her nest around it."
 		&"key_found":
-			text = "%s, a host, took the key of the heart from the Matron's nest." % (event.actors[0] if event.actors.size() > 0 else "Someone")
+			var nest := "the High Aerie" if d.get("key", &"") == ValveKeys.LUNGS else "the Matron's nest"
+			text = "%s, a host, took the key of the heart from %s." % [event.actors[0] if event.actors.size() > 0 else "Someone", nest]
 		&"key_stolen":
 			text = "%s, a host, stole the key of the heart from %s%s." % [event.actors[1] if event.actors.size() > 1 else "Someone", a, "" if d.get("seen", false) else ", and nobody saw"]
 		&"key_given":

@@ -15,7 +15,7 @@ extends RefCounted
 ## The hand-made factions are destined (DESTINED): in the Gut the
 ## Flesh-Tenders are among the early peoples and the Choir of Waking is born
 ## as a prophet's schism mid-history; none of them can vanish before the
-## present.
+## present. The Lungs (week 50) have the Bellows-Kin, gliders who arrive early.
 
 const YEARS := 2000
 ## Between lives (week 37): hand-made places (sites in a slot) cannot be
@@ -24,6 +24,7 @@ const YEARS := 2000
 static var protect_slots := false
 const TENDERS := &"flesh_tenders"
 const CHOIR := &"choir_of_waking"
+const KIN := &"bellows_kin"
 ## The hand-made factions of each region and how they come to be:
 ##   early   founded in years `from`..`to` of the past, like any people
 ##   schism  born in years `from`..`to` as a prophet's split (`cause`) from
@@ -32,6 +33,9 @@ const DESTINED := {
 	&"gut": [
 		{"id": TENDERS, "how": "early", "from": 5, "to": 220},
 		{"id": CHOIR, "how": "schism", "from": 700, "to": 1500, "cause": "over whether the god only sleeps"},
+	],
+	&"lungs": [
+		{"id": KIN, "how": "early", "from": 40, "to": 400},
 	],
 }
 ## The region being simulated: _alive(), _living_sites() and new peoples
@@ -446,7 +450,9 @@ static func _new_site(data: WorldData, faction: FactionData, population: int, rn
 	site.region = faction.region
 	site.population = maxi(1, population)
 	site.founded_year = data.year
-	var used := data.sites.values().map(func(s): return s.name)
+	# Names are not reused. The Gut only looks at its own (as it always did,
+	# so its past stays word for word); other regions avoid every name.
+	var used := data.sites.values().filter(func(s): return faction.region != Regions.GUT or s.region == Regions.GUT).map(func(s): return s.name)
 	site.name = HistoryNames.place(rng)
 	for attempt in 6:
 		if not site.name in used:

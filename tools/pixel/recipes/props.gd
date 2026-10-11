@@ -94,6 +94,9 @@ static func _items(pal, out: Array) -> void:
 		"artifact": func(c): c.ellipse(Vector2(8, 9.5), 5, 5.5, &"gold"); c.circle(Vector2(8, 8.5), 2.0, &"blood", {"z": 1, "lo": 2}),
 		"unknown": func(c): c.ellipse(Vector2(8, 10), 5, 4.5, &"ash", {"lo": 1, "dither": true}),
 		"valve_key_gut": func(c): Draw.valve_key(c, null, pal, Vector2(7, 14)),
+		"valve_key_lungs": func(c): Draw.valve_key_lungs(c, null, pal, Vector2(7, 14)),
+		"wind_bladder": func(c): c.ellipse(Vector2(8, 9.5), 5.5, 5.0, &"lung", {"dither": true}); c.stroke(Vector2(4, 8), Vector2(12, 7), pal.step(&"rock_cartilage", 3)); c.stroke(Vector2(4, 12), Vector2(12, 11), pal.step(&"rock_cartilage", 3)); c.capsule(Vector2(8, 5), Vector2(10, 1.5), 1.3, 0.9, &"rock_cartilage", {"lo": 2}),
+		"second_heart": func(c): c.ellipse(Vector2(8, 10), 5.0, 5.5, &"lung", {"lo": 1}); c.capsule(Vector2(7, 5), Vector2(5, 1.5), 1.2, 0.8, &"blood", {"lo": 1}); c.capsule(Vector2(9, 5), Vector2(12, 2), 1.2, 0.8, &"rock_cartilage", {"lo": 2}); c.stroke(Vector2(4, 8), Vector2(12, 8), pal.step(&"rock_alveolus", 2)); c.stroke(Vector2(4, 10), Vector2(12, 10), pal.step(&"rock_alveolus", 2)); c.stroke(Vector2(4, 12), Vector2(12, 12), pal.step(&"rock_alveolus", 2)),
 	}
 	for id in icons:
 		var c = Canvas.new(16, 16, pal)
@@ -326,6 +329,14 @@ class Draw:
 		c.circle(centre, 3.0, &"blood", {"lo": 0, "hi": 0, "z": 1, "flat": true})
 		for a in [0.0, 1.6, 3.2, 4.7]:
 			c.detail(Vector2i((centre + Vector2.from_angle(a) * 3.0).floor()), pal.step(&"bone", -1))
+
+	## The Lungs' key: a ring of cartilage, banded like an airway, cold blue.
+	static func valve_key_lungs(c, cloth, pal, o: Vector2) -> void:
+		var centre = o + Vector2(0, -7)
+		c.circle(centre, 6.0, &"rock_cartilage", {"lo": 2})
+		c.circle(centre, 3.0, &"outline", {"z": 1, "flat": true})
+		for a in [0.4, 1.9, 3.5, 5.0]:
+			c.stroke(centre + Vector2.from_angle(a) * 3.5, centre + Vector2.from_angle(a) * 6.0, pal.step(&"rock_cartilage", 1))
 
 	static func brazier(c, cloth, pal, o: Vector2) -> void:
 		c.ellipse(o + Vector2(0, -15), 10, 4, &"bone", {"lo": 1})

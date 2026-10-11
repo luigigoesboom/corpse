@@ -33,7 +33,7 @@ const INFO := {
 		"goods": ["bile and salt", "dried gut-meat", "bone tools", "lamp oil", "spores", "relics", "cartilage"],
 	},
 	&"lungs": {
-		"name": "the Lungs", "paint": Color8(110, 170, 230), "capacity": 1500, "history": false,
+		"name": "the Lungs", "paint": Color8(110, 170, 230), "capacity": 1500, "history": true,
 		"from": ["the windpipe", "the Gut below", "a collapsed lobe", "the far bronchi", "the Wound"],
 		"goods": ["woven membrane", "breath-bladders", "cartilage", "dried spores", "kite silk", "bone pins"],
 	},

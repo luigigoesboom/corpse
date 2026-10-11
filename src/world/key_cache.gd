@@ -19,6 +19,9 @@ const KEY_ART := preload("res://assets/art/props/valve_key_body.png")
 @export var key := ValveKeys.GUT
 ## Whose reliquary this is (&"" = nobody's: a nest, a hole).
 @export var keeper: StringName
+## Draw its own reliquary or nest (off when a set piece is there already:
+## the High Aerie's nest, the Kin's roost).
+@export var show_art := true
 
 var _prompt: Label
 var _time := 0.0
@@ -28,12 +31,13 @@ var _key_sprite: Sprite2D
 func _ready() -> void:
 	collision_layer = 2
 	collision_mask = 4
-	var art := Sprite2D.new()
-	art.texture = NEST_ART if place == ValveKeys.MATRON_NEST else RELIQUARY_ART
-	art.offset = Vector2(0, -art.texture.get_height() / 2.0)
-	add_child(art)
+	if show_art:
+		var art := Sprite2D.new()
+		art.texture = NEST_ART if place == ValveKeys.MATRON_NEST else RELIQUARY_ART
+		art.offset = Vector2(0, -art.texture.get_height() / 2.0)
+		add_child(art)
 	_key_sprite = Sprite2D.new()
-	_key_sprite.texture = KEY_ART
+	_key_sprite.texture = KEY_ART if key == ValveKeys.GUT else load("res://assets/art/items/%s.png" % key)
 	_key_sprite.material = UNSHADED
 	add_child(_key_sprite)
 	var shape := CollisionShape2D.new()

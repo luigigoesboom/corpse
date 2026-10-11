@@ -5,6 +5,16 @@ Three lines a week minimum. Newest at the top.
 Template:
 
 ```
+## Week 51 (2026-10-11)
+Done: The Lungs' mutations: the Bellows Heart (a second jump in the air; the Second Heart lies in the Hives) and the Gust Bladder (head slot, R: a gust that throws creatures back and you the other way; a Puffsac popped by it bursts out of reach; the Wind Bladder lies in the Hives and the Kin trade it), with overlays, icons, sounds. Valve keys are one table now (`ValveKeys.KEYS`); the Lungs' key is kept by the Kin on a string atop their roost if their past is rich in wonders and trade, else it lies in the High Aerie's nest up the Trachea. The Kin talk about it, sell it (120 ichor), give it to friends, take it home from bodies. tests/test_lung_mutations.gd.
+Not done: Nothing guards the Aerie yet but the climb and the Rays.
+Next: Week 52, the breath cycle.
+
+## Week 50 (2026-10-11)
+Done: The Bellows-Kin, the Lungs' people (data/factions/bellows_kin.tres): the Lungs' past is simulated now, side by side with the Gut's but with its own generator, the Kin destined in it; other peoples rise and fall there, the Kin split into "True" and "Reformed" Kin in some worlds. The Gut's story stays word for word the same for every seed checked (a name clash between regions used to reroll Gut names; fixed). They hold the Lungs; their roost in the Lower Lobe (kite racks, a breath drum, hammocks, windsocks), residents in a bladder mask with a breathing tube and a folded kite; a ruin from the Lungs' past at the Lobe's east end; hosts can wake at the roost. Old saves gain the Lungs' past when loaded. tests/test_kin.gd.
+Not done: The Kin have no valve key yet (week 51) and nothing of their own to say about the breath (week 52).
+Next: Week 51, the Lungs' mutations and valve key.
+
 ## Week 49 (2026-10-11)
 Done: The Lungs' creatures, each started with tools/creature/new_creature.gd: the Puffsac (week 45) now lives in the Bellows, the Hives and the Lobe; the Cilia Lasher (rooted: draws its lash back, whips the floor ahead) on floors; the Bellows Ray (flyer: perches high, swoops down to your height and pulls up; drops a breath sac, the Lung Sac you can eat) in the high spaces. Their own sounds, ichor values. tests/test_lung_creatures.gd. The test helper goto() now holds the player until far chunks are built (it fell through floors that were not there yet).
 Not done: The breath does not move them yet (week 52).

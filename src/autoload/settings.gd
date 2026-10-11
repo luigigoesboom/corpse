@@ -13,7 +13,7 @@ const BUSES := [&"Master", &"Music", &"Ambience", &"SFX", &"UI"]
 const REBINDABLE := {
 	&"move_left": "Move left", &"move_right": "Move right", &"move_down": "Down (drop through)", &"jump": "Jump", &"attack": "Attack",
 	&"dodge": "Dodge roll", &"sneak": "Sneak", &"interact": "Talk / take / use",
-	&"ability_mouth": "Mouth mutation", &"ability_arm": "Arm mutation", &"inventory": "Inventory",
+	&"ability_mouth": "Mouth mutation", &"ability_arm": "Arm mutation", &"ability_head": "Head mutation", &"inventory": "Inventory",
 	&"quick_save": "Quick save", &"quick_load": "Quick load",
 }
 

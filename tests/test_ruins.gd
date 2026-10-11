@@ -84,8 +84,8 @@ func run() -> void:
 	var bare := WorldData.create(205895)
 	bare.year = HistorySim.YEARS
 	HistorySim.run(bare)
-	check(bare.sites.values().filter(func(s): return s.kind == &"ruin").is_empty(), "seed 205895's history leaves no ruins")
-	var slots: Array = game._entities.templates().filter(func(t): return "width" in t and t.has_method("story_text"))
+	check(bare.sites.values().filter(func(s): return s.kind == &"ruin" and s.region == &"gut").is_empty(), "seed 205895's history leaves no ruins in the Gut")
+	var slots: Array = game._entities.templates().filter(func(t): return "width" in t and t.has_method("story_text") and WorldMap.region_of(t.position) == &"gut")
 	load("res://src/world/site_seeder.gd").fill_ruin_slots(bare, slots)
 	var filled := 0
 	var told := true
@@ -94,7 +94,7 @@ func run() -> void:
 		if site and site.kind == &"ruin":
 			filled += 1
 			told = told and ArtifactForge.events_at(bare, site.id).size() >= 2
-	check(filled == slots.size() and slots.size() == 2 and told, "both slots get an older ruin, with a founding and an end in the log")
+	check(filled == slots.size() and slots.size() == 2 and told, "both Gut slots get an older ruin, with a founding and an end in the log")
 	var in_order := true
 	for i in range(1, bare.events.size()):
 		in_order = in_order and bare.events[i].year >= bare.events[i - 1].year

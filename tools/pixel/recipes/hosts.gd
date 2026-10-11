@@ -36,10 +36,11 @@ const LOOKS := {
 	"antibody": {"cloth": &"antibody", "skin": &"antibody", "round": true, "mask": "egg"},
 	"tender": {"cloth": &"tender", "skin": &"skin", "apron": true, "mask": "stitched"},
 	"chorister": {"cloth": &"gold", "skin": &"skin", "hood": true, "cloak": true, "mask": "halo"},
+	"kin": {"cloth": &"kin", "skin": &"skin", "kite": true, "mask": "bellows"},
 }
 const HOSTS := ["colonist", "pilgrim", "antibody"]
-const RESIDENTS := ["tender", "chorister"]
-const PARTS := ["acid_gland", "bone_spur", "lung_sac"]
+const RESIDENTS := ["tender", "chorister", "kin"]
+const PARTS := ["acid_gland", "bone_spur", "lung_sac", "gust_bladder", "bellows_heart"]
 
 
 static func make(pal, out: Array) -> void:
@@ -210,6 +211,8 @@ static func _body(pal, look: Dictionary, b: Dictionary, p: Dictionary) -> Image:
 	var cloth: StringName = look.cloth
 	if p.has("roll"):
 		return _roll(c, pal, look, p.roll)
+	if look.get("kite", false):  # The Bellows-Kin: a kite of lung folded on the back.
+		_kite(c, pal, b)
 	# Back limbs, in shadow.
 	_arm(c, b, "b", skin, -3.0, -0.28)
 	_leg(c, b, "b", skin, cloth, -2.0, -0.22)
@@ -247,6 +250,20 @@ static func _body(pal, look: Dictionary, b: Dictionary, p: Dictionary) -> Image:
 		var elbow: Vector2 = b["elbow_" + arm]
 		c.capsule(b.shoulder, b.shoulder.lerp(elbow, 0.6), 2.6, 2.2, cloth, {"z": 3.1 if arm == "f" else -2.9, "tone": 0.0 if arm == "f" else -0.25, "lo": 1})
 	return c.render().body
+
+
+## The Bellows-Kin's kite: two ribbed sheets of lung folded up behind the
+## shoulders, their tips above the head.
+static func _kite(c, pal, b: Dictionary) -> void:
+	var behind: Vector2 = b.up.orthogonal()  # Facing right, "up" turned left: behind.
+	var back: Vector2 = b.shoulder + behind * 2.0
+	for k in 2:
+		var tip: Vector2 = back + b.up * (15.0 + k * 3.0) + behind * (9.0 + k * 5.0)
+		var foot: Vector2 = b.hip + b.up * 2.0 + behind * (5.0 + k * 2.0)
+		for i in 6:
+			var t := i / 5.0
+			c.capsule(back.lerp(tip, t), foot.lerp(tip, t), 1.4, 1.2, &"lung", {"z": -4.0 - k * 0.1, "alpha": 0.8, "dither": true, "lo": 0, "hi": 2, "line": false})
+		c.stroke(back, tip, pal.step(&"bone", 1))  # The spar.
 
 
 ## Tucked into a ball, turned `angle` degrees: cloth round the back, the
@@ -316,6 +333,16 @@ static func _mask(c, pal, b: Dictionary, p: Dictionary, look: Dictionary) -> voi
 				var at: Vector2 = plate + fwd * 2.0 - up * (2.0 + k * 1.5)
 				c.stroke(at - fwd * 1.0, at + fwd * 1.0, pal.step(&"ash", -1))
 			c.stroke(plate + fwd * 1.0 + up * 5.0, plate + fwd * 3.0 + up * 5.0, pal.step(&"wood", 0))
+		"bellows":  # A bladder of lung strapped over the face, ribbed, breathing
+			# through a tube that hangs to the chest.
+			var sac = head + fwd * 3.5 + up * 1.0
+			c.ellipse(sac, 7.0, 8.5, &"lung", {"z": 2.5, "rot": rot, "dither": true, "lo": 1})
+			for k in 3:  # Ribs around it.
+				var at: Vector2 = sac + up * (4.0 - k * 4.0)
+				c.stroke(at - fwd * 5.0, at + fwd * 5.5, pal.step(&"rock_alveolus", 2))
+			var tube_end: Vector2 = head + fwd * 4.0 - up * 13.0
+			c.capsule(sac + fwd * 4.0 - up * 5.0, tube_end, 1.6, 1.3, &"rock_cartilage", {"z": 2.6, "lo": 2})
+			c.circle(tube_end, 1.8, &"rock_cartilage", {"z": 2.7, "lo": 1})
 		"halo":  # A big gold sun held over the face, rays scratched in.
 			var sun = head + fwd * 4.0
 			c.circle(sun, 9.0, &"gold", {"z": 2.5, "lo": 1})
@@ -340,6 +367,17 @@ static func _part(pal, part: String, b: Dictionary) -> Image:
 		"bone_spur":  # A spike of bone grown out of the forearm.
 			var dir: Vector2 = (b.hand_f - b.elbow_f).normalized()
 			c.capsule(b.hand_f - dir * 2.0, b.hand_f + dir * 9.0, 2.0, 0.6, &"bone")
+		"gust_bladder":  # A taut bladder of breath at the throat, ringed with cartilage.
+			var throat: Vector2 = b.head - b.up * 7.0 + b.up.orthogonal() * -2.0
+			c.ellipse(throat, 4.2, 3.6, &"lung", {"dither": true})
+			c.stroke(throat + Vector2(-3, -1), throat + Vector2(3, -2), pal.step(&"rock_cartilage", 3))
+			c.detail(Vector2i(throat + Vector2(-1, -2)), pal.step(&"lung", -1))
+		"bellows_heart":  # A ribbed organ pumping in the belly, showing through.
+			var belly: Vector2 = b.chest.lerp(b.hip, 0.55) + b.up.orthogonal() * -2.5
+			c.ellipse(belly, 3.6, 4.6, &"lung", {"rot": b.up.angle() + PI / 2.0})
+			for k in 3:
+				var at: Vector2 = belly - b.up * (k - 1) * 2.4
+				c.stroke(at - Vector2(3, 0), at + Vector2(3, 0), pal.step(&"rock_alveolus", 2))
 		"lung_sac":  # A breathing bladder on the back.
 			var back: Vector2 = b.chest.lerp(b.hip, 0.35) - b.up.orthogonal() * -7.0
 			c.ellipse(back, 4.5, 5.5, &"lung", {"rot": b.up.angle() + PI / 2.0})

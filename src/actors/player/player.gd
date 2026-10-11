@@ -54,7 +54,7 @@ signal teleported
 @export var wall_jump_lock_time := 0.14
 
 ## Which input uses the ability in each body slot.
-const ABILITY_ACTIONS := {"mouth": &"ability_mouth", "arm": &"ability_arm", "back": &"jump"}
+const ABILITY_ACTIONS := {"mouth": &"ability_mouth", "arm": &"ability_arm", "back": &"jump", "belly": &"jump", "head": &"ability_head"}
 
 @export_group("Dodge")
 ## Start speed of the roll; it eases out towards the end.

@@ -35,6 +35,8 @@ const PLACES := "res://tools/map/lungs.json"
 ## Magenta: a membrane (WorldMap.is_membrane_color).
 const MEMBRANE := Color8(255, 0, 255)
 const ROCK := Color.BLACK
+## The Bellows-Kin's color (data/factions/bellows_kin.tres): their territory.
+const KIN_COLOR := Color(0.55, 0.78, 0.92, 1)
 const AIR := Color(1, 1, 1, 0)
 ## How far the host's jump reaches, in tiles (jump height 120 px = 3.75).
 const JUMP_UP := 3
@@ -362,7 +364,7 @@ func _write(old_world: Image) -> void:
 	# Kinds: the Lungs are alveolus, cartilage around the airways.
 	_widen(KINDS, func(x, y): return RockKinds.INFO[&"cartilage" if cartilage[_i(x, y)] else &"alveolus"].paint)
 	_widen(REGIONS, func(_x, _y): return Regions.INFO[Regions.LUNGS].paint)
-	_widen(TERRITORY, func(_x, _y): return AIR)
+	_widen(TERRITORY, func(_x, _y): return KIN_COLOR)  # The Lungs are the Bellows-Kin's (week 50).
 	var file := FileAccess.open(PLACES, FileAccess.WRITE)
 	file.store_string(JSON.stringify(places, "\t"))
 	file.close()

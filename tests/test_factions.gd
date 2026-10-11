@@ -9,7 +9,8 @@ func run() -> void:
 
 	# Definitions.
 	var ids := FactionDb.all_ids()
-	check(ids == [&"choir_of_waking", &"flesh_tenders"], "two Gut factions are defined (%s)" % [ids])
+	check(ids == [&"bellows_kin", &"choir_of_waking", &"flesh_tenders"], "three factions are defined (%s)" % [ids])
+	check(ids.filter(func(id): return FactionDb.get_def(id).region == &"gut").size() == 2, "two of them in the Gut, one in the Lungs")
 	var tenders := FactionDb.get_def(&"flesh_tenders")
 	var choir := FactionDb.get_def(&"choir_of_waking")
 	check(tenders.creed != "" and choir.creed != "" and tenders.color != choir.color, "each has a creed and its own color")
@@ -61,5 +62,6 @@ func run() -> void:
 
 	# The debug map lists them.
 	var lines: Array = game.get_node("UI/DebugMap").legend_lines()
-	check(lines.size() >= 2 and lines[0].text.begins_with("Choir of Waking:") and lines[1].text.begins_with("Flesh-Tenders:") and "chunks" in lines[0].text,
-		"the debug map's legend lists each faction")
+	var texts: Array = lines.map(func(l): return l.text)
+	var listed := ["Bellows-Kin:", "Choir of Waking:", "Flesh-Tenders:"].all(func(name): return texts.any(func(t): return t.begins_with(name) and "chunks" in t))
+	check(listed, "the debug map's legend lists each faction (%s)" % [texts])

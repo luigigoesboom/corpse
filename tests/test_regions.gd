@@ -5,12 +5,18 @@ extends "res://tests/test_case.gd"
 
 
 func run() -> void:
+	var gut := WorldData.create(1234)
+	gut.year = HistorySim.YEARS
+	HistorySim.run_regions(gut, [Regions.GUT])
+	check(not gut.factions.is_empty() and gut.factions.values().all(func(f): return f.region == Regions.GUT),
+		"the Gut's past makes Gut peoples")
+	check(gut.sites.values().all(func(s): return s.region == Regions.GUT), "and Gut places")
 	var data := WorldData.create(1234)
 	data.year = HistorySim.YEARS
 	HistorySim.run(data)
-	check(not data.factions.is_empty() and data.factions.values().all(func(f): return f.region == Regions.GUT),
-		"the Gut's past makes Gut peoples")
-	check(data.sites.values().all(func(s): return s.region == Regions.GUT), "and Gut places")
+	for region in [Regions.GUT, Regions.LUNGS]:
+		check(data.factions.values().any(func(f): return f.region == region) and data.sites.values().any(func(s): return s.region == region),
+			"a whole world's past has peoples and places in %s" % Regions.display_name(region))
 	check(HistorySim.regions_without_past(data).is_empty(), "every simulated region has its past")
 
 	# Nobody wars, trades or splits across regions.

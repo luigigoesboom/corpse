@@ -106,6 +106,11 @@ title = "The High Aerie"
 line = "Something nests up here, where the air is thinnest."
 extents = Vector2(672, 192)
 
+[node name="KinRoost" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(13456, 3370)
+script = ExtResource("11_spawn")
+place_name = "the Bellows-Kin roost"
+
 [node name="Entities" type="Node2D" parent="."]
 script = ExtResource("2_entities")
 
@@ -376,3 +381,38 @@ position = Vector2(10256, 976)
 
 [node name="RayLobe" parent="Entities" instance=ExtResource("27_ray")]
 position = Vector2(13776, 3056)
+
+[node name="KinRoost" type="Node2D" parent="Entities"]
+position = Vector2(13456, 3398)
+script = ExtResource("12_settlement")
+width = 576.0
+capacity = 6
+preferred_faction = &"bellows_kin"
+
+[node name="LobeRuin" type="Node2D" parent="Entities"]
+position = Vector2(15312, 3398)
+script = ExtResource("13_ruin")
+width = 288.0
+
+[node name="KinKeyString" type="Area2D" parent="Entities"]
+position = Vector2(13680, 3398)
+script = ExtResource("18_cache")
+place = "kin_roost"
+key = &"valve_key_lungs"
+keeper = &"bellows_kin"
+show_art = false
+
+[node name="AerieKey" type="Area2D" parent="Entities"]
+position = Vector2(15056, 422)
+script = ExtResource("18_cache")
+place = "high_aerie"
+key = &"valve_key_lungs"
+show_art = false
+
+[node name="SecondHeart" parent="Entities" instance=ExtResource("4_item")]
+position = Vector2(12496, 1574)
+item_id = &"second_heart"
+
+[node name="WindBladder" parent="Entities" instance=ExtResource("4_item")]
+position = Vector2(14032, 1638)
+item_id = &"wind_bladder"

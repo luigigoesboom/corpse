@@ -1,0 +1,51 @@
+[gd_resource type="Resource" script_class="FactionDef" format=3]
+
+[ext_resource type="Script" path="res://src/sim/factions/faction_def.gd" id="1_def"]
+[ext_resource type="PackedScene" path="res://src/props/settlement/kite_rack.tscn" id="2_rack"]
+[ext_resource type="PackedScene" path="res://src/props/settlement/breath_drum.tscn" id="3_drum"]
+[ext_resource type="PackedScene" path="res://src/props/settlement/membrane_hammock.tscn" id="4_hammock"]
+[ext_resource type="PackedScene" path="res://src/props/settlement/windsock.tscn" id="5_windsock"]
+[ext_resource type="PackedScene" path="res://src/props/settlement/banner.tscn" id="6_banner"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"bellows_kin"
+display_name = "Bellows-Kin"
+member_name = "a Bellows-Kin"
+description = "Gliders who live by the Lungs' breath. They keep time to the god's slow breathing on drums of lung skin, ride its winds on kites of the same, and trade in whatever the air carries in."
+creed = "Every breath is a road. Learn when it goes in and when it goes out, and the whole body is yours to cross."
+color = Color(0.55, 0.78, 0.92, 1)
+values = Array[StringName]([&"the_breath", &"freedom", &"trade", &"kites"])
+region = &"lungs"
+aggression = 0.3
+expansion = 0.5
+piety = 0.35
+trade = 0.85
+senses_fragment = 0.3
+corpse_fates = {
+&"studied": 3,
+&"looted": 2,
+&"enshrined": 1
+}
+npc_frames_dir = "res://assets/art/npcs/kin"
+settlement_props = Array[PackedScene]([ExtResource("2_rack"), ExtResource("3_drum"), ExtResource("4_hammock"), ExtResource("5_windsock"), ExtResource("6_banner")])
+barks = Array[String](["In... and out. Feel it? Count with me.", "The next breath goes our way. Rest till then.", "Never fly on the turn of the breath.", "Mind the cilia, they whip.", "The Rays are hunting. Stay under the sheets.", "You walk. We used to walk too.", "Something in the air today. Something from below."])
+greetings = {
+"friendly": ["Welcome down, friend. Sit, the next breath is a long one.", "Ah, a known face. The wind told us you were coming.", "Friend of the Kin. Take what you need, give what you can."],
+"hostile": ["Walk back the way you came. The air here is ours.", "We know what you did. The wind carries everything.", "Leave, or we let the Rays have you."],
+"neutral": ["Breathe easy, stranger. What do you carry?", "A walker. Mind your step on the sheets.", "In or out, stranger? Which way are you going?"],
+"wary": ["You came up the Bronchus. What do you want?", "Hm. Gut-folk. Keep your hands where we can see them.", "Speak, and make it short. The breath is turning."]
+}
+farewells = Array[String](["Ride the out-breath.", "Mind the turn.", "Fly well.", "Count your breaths."])
+wares = Array[StringName]([&"breath_sac", &"wind_bladder"])
+wants = Array[StringName]([&"bone_shard", &"bile_bulb", &"artifact"])
+strength = 70
+relations = {
+&"choir_of_waking": -10,
+&"flesh_tenders": 15
+}
+host_attitudes = {
+&"antibody": -15,
+&"colonist": 5,
+&"pilgrim": 25
+}

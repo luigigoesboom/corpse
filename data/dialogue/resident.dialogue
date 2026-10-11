@@ -46,7 +46,7 @@ if hostile
 	=> END
 
 ~ key
-{{npc}}: The key of the Gut's valve. It sleeps in our reliquary until the heart calls for it.
+{{npc}}: {{key_line}}
 - Give it to me. The heart is calling. [if can_ask_key /]
 	do ask_key()
 	{{npc}}: {{key_text}}

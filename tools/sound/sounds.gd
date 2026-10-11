@@ -129,6 +129,13 @@ func _one_shots() -> void:
 	s.tone(0.0, 0.9, 1050, 640, 0.12, "tri", 0.05, 1.2)
 	s.noise(0.0, 0.9, 0.3, 1800.0, 0.1, 1.0)
 	_done(s, "ray_cry", false, 0.6)
+	s = Synth.new(0.5, 46)
+	s.noise(0.0, 0.45, 0.9, 1800.0, 0.01, 1.6)  # A rush of breath.
+	s.tone(0.0, 0.3, 140, 90, 0.25, "sine", 0.01, 2.0)
+	_done(s, "gust", false, 0.8)
+	s = Synth.new(0.3, 47)
+	s.noise(0.0, 0.25, 0.7, 2600.0, 0.005, 2.5)  # A short puff.
+	_done(s, "puff", false, 0.6)
 
 func _ui() -> void:
 	var s

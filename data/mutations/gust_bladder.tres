@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MutationDef" format=3]
+
+[ext_resource type="Script" path="res://src/mutations/mutation_def.gd" id="1_def"]
+[ext_resource type="Script" path="res://src/mutations/abilities/gust.gd" id="2_ability"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"gust_bladder"
+display_name = "Gust Bladder"
+description = "A bladder of old breath in the throat. Let it all out at once: a gust that throws things back, and you the other way."
+slot = "head"
+ability = ExtResource("2_ability")
+part_frames_dir = "res://assets/art/mutations/gust_bladder"
+control_hint = "R"
+part_color = Color(0.84, 0.86, 0.9, 1)
+part_polygon = PackedVector2Array(0, -4, 6, 0, 0, 4, -4, 0)

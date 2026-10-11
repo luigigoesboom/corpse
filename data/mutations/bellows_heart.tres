@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MutationDef" format=3]
+
+[ext_resource type="Script" path="res://src/mutations/mutation_def.gd" id="1_def"]
+[ext_resource type="Script" path="res://src/mutations/abilities/air_jump.gd" id="2_ability"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"bellows_heart"
+display_name = "Bellows Heart"
+description = "A second heart that is a bellows, pumping air through the ribs. Jump again in the air."
+slot = "belly"
+ability = ExtResource("2_ability")
+part_frames_dir = "res://assets/art/mutations/bellows_heart"
+control_hint = "Jump in the air"
+part_color = Color(0.89, 0.6, 0.66, 1)
+part_polygon = PackedVector2Array(0, -4, 6, 0, 0, 4, -4, 0)

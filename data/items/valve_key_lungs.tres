@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://src/items/item_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"valve_key_lungs"
+display_name = "Valve Key of the Lungs"
+description = "A key of the heart, ringed like an airway, cold as breath. One of the locks on the god's heart."
+color = Color(0.75, 0.82, 0.92, 1)
