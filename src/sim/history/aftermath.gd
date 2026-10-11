@@ -72,7 +72,7 @@ static func _hint_history(data: WorldData, happened: Array, report: Dictionary) 
 	for site: SiteData in data.sites.values():
 		if site.slot != "" and site.is_lived_in():
 			known[site.faction] = true
-	for type in [&"war_declared", &"peace", &"site_taken", &"disaster", &"rot_spread", &"rot_receded", &"beast_arose", &"beast_slain", &"beast_raided", &"schism", &"prophet", &"wonder"]:
+	for type in [&"war_declared", &"peace", &"site_taken", &"disaster", &"rot_spread", &"rot_receded", &"beast_arose", &"beast_slain", &"beast_raided", &"leader_overthrown", &"leader_rose", &"leader_deed", &"schism", &"prophet", &"wonder"]:
 		for event in happened:
 			if event.type == type and event.actors.any(func(a): return known.has(StringName(str(a)))):
 				report.hints.append("While you were gone: %s" % EventText.describe(event, data))

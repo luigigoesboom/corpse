@@ -73,9 +73,19 @@ func build() -> void:
 	_lay_out_props(def, rng)
 	_add_mural()
 	var bounds := walk_bounds()
+	# The seat of a people: their leader lives here (D-033), the last of them
+	# (the first third are guards).
+	var leader := Figures.leader_of(WorldState.data, site.faction)
+	if leader and Figures.seat_of(WorldState.data, site.faction) != site:
+		leader = null
 	for i in site.residents_shown(capacity):
 		var npc: ColonyNpc = RESIDENT.instantiate()
-		npc.setup(self, Names.resident_name(WorldState.data.world_seed, site.id, i), def.npc_frames_dir, rng.randi())
+		var resident_name := Names.resident_name(WorldState.data.world_seed, site.id, i)
+		if leader and i == site.residents_shown(capacity) - 1:
+			resident_name = leader.full_name()
+			npc.set_meta(&"figure", leader.id)
+			npc.modulate = Color(1.15, 1.05, 0.85)
+		npc.setup(self, resident_name, def.npc_frames_dir, rng.randi())
 		npc.position = Vector2(rng.randf_range(bounds.x, bounds.y), 0)
 		npc.is_guard = i < ceili(site.residents_shown(capacity) / 3.0)
 		_add_built(npc)
@@ -208,6 +218,10 @@ func resident_died(npc: ColonyNpc) -> void:
 		WorldState.data.log_deed(&"resident_killed", [site.faction, life.host_name if life else "someone"],
 			{"site": site.id, "victim": npc.npc_name})
 		_deed(KILL_DEED)
+		var figure: FigureData = WorldState.data.figures.get(npc.get_meta(&"figure", ""))
+		if figure and figure.is_alive():  # Their leader (D-033).
+			Figures.killed_by_host(WorldState.data, figure, life.host_name if life else "someone", site.id)
+			_deed(KILL_DEED)
 
 
 func _deed(amount: int) -> void:

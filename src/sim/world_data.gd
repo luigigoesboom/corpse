@@ -81,6 +81,8 @@ var rot_width := 0
 var beasts: Dictionary = {}
 ## Whether the beasts of the recent past were made (Beasts.seed_past()).
 var beasts_seeded := false
+## Notable people (D-033, Figures): id -> FigureData, living and dead.
+var figures: Dictionary = {}
 
 
 static func create(seed_value: int) -> WorldData:
@@ -432,6 +434,7 @@ func to_dict() -> Dictionary:
 		"ichor": ichor, "ichor_banked": ichor_banked, "boons": boons.duplicate(), "kept_graft": kept_graft.duplicate(), "known_events": known_events.duplicate(), "key_places": key_places.duplicate(), "explored": explored.duplicate(true), "places_seen": places_seen.duplicate(),
 		"rot": rot.duplicate(), "rot_width": rot_width,
 		"beasts": beasts.values().map(func(b): return b.to_dict()), "beasts_seeded": beasts_seeded,
+		"figures": figures.values().map(func(f): return f.to_dict()),
 	}
 
 
@@ -474,6 +477,9 @@ static func from_dict(d: Dictionary) -> WorldData:
 		var beast := BeastData.from_dict(beast_dict)
 		data.beasts[beast.id] = beast
 	data.beasts_seeded = d.get("beasts_seeded", false)
+	for figure_dict in d.get("figures", []):
+		var figure := FigureData.from_dict(figure_dict)
+		data.figures[figure.id] = figure
 	data._fit_inventory()
 	return data
 

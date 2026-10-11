@@ -27,6 +27,58 @@ static func describe(event: EventRecord, data: WorldData) -> String:
 			return EventText._one(pick, ["Rot sickness took %d in %s." % [d.get("dead", 0), site], "%s coughed grey for a season; %d died." % [site, d.get("dead", 0)]])
 		&"beast_arose", &"beast_raided", &"beast_slain", &"beast_slain_by_host", &"beast_died", &"beast_escaped":
 			return _beast(event, data, a, site, pick)
+		&"leader_rose", &"leader_died", &"leader_overthrown", &"leader_deed", &"leader_killed":
+			return _leader(event, data, a, site, pick)
+	return ""
+
+
+static func _leader(event: EventRecord, data: WorldData, a: String, site: String, pick: int) -> String:
+	var d := event.data
+	var f: FigureData = data.figures.get(str(d.get("figure", "")))
+	var who := f.full_name() if f else "their leader"
+	match event.type:
+		&"leader_rose":
+			return EventText._one(pick, ["%s chose %s to lead them." % [a, who], "%s took the lead of %s." % [who, a]])
+		&"leader_died":
+			var cause := f.cause if f else "something"
+			var heir: FigureData = data.figures.get(str(d.get("heir", "")))
+			var after := (" They chose %s." % heir.full_name()) if heir else ""
+			if cause in Figures.DEATHS:
+				return EventText._one(pick, ["%s of %s died of %s.%s" % [who, a, cause, after], "%s mourned %s, dead of %s.%s" % [a, who, cause, after]])
+			return "%s of %s was killed by %s.%s" % [who, a, cause, after]
+		&"leader_overthrown":
+			var fallen: FigureData = data.figures.get(str(d.get("fallen", "")))
+			var fallen_name := fallen.full_name() if fallen else "the old leader"
+			return EventText._one(pick, ["%s put a knife in %s and took the lead of %s." % [who, fallen_name, a],
+				"%s fell to %s, who now leads %s." % [fallen_name, who, a]])
+		&"leader_killed":
+			return "%s, a host, killed %s, leader of %s." % [event.actors[1] if event.actors.size() > 1 else "Someone", who, a]
+		&"leader_deed":
+			var other := EventText._faction(data, d.get("other", "")) if d.has("other") else "their neighbours"
+			match d.get("deed", &""):
+				&"cruel":
+					return EventText._one(pick, ["%s purged %s; %d were thrown into the dark." % [who, site, d.get("dead", 0)], "%s hanged %d of their own people in %s." % [who, d.get("dead", 0), site]])
+				&"paranoid":
+					return "%s saw traitors everywhere in %s and drove out %d of them." % [who, site, d.get("dead", 0)]
+				&"pious":
+					return EventText._one(pick, ["%s raised a shrine to the god in %s." % [who, site], "%s ordered a year of fasting in %s." % [who, site]])
+				&"wise":
+					return "%s made peace with %s." % [who, other]
+				&"ambitious":
+					return "%s laid claim to the lands of %s." % [who, other]
+				&"greedy":
+					return "%s doubled the tolls on the traders of %s." % [who, other]
+				&"kind":
+					return EventText._one(pick, ["%s held a feast in %s and invited every neighbour." % [who, site], "%s opened the stores of %s to the hungry." % [who, site]])
+				&"brave":
+					var beast: BeastData = data.beasts.get(str(d.get("beast", "")))
+					if beast:
+						return "%s went alone into the lair of %s and came back with its head." % [who, beast.full_name()]
+					return "%s led the hunters of %s into the deep and came back." % [who, a]
+				&"mad":
+					return String(Figures.MAD_DECREES[int(d.get("decree", 0)) % Figures.MAD_DECREES.size()]).format({"n": who, "site": site})
+				&"craven":
+					return "%s had the walls of %s built higher, and higher again." % [who, site]
 	return ""
 
 

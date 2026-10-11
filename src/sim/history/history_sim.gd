@@ -147,6 +147,7 @@ static func tick(data: WorldData, rng: RandomNumberGenerator) -> void:
 	if _alive(data).size() < 4 and rng.randf() < (0.05 if _alive(data).size() < 2 else 0.006):
 		_arrive(data, rng)
 	_falls(data)
+	Figures.tick(data, rng)  # Leaders rise, rule and die (D-033).
 
 
 # --- Peoples ---------------------------------------------------------------

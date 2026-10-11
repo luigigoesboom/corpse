@@ -48,6 +48,12 @@ static func recognition(data: WorldData, faction: StringName) -> String:
 			what = "you robbed the body we laid in our shrine at %s" % place
 		&"boss_slain":
 			what = "you slew %s" % event.data.get("boss", "a great beast")
+		&"leader_killed":
+			var leader: FigureData = data.figures.get(str(event.data.get("figure", "")))
+			what = "you killed %s, who led us, at %s" % [leader.full_name() if leader else "our leader", place]
+		&"beast_slain_by_host":
+			var beast: BeastData = data.beasts.get(str(event.data.get("beast", "")))
+			what = "you slew %s" % (beast.full_name() if beast else "a great beast")
 	var how := "The heart was glad of it." if event.type in GOOD else "We have not forgiven it."
 	return "I know you, whatever face you wear now. %s, %s. %s" % [when, what, how]
 

@@ -152,6 +152,7 @@ func _on_world_loaded() -> void:
 		Rot.settle(data, body(), SeededRng.make([data.world_seed, "rot"]))
 	WorldMap.set_rot(data.rot, data.rot_width)
 	Beasts.seed_past(data, body().lairs, SeededRng.make([data.world_seed, "beasts"]))  # D-033
+	Figures.ensure(data, SeededRng.make([data.world_seed, "figures", data.year]))
 	if data.current_life() == null:
 		data.start_life(&"colonist")  # Saves from before week 21 have no lives.
 	$UI.close_all()

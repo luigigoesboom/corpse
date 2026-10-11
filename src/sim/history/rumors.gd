@@ -26,11 +26,11 @@ static func candidates(data: WorldData, speaker_faction: StringName, exclude: Ar
 		var weight := 1.0 / (1.0 + age / 40.0)
 		if ours:
 			weight *= 3.0
-		if event.type in [&"host_died", &"resident_killed", &"boss_slain", &"corpse_claimed", &"vengeance_sworn", &"deep_settled", &"pilgrims_came", &"key_stolen", &"key_taken", &"key_given", &"key_bought", &"key_found", &"beast_slain_by_host"]:
+		if event.type in [&"host_died", &"resident_killed", &"boss_slain", &"corpse_claimed", &"vengeance_sworn", &"deep_settled", &"pilgrims_came", &"key_stolen", &"key_taken", &"key_given", &"key_bought", &"key_found", &"beast_slain_by_host", &"leader_killed"]:
 			weight *= 10.0  # Everybody talks about the strangers who die here, and who kill.
 		elif event.type in [&"corpse_scavenged", &"corpse_rotted", &"creatures_returned", &"wonder", &"prophet", &"trade_pact", &"site_founded"]:
 			weight *= 0.5
-		elif event.type in [&"faction_fell", &"site_razed", &"schism", &"war_declared", &"disaster", &"rot_spread", &"rot_bloom", &"rot_sickness", &"beast_raided", &"beast_arose", &"beast_slain"]:
+		elif event.type in [&"faction_fell", &"site_razed", &"schism", &"war_declared", &"disaster", &"rot_spread", &"rot_bloom", &"rot_sickness", &"beast_raided", &"beast_arose", &"beast_slain", &"leader_deed", &"leader_overthrown", &"leader_died", &"leader_rose"]:
 			weight *= 1.5
 		var site: SiteData = data.sites.get(str(event.data.get("site", "")))
 		if site and site.slot != "":

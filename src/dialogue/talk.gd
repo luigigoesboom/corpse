@@ -101,6 +101,14 @@ var _take: Array[StringName] = []
 var _price := 1
 
 
+## How a leader greets you, by their first trait (%s = their name).
+const LEADER_GREETINGS := {&"cruel": "I am %s. You have one breath to say why you are here.", &"pious": "%s. The god sees you. So do I.",
+	&"greedy": "%s. What have you brought me?", &"wise": "I am %s. Sit, if you like. Most things can wait.",
+	&"ambitious": "%s. You look useful. Are you?", &"paranoid": "%s. Who sent you? Do not lie.",
+	&"mad": "%s, that is me, and the walls agree. Do you hear them?", &"kind": "I am %s. Have you eaten? Sit.",
+	&"brave": "%s. You have the look of someone who goes into the dark. Good.", &"craven": "%s. Keep your voice down. Please."}
+
+
 func _init(data: WorldData, speaker_name: String, faction_id: StringName, rng_seed: int) -> void:
 	_data = data
 	_faction = faction_id
@@ -115,6 +123,9 @@ func _init(data: WorldData, speaker_name: String, faction_id: StringName, rng_se
 		recognition = Legend.recognition(data, faction_id)
 		recognized = recognition != ""
 	greeting = _pick(_greetings(), "Hm.")
+	var leader := Figures.leader_of(data, faction_id) if faction_id != &"" else null
+	if leader and leader.full_name() == speaker_name and not hostile:  # The leader themselves (D-033).
+		greeting = LEADER_GREETINGS.get(leader.traits[0], "%s. Speak.") % leader.name
 	farewell = _pick(_def.farewells if _def else [], "Go well.")
 	creed = _creed()
 	_set_up_barter()
@@ -197,7 +208,8 @@ func _creed() -> String:
 		return "My people? Gone, or never were. I walk."
 	var faction: FactionData = _data.factions.get(_faction)
 	var how_many := " There are %d of us now." % faction.strength if faction and faction.is_alive() else ""
-	return "%s%s" % [_def.creed, how_many]
+	var leader := Figures.leader_line(_data, _faction, _rng.randi())
+	return "%s%s%s" % [_def.creed, how_many, (" " + leader) if leader != "" else ""]
 
 
 ## Their first ware for the first thing they want that you carry. Artifacts
