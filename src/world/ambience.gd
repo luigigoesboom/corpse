@@ -19,6 +19,7 @@ const LAYERS := {
 	&"body": [-8.0, 1.0],
 	&"settlement": [-16.0, 1.0],
 	&"boss": [-10.0, 1.0],
+	&"breath": [-8.0, 1.0],
 }
 ## How fast layers fade in and out (fraction of the way per second).
 const FADE := 0.8
@@ -88,6 +89,8 @@ func targets_at(at: Vector2) -> Dictionary:
 		nearest = minf(nearest, (node as Node2D).global_position.distance_to(at))
 	t[&"settlement"] = clampf(1.0 - (nearest - SETTLEMENT_NEAR) / (SETTLEMENT_RANGE - SETTLEMENT_NEAR), 0.0, 1.0)
 	t[&"boss"] = 1.0 if _boss else 0.0
+	# The breath (week 52): rushing air as loud as it blows, in the Lungs.
+	t[&"breath"] = absf(Breath.strength()) * WorldMap.region_share(at, Regions.LUNGS)
 	if _boss:
 		for k in ChunkData.KINDS:
 			t[k] *= 0.4  # The fight drowns the cave out.

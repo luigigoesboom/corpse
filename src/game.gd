@@ -39,6 +39,10 @@ func _ready() -> void:
 	EventBus.entity_killed.connect(_on_entity_killed)
 	EventBus.ichor_gained.connect(_on_ichor_gained)
 	EventBus.boon_bought.connect(_on_boon_bought)
+	var breath := Breath.new()  # The god still breathes (week 52).
+	breath.name = "Breath"
+	add_child(breath)
+	breath.phase_changed.connect(_on_breath)
 	var ambience := Ambience.new()  # The Gut's background sound (week 40).
 	ambience.name = "Ambience"
 	add_child(ambience)
@@ -102,6 +106,12 @@ func _process(delta: float) -> void:
 	if life:
 		life.seconds_alive += delta
 		_check_region()
+
+
+## The breath turning is heard in the Lungs (week 52).
+func _on_breath(phase: StringName) -> void:
+	if phase in [&"inhale", &"exhale"] and WorldMap.region_of(_player.global_position) == Regions.LUNGS:
+		Sfx.play(&"breath_in" if phase == &"inhale" else &"breath_out")
 
 
 ## Crossing into another region shows its name (week 48), like a landmark.

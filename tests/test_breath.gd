@@ -26,8 +26,9 @@ func run() -> void:
 	check(breath.wind_at(Vector2(100 * T, 90 * T)) == Vector2.ZERO, "and the Gut feels nothing")
 
 	# A fall in the Bellows: slower while it breathes in.
-	var still := await _fall_speed(Vector2(335 * T, 40 * T), 9.0)
-	var inhale := await _fall_speed(Vector2(335 * T, 40 * T), 3.0)
+	# (Open air east of the membrane ladder, below its wide membrane.)
+	var still := await _fall_speed(Vector2(350 * T, 52 * T), 9.0)
+	var inhale := await _fall_speed(Vector2(350 * T, 52 * T), 3.0)
 	check(inhale < still * 0.7, "falling through the Bellows' inhale is slower (%.0f vs %.0f px/s)" % [inhale, still])
 
 	# A glider rides the updraft up.
@@ -35,7 +36,7 @@ func run() -> void:
 	data.graft("back", &"lung_sac")
 	autoload("EventBus").mutations_changed.emit()
 	await wait_frames(3)
-	await goto(Vector2(335 * T, 70 * T), 2)
+	await goto(Vector2(350 * T, 70 * T), 2)  # Open air, clear of the ladder.
 	breath.time = 2.0
 	Input.action_press("jump")
 	var y0: float = player.global_position.y
@@ -78,11 +79,12 @@ func run() -> void:
 	sac.queue_free()
 
 
-## How fast the host falls (px/s) after a second from `from`, the breath held at `at`.
+## How fast the host falls (px/s) a third of a second after letting go at
+## `from`, the breath held at `at`.
 func _fall_speed(from: Vector2, at: float) -> float:
 	var breath: GDScript = load("res://src/world/breath.gd")
 	await goto(from, 2)
-	for i in 50:
+	for i in 20:
 		breath.time = at
 		await physics_frame
 	return player.velocity.y

@@ -54,6 +54,18 @@ static func region_of(point: Vector2) -> StringName:
 	return region_at(Vector2i((point / ChunkData.TILE_PX).floor()))
 
 
+## How much of a screen around a point is in a region (0..1).
+static func region_share(at: Vector2, region: StringName) -> float:
+	var n := 0
+	var inside := 0
+	for dy in [-160.0, 0.0, 160.0]:
+		for dx in [-300.0, -150.0, 0.0, 150.0, 300.0]:
+			n += 1
+			if region_of(at + Vector2(dx, dy)) == region:
+				inside += 1
+	return inside / float(n)
+
+
 ## Makes region_at() read the painting again (F4 reloads the map).
 static func forget_regions() -> void:
 	_regions_read = false

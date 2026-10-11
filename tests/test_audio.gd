@@ -21,7 +21,7 @@ func run() -> void:
 
 	await start_scene("res://game.tscn")
 	var ambience = game.get_node("Ambience")
-	var layers: int = 3 + RockKinds.count()  # Body, settlement, boss, and one per kind of rock.
+	var layers: int = 4 + RockKinds.count()  # Body, settlement, boss, breath, and one per kind of rock.
 	check(ambience.get_child_count() == layers, "%d ambience layers are playing (%d)" % [layers, ambience.get_child_count()])
 	var top: Dictionary = ambience.targets_at(Vector2(5300, 820))
 	var deep: Dictionary = ambience.targets_at(Vector2(5300, 3840))

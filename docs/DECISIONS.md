@@ -152,6 +152,11 @@ Format: ID, date, decision, why, what it rules out.
 - Why: the Lungs need their own peoples and destined faction without rewriting the Gut's story: the Gut keeps the generator it always had, so every old seed keeps its past word for word (checked for five seeds and between lives).
 - Also: the rock kinds moved into one table (`RockKinds`, src/world) instead of eight copies; old saves are now tested: tests/fixtures holds a save of every format since 22 (tests/make_fixture.gd writes the current one), and tests/test_old_saves.gd loads them all. Save version 23.
 
+**D-031 The breath is a clock and wind zones** (2026-10-11, week 52)
+- What: the Lungs breathe on a fixed 20-second cycle (inhale 8 s, hold 2, exhale 8, rest 2), counted while the game runs (`Breath`, src/world). Where air moves is hand-placed: `WindZone` areas under World/WindZones, each with the way the inhale blows there (the exhale reverses it). The wind shifts the host's running speed sideways and pushes it up or down in the air; a gliding Lung Sac turns an updraft into lift; floating creatures (`Creature.wind_weight`) drift; wind bones swing; streaks of air, a rushing sound and the back wall's brightness follow the breath.
+- Why: the roadmap's signature system for the Lungs ("winds on a timer change traversal"). A clock is easy to read, to learn and to test; hand-placed zones say exactly where air moves, like the rest of the painted world (D-010), instead of simulating airflow.
+- Consequences: the Trachea is a timed climb (the exhale carries you up, the inhale presses you down); the Bellows' inhale slows falls and lifts gliders. The breath is not saved (it restarts with the scene); nothing depends on its phase across saves.
+
 ---
 
 ## Open questions

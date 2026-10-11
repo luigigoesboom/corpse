@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" path="res://src/actors/bosses/gullet_matron.tscn" id="17_matron"]
 [ext_resource type="Script" path="res://src/world/key_cache.gd" id="18_cache"]
 [ext_resource type="Script" path="res://src/world/landmark.gd" id="19_landmark"]
+[ext_resource type="Script" path="res://src/world/wind_zone.gd" id="28_wind"]
 [ext_resource type="PackedScene" path="res://src/props/lungs/cartilage_gate.tscn" id="20_gate"]
 [ext_resource type="PackedScene" path="res://src/props/lungs/hive_lantern.tscn" id="21_lantern"]
 [ext_resource type="PackedScene" path="res://src/props/lungs/pleura_curtain.tscn" id="22_curtain"]
@@ -110,6 +111,38 @@ extents = Vector2(672, 192)
 position = Vector2(13456, 3370)
 script = ExtResource("11_spawn")
 place_name = "the Bellows-Kin roost"
+
+[node name="WindZones" type="Node2D" parent="."]
+
+[node name="BellowsUpdraft" type="Node2D" parent="WindZones"]
+position = Vector2(10720, 1856)
+script = ExtResource("28_wind")
+extents = Vector2(960, 1408)
+inhale = Vector2(0, -2000)
+
+[node name="BronchusDraught" type="Node2D" parent="WindZones"]
+position = Vector2(8832, 2240)
+script = ExtResource("28_wind")
+extents = Vector2(896, 160)
+inhale = Vector2(650, 0)
+
+[node name="TracheaDraught" type="Node2D" parent="WindZones"]
+position = Vector2(15296, 1664)
+script = ExtResource("28_wind")
+extents = Vector2(128, 1280)
+inhale = Vector2(0, 3000)
+
+[node name="HivesEddy" type="Node2D" parent="WindZones"]
+position = Vector2(12992, 1216)
+script = ExtResource("28_wind")
+extents = Vector2(1088, 768)
+inhale = Vector2(-300, -400)
+
+[node name="LobeDraught" type="Node2D" parent="WindZones"]
+position = Vector2(13952, 3136)
+script = ExtResource("28_wind")
+extents = Vector2(2048, 288)
+inhale = Vector2(-450, 0)
 
 [node name="Entities" type="Node2D" parent="."]
 script = ExtResource("2_entities")

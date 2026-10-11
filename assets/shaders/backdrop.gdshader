@@ -13,6 +13,8 @@ uniform sampler2D lungs_far_texture : repeat_enable, filter_nearest;
 uniform sampler2D lungs_mid_texture : repeat_enable, filter_nearest;
 uniform sampler2D lungs_near_texture : repeat_enable, filter_nearest;
 uniform float lungs = 0.0;
+// The god's breath (week 52), -1..1: the Lungs' walls brighten as they fill.
+uniform float breath = 0.0;
 uniform vec2 camera_position;  // Screen centre in world pixels, set by backdrop.gd.
 uniform vec2 screen_size = vec2(640.0, 360.0);  // Viewport size in game pixels.
 uniform float far_scroll = 0.12;
@@ -39,5 +41,5 @@ void fragment() {
 	if (lungs > 0.001) {
 		col = mix(col, stack(lungs_far_texture, lungs_mid_texture, lungs_near_texture, UV), lungs);
 	}
-	COLOR = vec4(col * tint * brightness, 1.0);
+	COLOR = vec4(col * tint * brightness * (1.0 + breath * 0.12), 1.0);
 }

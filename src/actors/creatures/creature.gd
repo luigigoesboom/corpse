@@ -24,6 +24,9 @@ extends CharacterBody2D
 @export var gravity := 1400.0
 ## Item dropped on death (an ItemDef id), or empty.
 @export var drop_item: StringName = &""
+## How much the god's breath pushes it (week 52): 0 = not at all, 1 = like
+## a loose thing. Floaters and gliders feel it; walkers do not.
+@export var wind_weight := 0.0
 
 ## The creature's own State enum value.
 var state := 0
@@ -70,6 +73,8 @@ func _physics_process(delta: float) -> void:
 			attack_box.deactivate()
 	if gravity > 0.0 and not is_on_floor():
 		velocity.y += gravity * delta
+	if wind_weight > 0.0:
+		velocity += Breath.wind_at(global_position) * wind_weight * delta
 	if is_dead():
 		velocity.x = move_toward(velocity.x, 0.0, 600.0 * delta)
 		if gravity <= 0.0:

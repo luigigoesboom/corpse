@@ -136,6 +136,18 @@ func _one_shots() -> void:
 	s = Synth.new(0.3, 47)
 	s.noise(0.0, 0.25, 0.7, 2600.0, 0.005, 2.5)  # A short puff.
 	_done(s, "puff", false, 0.6)
+	s = Synth.new(3.0, 48)
+	s.noise(0.0, 3.0, 0.8, 900.0, 1.6, 0.8)  # A huge slow inhale.
+	s.tone(0.0, 3.0, 50, 70, 0.3, "sine", 1.5, 0.8)
+	_done(s, "breath_in", false, 0.6)
+	s = Synth.new(3.0, 49)
+	s.noise(0.0, 3.0, 0.8, 600.0, 0.3, 1.6)  # And out.
+	s.tone(0.0, 3.0, 70, 45, 0.3, "sine", 0.3, 1.5)
+	_done(s, "breath_out", false, 0.6)
+	s = Synth.new(0.4, 50)
+	for i in 4:
+		s.tone(i * 0.05, i * 0.05 + 0.15, 1400 + i * 230, 1300 + i * 200, 0.2, "tri", 0.001, 4.0)  # Bones knocking.
+	_done(s, "bones_click", false, 0.5)
 
 func _ui() -> void:
 	var s
@@ -239,3 +251,9 @@ func _loops() -> void:
 		s.tone(a, a + 3.5, f * 2.01, f * 1.95, 0.03, "sine", 1.2, 1.2)
 	s.make_loop(1.0)
 	_done(s, "amb_cartilage", true, 0.5)
+	# The breath: a steady rush of air (its loudness follows the breath).
+	s = Synth.new(LOOP + 1.0, 51)
+	s.noise(0.0, LOOP + 1.0, 0.6, 700.0, 0.0, 0.0)
+	s.noise(0.0, LOOP + 1.0, 0.25, 2200.0, 0.0, 0.0)
+	s.make_loop(1.0)
+	_done(s, "amb_breath", true, 0.55)

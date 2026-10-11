@@ -33,6 +33,7 @@ const SOUNDS := {
 	&"matron_hurt": [-8.0, 0.75, &"SFX"], &"matron_die": [-2.0, 0.8, &"SFX"], &"matron_phase": [-4.0, 0.8, &"SFX"],
 	&"puffsac_swell": [-12.0, 1.0, &"SFX"], &"puffsac_burst": [-6.0, 1.0, &"SFX"], &"membrane": [-12.0, 1.0, &"SFX"],
 	&"lasher_draw": [-14.0, 1.0, &"SFX"], &"lasher_lash": [-8.0, 1.0, &"SFX"], &"ray_cry": [-12.0, 1.0, &"SFX"], &"gust": [-8.0, 1.0, &"SFX"], &"puff": [-12.0, 1.0, &"SFX"],
+	&"breath_in": [-10.0, 1.0, &"SFX"], &"breath_out": [-10.0, 1.0, &"SFX"], &"bones_click": [-16.0, 1.0, &"SFX"],
 	# The world.
 	&"alert": [-12.0, 1.0, &"SFX"], &"alarm": [-8.0, 0.8, &"SFX"], &"grate": [-8.0, 0.8, &"SFX"],
 	&"latch": [-10.0, 1.0, &"SFX"], &"ichor": [-12.0, 0.7, &"SFX"], &"bank": [-6.0, 0.85, &"UI"],

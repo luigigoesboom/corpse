@@ -25,6 +25,7 @@ collision_mask = 1
 motion_mode = 1
 script = ExtResource("1_script")
 gravity = 0.0
+wind_weight = 0.3
 sight_range = 400.0
 lose_range = 620.0
 drop_item = &"breath_sac"

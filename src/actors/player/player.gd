@@ -122,6 +122,9 @@ var body_hidden := false
 ## jumping off one goes MEMBRANE_JUMP times as high; down + jump drops
 ## through it.
 const MEMBRANE_LAYER := 64
+## How much a sideways wind (px/s^2) shifts the running speed: this many
+## seconds of it (week 52).
+const WIND_DRIFT := 0.2
 const MEMBRANE_MIN_BOUNCE := 300.0
 const MEMBRANE_BOUNCE := 0.6
 const MEMBRANE_BOUNCE_HELD := 0.85
@@ -173,6 +176,7 @@ func _physics_process(delta: float) -> void:
 		if has_control:
 			_try_drop()
 			_apply_jump()
+	_apply_wind(delta)
 	_mutations.physics_tick(delta)
 
 	var fall_speed := velocity.y
@@ -465,7 +469,21 @@ func _apply_run(input_dir: float, delta: float) -> void:
 	else:
 		rate = air_decel if input_dir == 0.0 else air_accel
 	var top := run_speed * (SNEAK_SPEED_SCALE if is_sneaking() else 1.0)
-	velocity.x = move_toward(velocity.x, input_dir * top, rate * delta)
+	velocity.x = move_toward(velocity.x, input_dir * top + wind().x * WIND_DRIFT, rate * delta)
+
+
+## The god's breath (week 52): sideways, the wind shifts the speed the host
+## runs at (or drifts at, standing: WIND_DRIFT seconds of it, see
+## _apply_run); up or down, it pushes the host in the air.
+func _apply_wind(delta: float) -> void:
+	var w := wind()
+	if w.y != 0.0 and not is_on_floor() and not _dead:
+		velocity.y += w.y * delta
+
+
+## The wind at the host now (px/s^2); the Lung Sac rides it.
+func wind() -> Vector2:
+	return Breath.wind_at(global_position)
 
 
 ## Down + jump on a membrane: through it.

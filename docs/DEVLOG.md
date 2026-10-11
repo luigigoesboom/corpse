@@ -5,6 +5,11 @@ Three lines a week minimum. Newest at the top.
 Template:
 
 ```
+## Week 52 (2026-10-11)
+Done: The breath (D-031): the Lungs breathe on a 20 s cycle and the wind follows hand-placed WindZones. The Bellows draw air up on the inhale (falls slow; a gliding Lung Sac rides the updraft up hundreds of px), the Trachea's exhale carries you up the windpipe and its inhale presses you down (a timed climb), walking into the Bronchus against the exhale is slow, Puffsacs and Rays drift, wind bones swing and click, streaks of air, a rushing layer, a great inhale and exhale sound, the back wall brightening as it fills. tests/test_breath.gd. This finishes the Lungs (weeks 45-52).
+Not done: The Kin say nothing about the breath beyond their barks; no HUD sign of the phase (sound and air only). Weeks 42-44 (onboarding, playtests) are still ahead (D-029). The developer asked for much more vignetting and atmosphere (shaders): next.
+Next: An atmosphere pass (vignette, fog, motes, grading, grain), then the developer's call between the image-import tool, weeks 42-44 and the Bones.
+
 ## Week 51 (2026-10-11)
 Done: The Lungs' mutations: the Bellows Heart (a second jump in the air; the Second Heart lies in the Hives) and the Gust Bladder (head slot, R: a gust that throws creatures back and you the other way; a Puffsac popped by it bursts out of reach; the Wind Bladder lies in the Hives and the Kin trade it), with overlays, icons, sounds. Valve keys are one table now (`ValveKeys.KEYS`); the Lungs' key is kept by the Kin on a string atop their roost if their past is rich in wonders and trade, else it lies in the High Aerie's nest up the Trachea. The Kin talk about it, sell it (120 ichor), give it to friends, take it home from bodies. tests/test_lung_mutations.gd.
 Not done: Nothing guards the Aerie yet but the climb and the Rays.

@@ -1,8 +1,10 @@
 [gd_scene format=3]
 
+[ext_resource type="Script" path="res://src/props/lungs/wind_bones.gd" id="1_bones"]
 [ext_resource type="Texture2D" path="res://assets/art/props/wind_bones_body.png" id="art_1"]
 
 [node name="WindBones" type="Node2D"]
+script = ExtResource("1_bones")
 z_index = -1
 
 [node name="Art" type="Sprite2D" parent="."]

@@ -52,7 +52,9 @@ func run() -> void:
 	check(player.global_position.y > 103 * T, "down and jump drops through it")
 	await wait_frames(30)
 
-	# Climb the ladder: membranes every 3 rows, hop by hop.
+	# Climb the ladder: membranes every 3 rows, hop by hop. The breath is
+	# held still (on the exhale the wind presses you down too hard to climb:
+	# the Bellows are climbed on the inhale; tests/test_breath.gd).
 	await goto(_stand(_membrane_in_row(102, 300, 372).x + 4, 104), 20)
 	var climbed := 0
 	for row in [102, 99, 96, 93, 90]:
@@ -91,6 +93,7 @@ func _hop_to(x: float, row: int) -> bool:
 		await _to_edge(signf(x - player.global_position.x))
 		Input.action_press("jump")
 		for i in 90:
+			load("res://src/world/breath.gd").time = 9.0  # The hold: no wind.
 			await physics_frame
 			var dx: float = x - player.global_position.x
 			var want: float = signf(dx) if absf(dx) > 6.0 else 0.0
@@ -107,7 +110,9 @@ func _hop_to(x: float, row: int) -> bool:
 		Input.action_release("jump")
 		Input.action_release("move_left")
 		Input.action_release("move_right")
-		await wait_frames(40)  # Let any bounce settle.
+		for i in 40:  # Let any bounce settle.
+			load("res://src/world/breath.gd").time = 9.0
+			await physics_frame
 		if player.is_on_floor() and int(player.global_position.y / T) == row - 1:
 			return true
 	return false

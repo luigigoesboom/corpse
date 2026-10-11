@@ -28,20 +28,10 @@ func _process(delta: float) -> void:
 	material.set_shader_parameter("screen_size", get_viewport().get_visible_rect().size)
 	_tint = _tint.lerp(_target_tint(centre), clampf(delta * EASE, 0.0, 1.0))
 	material.set_shader_parameter("tint", Vector3(_tint.r, _tint.g, _tint.b))
-	lungs = move_toward(lungs, lungs_share(centre), delta * EASE * 0.6)
+	lungs = move_toward(lungs, WorldMap.region_share(centre, Regions.LUNGS), delta * EASE * 0.6)
 	material.set_shader_parameter("lungs", lungs)
+	material.set_shader_parameter("breath", Breath.strength() * lungs)
 
-
-## How much of the view around a point is in the Lungs (0..1).
-static func lungs_share(at: Vector2) -> float:
-	var n := 0
-	var inside := 0
-	for dy in [-160.0, 0.0, 160.0]:
-		for dx in [-300.0, -150.0, 0.0, 150.0, 300.0]:
-			n += 1
-			if WorldMap.region_of(at + Vector2(dx, dy)) == Regions.LUNGS:
-				inside += 1
-	return inside / float(n)
 
 
 ## The average tint of the kinds of rock painted around a point.
