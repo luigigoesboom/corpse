@@ -78,6 +78,8 @@ func _add_ability(def: MutationDef) -> void:
 	var node: MutationAbility = def.ability.new()
 	node.host = _host
 	node.def = def
+	if innate.is_empty() and WorldState.data:  # The player's: its strain (D-033).
+		node.strain = WorldState.data.strains.get(def.slot, &"plain")
 	node.name = String(def.id)
 	add_child(node)
 
@@ -95,6 +97,9 @@ func _on_eat_requested(slot: int) -> void:
 	var text := "%s grows from your %s" % [mutation.display_name, mutation.slot]
 	if lost != &"" and lost != mutation.id:
 		text += ", your %s withers" % MutationDb.get_def(lost).display_name
+	var strain := MutationStrains.grown_text(data.strains.get(mutation.slot, &"plain"))
+	if strain != "":
+		text += ". " + strain
 	EventBus.notify.emit(text)
 	Sfx.play(&"eat")
 	EventBus.inventory_changed.emit()

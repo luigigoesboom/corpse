@@ -48,11 +48,15 @@ func physics_tick(delta: float) -> void:
 			_hitbox.deactivate()
 	if _cooldown > 0.0 or not host.can_act() or not host.ability_pressed(def.slot):
 		return
-	_cooldown = COOLDOWN
+	_cooldown = COOLDOWN * cooldown_scale()
+	if not try_use():
+		return
 	_active = ACTIVE
+	_hitbox.damage = 1 + damage_bonus()
+	_hitbox.knockback = KNOCKBACK * power()
 	_hitbox.activate()
 	var facing: float = host.facing()
-	host.velocity.x -= facing * RECOIL
+	host.velocity.x -= facing * RECOIL * power()
 	if not host.is_on_floor():
 		host.velocity.y = minf(host.velocity.y, -140.0)  # A hop back, in the air.
 	Sfx.play(&"gust", host.global_position)

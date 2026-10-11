@@ -21,7 +21,9 @@ func physics_tick(delta: float) -> void:
 	_air_time += delta
 	if _charges > 0 and _air_time > GRACE and host.can_act() and host.ability_pressed(def.slot):
 		_charges -= 1
-		host.velocity.y = -PUFF
+		if not try_use():
+			return
+		host.velocity.y = -PUFF * clampf(power(), 0.8, 1.25)
 		Sfx.play(&"puff", host.global_position)
 		var puff := GustPuff.new()
 		puff.direction = Vector2.DOWN

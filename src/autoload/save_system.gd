@@ -17,7 +17,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 28
+const SAVE_VERSION := 29
 const SLOTS := [1, 2, 3]
 
 
@@ -238,4 +238,7 @@ func _migrate(save: Dictionary) -> Dictionary:
 	if save.save_version == 27:
 		# v28 (D-033): quests. Nothing to convert: none taken yet.
 		save.save_version = 28
+	if save.save_version == 28:
+		# v29 (D-033): mutation strains. Nothing to convert: missing is plain.
+		save.save_version = 29
 	return save

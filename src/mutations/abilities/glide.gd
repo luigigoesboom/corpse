@@ -13,7 +13,7 @@ func physics_tick(_delta: float) -> void:
 		return
 	var lift := 0.0
 	if host.has_method("wind"):
-		lift = minf(0.0, host.wind().y) * LIFT  # Only up-winds lift.
+		lift = minf(0.0, host.wind().y) * LIFT * MutationStrains.info(strain).get("power", 1.0)  # Only up-winds lift.
 	var cap := GLIDE_FALL_SPEED + lift
 	if cap < 0.0:
 		# Carried up: ease into the rise (gravity is added back every frame,

@@ -41,16 +41,19 @@ func is_dashing() -> bool:
 func physics_tick(delta: float) -> void:
 	_cooldown -= delta
 	if _time_left <= 0.0 and _cooldown <= 0.0 and host.can_act() and host.ability_pressed(def.slot):
+		_cooldown = COOLDOWN * cooldown_scale()
+		if not try_use():
+			return
 		_dir = host.facing()
 		_time_left = DURATION
-		_cooldown = COOLDOWN
+		_hitbox.damage = 2 + damage_bonus()
 		_hitbox.activate()
 		host.health.invulnerable = true
 		Sfx.play(&"dash", host.global_position)
 	if _time_left > 0.0:
 		# Moves on the very frame it starts, so the dash feels instant.
 		_time_left -= delta
-		host.velocity = Vector2(_dir * SPEED, 0.0)
+		host.velocity = Vector2(_dir * SPEED * power(), 0.0)
 		if _time_left <= 0.0:
 			_hitbox.deactivate()
 			host.health.invulnerable = false

@@ -85,6 +85,9 @@ var beasts_seeded := false
 var figures: Dictionary = {}
 ## Tasks peoples gave the fragment (D-033, Quests): id -> QuestData.
 var quests: Dictionary = {}
+## The strain of the mutation in each body slot (D-033, MutationStrains):
+## slot -> strain. Rolled whenever a mutation takes root.
+var strains: Dictionary = {}
 
 
 static func create(seed_value: int) -> WorldData:
@@ -171,6 +174,7 @@ func end_life(position: Vector2, corpse_position: Vector2, killed_by: StringName
 	for i in inventory.size():
 		inventory[i] = &""
 	mutations.clear()
+	strains.clear()
 	log_event(&"host_died", [life.host_name], {"killed_by": killed_by, "position": corpse_position})
 	return life
 
@@ -191,7 +195,7 @@ func reclaim_corpse(index: int) -> Dictionary:
 			taken.items.append(item)
 	for slot in life.corpse_mutations.keys():
 		if not mutations.has(slot):
-			mutations[slot] = life.corpse_mutations[slot]
+			graft(slot, life.corpse_mutations[slot])  # It takes root anew: a new strain.
 			taken.mutations.append(life.corpse_mutations[slot])
 			life.corpse_mutations.erase(slot)
 	return taken
@@ -390,6 +394,7 @@ func take_from_inventory(slot: int) -> StringName:
 func graft(slot: String, mutation: StringName) -> StringName:
 	var old: StringName = mutations.get(slot, &"")
 	mutations[slot] = mutation
+	strains[slot] = MutationStrains.roll(SeededRng.make([world_seed, "strain", slot, new_id()]), mutation)
 	return old
 
 
@@ -438,6 +443,7 @@ func to_dict() -> Dictionary:
 		"beasts": beasts.values().map(func(b): return b.to_dict()), "beasts_seeded": beasts_seeded,
 		"figures": figures.values().map(func(f): return f.to_dict()),
 		"quests": quests.values().map(func(q): return q.to_dict()),
+		"strains": strains.duplicate(),
 	}
 
 
@@ -486,6 +492,7 @@ static func from_dict(d: Dictionary) -> WorldData:
 	for quest_dict in d.get("quests", []):
 		var quest := QuestData.from_dict(quest_dict)
 		data.quests[quest.id] = quest
+	data.strains = d.get("strains", {}).duplicate()
 	data._fit_inventory()
 	return data
 

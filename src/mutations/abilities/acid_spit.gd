@@ -15,15 +15,18 @@ func physics_tick(delta: float) -> void:
 	_cooldown -= delta
 	if _cooldown > 0.0 or not host.can_act() or not host.ability_pressed(def.slot):
 		return
-	_cooldown = COOLDOWN
+	_cooldown = COOLDOWN * cooldown_scale()
+	if not try_use():
+		return
 	var glob := PROJECTILE.instantiate()
 	glob.position = host.socket(def.slot).global_position
 	# Creatures may aim (spit_velocity); the player spits straight ahead.
 	if host.has_method("spit_velocity"):
 		glob.velocity = host.spit_velocity(glob.position)
 	else:
-		glob.velocity = Vector2(SPEED.x * host.facing(), SPEED.y)
+		glob.velocity = Vector2(SPEED.x * host.facing(), SPEED.y) * power()
 	var hitbox: Hitbox = glob.get_node("Hitbox")
+	hitbox.damage += damage_bonus()
 	hitbox.collision_layer = host.attack_layer()
 	hitbox.exclude = host.get_node_or_null("Hurtbox")  # Never hit the spitter.
 	hitbox.source = CombatRules.kind_of(host)

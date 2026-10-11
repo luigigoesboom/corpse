@@ -168,11 +168,14 @@ func _refresh_body() -> void:
 		slot_label.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 		_body_list.add_child(slot_label)
 		var text := "-"
+		var strain: StringName = data.strains.get(slot, &"plain")
 		if mutation:
-			text = mutation.display_name
+			text = MutationStrains.label(mutation.display_name, strain)
 			if mutation.control_hint != "":
 				text += "  [%s]" % mutation.control_hint
 			text += "\n" + mutation.description
+			if MutationStrains.grown_text(strain) != "":
+				text += " " + MutationStrains.grown_text(strain)  # D-033
 		var part := _label(text)
 		part.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		part.size_flags_horizontal = Control.SIZE_EXPAND_FILL
