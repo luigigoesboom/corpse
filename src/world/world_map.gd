@@ -21,6 +21,12 @@ const KINDS_PATH := "res://data/maps/tiles.png"
 ## its Regions paint color; unpainted, or outside it, is the Gut.
 const REGIONS_PATH := "res://data/maps/regions.png"
 
+## The body's rot (D-033), copied from WorldData by Game whenever it changes
+## (set_rot()): heavy rot turns rock into rot rock, with a ragged edge.
+static var _rot := PackedByteArray()
+static var _rot_width := 0
+static var _rot_kind := -1
+
 ## The regions painting, read once (forget_regions() reads it again).
 static var _regions: Image
 static var _regions_read := false
@@ -71,11 +77,40 @@ static func forget_regions() -> void:
 	_regions_read = false
 
 
-## Which kind of rock a tile is (index into ChunkData.KINDS).
+## Which kind of rock a tile is (index into ChunkData.KINDS): as painted,
+## unless the rot has taken it.
 func kind_at(tile: Vector2i) -> int:
+	if rotten(tile):
+		return _rot_kind
+	return painted_kind_at(tile)
+
+
+## The kind painted in tiles.png, rot or no rot.
+func painted_kind_at(tile: Vector2i) -> int:
 	if kinds == null or tile.x < 0 or tile.y < 0 or tile.x >= kinds.get_width() or tile.y >= kinds.get_height():
 		return 0
 	return kind_of_color(kinds.get_pixelv(tile))
+
+
+static func set_rot(field: PackedByteArray, width: int) -> void:
+	_rot = field
+	_rot_width = width
+	_rot_kind = RockKinds.IDS.find(&"rot")
+
+
+## Whether rot has turned this tile: heavy rot in its cell, more surely the
+## heavier, so the edge of a rotten patch is ragged (a hash per tile).
+static func rotten(tile: Vector2i) -> bool:
+	if _rot_width <= 0 or tile.x < 0 or tile.y < 0:
+		return false
+	var c := tile / Rot.CELL
+	var i := c.y * _rot_width + c.x
+	if c.x >= _rot_width or i >= _rot.size():
+		return false
+	var level := _rot[i] / 255.0
+	if level < Rot.HEAVY - 0.15:
+		return false
+	return level > Rot.HEAVY - 0.15 + (hash(tile) % 1000) / 1000.0 * 0.3
 
 
 ## How much of each kind of rock is painted around a world point: a grid of
@@ -95,7 +130,9 @@ static func kind_weights(kinds_image: Image, at: Vector2) -> Array:
 		for dx in range(-12, 13, 4):
 			var p := tile + Vector2i(dx, dy)
 			var kind := 0
-			if p.x >= 0 and p.y >= 0 and p.x < kinds_image.get_width() and p.y < kinds_image.get_height():
+			if rotten(p):
+				kind = _rot_kind
+			elif p.x >= 0 and p.y >= 0 and p.x < kinds_image.get_width() and p.y < kinds_image.get_height():
 				kind = kind_of_color(kinds_image.get_pixelv(p))
 			out[kind] += 1.0
 			n += 1

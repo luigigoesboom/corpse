@@ -135,7 +135,9 @@ static func describe(event: EventRecord, data: WorldData) -> String:
 		&"creatures_returned":
 			text = "Creatures came back to the places they had been cleared from."
 		_:
-			text = String(event.type).capitalize() + "."
+			text = EventTextMore.describe(event, data)  # The simulation interlude's events (D-033).
+			if text == "":
+				text = String(event.type).capitalize() + "."
 	return text.substr(0, 1).to_upper() + text.substr(1)
 
 

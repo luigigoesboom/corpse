@@ -30,7 +30,7 @@ static func candidates(data: WorldData, speaker_faction: StringName, exclude: Ar
 			weight *= 10.0  # Everybody talks about the strangers who die here, and who kill.
 		elif event.type in [&"corpse_scavenged", &"corpse_rotted", &"creatures_returned", &"wonder", &"prophet", &"trade_pact", &"site_founded"]:
 			weight *= 0.5
-		elif event.type in [&"faction_fell", &"site_razed", &"schism", &"war_declared", &"disaster"]:
+		elif event.type in [&"faction_fell", &"site_razed", &"schism", &"war_declared", &"disaster", &"rot_spread", &"rot_bloom", &"rot_sickness"]:
 			weight *= 1.5
 		var site: SiteData = data.sites.get(str(event.data.get("site", "")))
 		if site and site.slot != "":

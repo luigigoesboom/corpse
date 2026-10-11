@@ -13,6 +13,8 @@ const NO_CARCASS := [&"gullet_matron", &"puffsac"]
 
 ## The region the host was last in (_check_region).
 var _region: StringName = &""
+## BodyMap.context() of the map, made once (D-033).
+var _body := {}
 
 @onready var _player: Player = $Player
 @onready var _chunks: ChunkManager = $ChunkManager
@@ -146,6 +148,9 @@ func _on_world_loaded() -> void:
 	SiteSeeder.fill_ruin_slots(data, _entities.templates().filter(func(t): return t is RuinSite))
 	ItemDb.set_generated(ArtifactText.item_defs(data))  # Artifacts work like items.
 	ValveKeys.place_at_start(data)  # Week 38: history decides who holds the Gut's key.
+	if Rot.ensure(data, body()):  # D-033: a new world (or an old save) rots in.
+		Rot.settle(data, body(), SeededRng.make([data.world_seed, "rot"]))
+	WorldMap.set_rot(data.rot, data.rot_width)
 	if data.current_life() == null:
 		data.start_life(&"colonist")  # Saves from before week 21 have no lives.
 	$UI.close_all()
@@ -189,10 +194,18 @@ func _pass_time() -> void:
 	for template in _entities.templates():
 		if template is Settlement and not template is GuardPost:
 			places[EntityLayer.key_of(template)] = template.body_spot()
-	var report := Aftermath.run(WorldState.data, places)
+	var report := Aftermath.run(WorldState.data, places, body())
+	WorldMap.set_rot(WorldState.data.rot, WorldState.data.rot_width)
 	_entities.rebuild()
 	_chunks.reset()
 	$UI.death_screen.show_time(report, rebirth_options())
+
+
+## The map of the body for the body-wide simulations (BodyMap, D-033).
+func body() -> Dictionary:
+	if _body.is_empty() and _chunks.map:
+		_body = BodyMap.context(_chunks.map, _entities.templates(), $World/Landmarks.get_children())
+	return _body
 
 
 ## Three ways to wake (week 24): different places, host types and names.

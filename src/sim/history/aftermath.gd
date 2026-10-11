@@ -21,7 +21,8 @@ const TIERS := [
 
 ## Rolls the gap for this death and applies it. Deterministic per world and death.
 ## `places`: settlement slot -> floor point, so factions can carry bodies home.
-static func run(data: WorldData, places: Dictionary = {}) -> Dictionary:
+## `body`: BodyMap.context() for the body-wide simulations (rot); {} = none.
+static func run(data: WorldData, places: Dictionary = {}, body: Dictionary = {}) -> Dictionary:
 	var rng := SeededRng.make([data.world_seed, "aftermath", data.lives.size()])
 	var total := 0
 	for tier in TIERS:
@@ -30,13 +31,13 @@ static func run(data: WorldData, places: Dictionary = {}) -> Dictionary:
 	for i in TIERS.size():
 		pick -= TIERS[i].weight
 		if pick <= 0:
-			return apply(data, i, rng, places)
-	return apply(data, 0, rng, places)
+			return apply(data, i, rng, places, body)
+	return apply(data, 0, rng, places, body)
 
 
 ## Applies tier `tier_index`. Returns a report:
 ##   {"tier", "years", "strength", "hints": [short vague lines for the player]}
-static func apply(data: WorldData, tier_index: int, rng: RandomNumberGenerator, places: Dictionary = {}) -> Dictionary:
+static func apply(data: WorldData, tier_index: int, rng: RandomNumberGenerator, places: Dictionary = {}, body: Dictionary = {}) -> Dictionary:
 	var tier: Dictionary = TIERS[tier_index]
 	var years := rng.randi_range(tier.years[0], tier.years[1])
 	var strength: float = tier.strength
@@ -45,6 +46,9 @@ static func apply(data: WorldData, tier_index: int, rng: RandomNumberGenerator, 
 	# The years pass (week 37), then what the last host did echoes in them.
 	var happened := HistorySim.between_lives(data, years, SeededRng.make([data.world_seed, "between", data.lives.size()]))
 	DeedEchoes.apply(data, _last_dead(data), report)
+	if not body.is_empty():  # The body rots on (D-033).
+		Rot.ensure(data, body)
+		happened.append_array(Rot.run(data, body, years, SeededRng.make([data.world_seed, "rot", data.lives.size()])))
 	_hint_history(data, happened, report)
 	CorpseFate.apply(data, strength, rng, places, report)  # Factions first (week 33).
 	_scavenge_bodies(data, strength, rng, report)
@@ -67,7 +71,7 @@ static func _hint_history(data: WorldData, happened: Array, report: Dictionary) 
 	for site: SiteData in data.sites.values():
 		if site.slot != "" and site.is_lived_in():
 			known[site.faction] = true
-	for type in [&"war_declared", &"peace", &"site_taken", &"disaster", &"schism", &"prophet", &"wonder"]:
+	for type in [&"war_declared", &"peace", &"site_taken", &"disaster", &"rot_spread", &"rot_receded", &"schism", &"prophet", &"wonder"]:
 		for event in happened:
 			if event.type == type and event.actors.any(func(a): return known.has(StringName(str(a)))):
 				report.hints.append("While you were gone: %s" % EventText.describe(event, data))

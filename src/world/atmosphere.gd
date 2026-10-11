@@ -24,6 +24,12 @@ const LOOKS := {
 		"vignette": Color(0.02, 0.02, 0.05), "fog": Color(0.55, 0.6, 0.72), "fog_density": 0.46,
 		"mist": Color(0.75, 0.78, 0.86), "motes": [Color8(214, 220, 232), Color8(140, 255, 204), Color8(246, 200, 208)],
 	},
+	# Heavy rot (D-033), mixed in by how rotten the air is where the camera is.
+	&"rot": {
+		"lift": Color(0.03, 0.04, 0.0), "gain": Color(1.0, 1.02, 0.82), "saturation": 0.7,
+		"vignette": Color(0.03, 0.03, 0.0), "fog": Color(0.42, 0.42, 0.2), "fog_density": 0.6,
+		"mist": Color(0.55, 0.55, 0.3), "motes": [Color8(170, 160, 90), Color8(120, 110, 60), Color8(200, 190, 120)],
+	},
 }
 ## The god's heart, as the ambience plays it (beats per minute).
 const HEART_BPM := 52.0
@@ -77,6 +83,9 @@ func _process(delta: float) -> void:
 	# Blend the looks by how much of the view is in each region.
 	var lungs := WorldMap.region_share(at, Regions.LUNGS)
 	var target := _mix(LOOKS[&"gut"], LOOKS[&"lungs"], lungs)
+	var rot := smoothstep(0.3, 0.8, Rot.at_point(WorldState.data, at)) if WorldState.data else 0.0
+	if rot > 0.0:
+		target = _mix(target, LOOKS[&"rot"], rot)
 	for key in _look:
 		if _look[key] is Color:
 			_look[key] = (_look[key] as Color).lerp(target[key], clampf(delta * EASE, 0.0, 1.0))

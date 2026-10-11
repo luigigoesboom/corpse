@@ -162,6 +162,11 @@ Format: ID, date, decision, why, what it rules out.
 - Why: the developer found the code-drawn art too geometric, hanging tiles too square, the halls "flat boxes", and suspected some places could not be reached: they could not (most of the chamber's upper ledges, the upper caves, the east cavern and so all of the Lungs needed more than a jump).
 - Consequences: generated pictures do not animate consistently, so creatures and hosts stay code-drawn (rigs, frames); generated art is for things that do not move. Claude cannot make pictures itself: generating needs the WebUI running or a key. Raw pictures stay local (gitignored), only the pixelated sprites are committed. The halls' old thin ledges are gone where nothing stood on them; tests that stood in mid-air in the chamber moved.
 
+**D-033 A simulation interlude: the body lives, and more of everything** (2026-10-11, after the Lungs)
+- What: before the Bones, the developer asked for "more simulation mechanics, think Caves of Qud, go wide, go crazy, add a bit more randomness". A run of systems, each plain data in the sim with something to see in play: the body's rot (a field over the map that creeps between lives, fed by bodies and ruins, burned back by the Flesh-Tenders, turning rock to rot rock and sickening settlements), legendary beasts, notable figures and leaders, village quests, the body's moods during a life, mutation strains, migration and creature ecology. Pulls roadmap weeks 69 (rot), 70 (migration) and parts of 71 (legend) forward.
+- Why: the systems are what makes each world different (pillars 1 and 3); with two regions there is room for them to interact.
+- Consequences: new worlds tell different stories than before (history uses new rules and more random rolls; the same seed still gives the same story). Old saves gain each system when they load. Each system is its own file in src/sim and has its own test.
+
 ---
 
 ## Open questions

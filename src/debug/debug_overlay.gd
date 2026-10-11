@@ -42,7 +42,7 @@ func _process(_delta: float) -> void:
 		"floor %s  wall %s  cling %s  membrane %s" % [player.is_on_floor(), player.is_on_wall(), player.is_clinging(), player.is_on_membrane()],
 	])
 	if WorldState.data:
-		lines.append("seed %d  year %d" % [WorldState.data.world_seed, WorldState.data.year])
+		lines.append("seed %d  year %d  rot %.2f" % [WorldState.data.world_seed, WorldState.data.year, Rot.at_point(WorldState.data, pos)])
 		var life := WorldState.data.current_life()
 		if life:
 			lines.append("life %d: %s, %d s, kills %s" % [WorldState.data.lives.size(), life.host_name, life.seconds_alive, life.kills])

@@ -17,7 +17,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 24
+const SAVE_VERSION := 25
 const SLOTS := [1, 2, 3]
 
 
@@ -223,4 +223,8 @@ func _migrate(save: Dictionary) -> Dictionary:
 	if save.save_version == 23:
 		# v24 (week 48): places found. Nothing to convert: none found yet.
 		save.save_version = 24
+	if save.save_version == 24:
+		# v25 (D-033): the body's rot. Nothing to convert: an old world gets
+		# its rot settled from the painting when it loads.
+		save.save_version = 25
 	return save

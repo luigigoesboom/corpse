@@ -73,6 +73,10 @@ var explored: Dictionary = {}
 ## Named places the fragment has found (week 48): Landmark name (or
 ## "region:<id>") -> the year it was first seen.
 var places_seen: Dictionary = {}
+## The body's rot (D-033, Rot): one byte per Rot.CELL x Rot.CELL tiles, row
+## by row, rot_width cells wide. Empty until the world layer sizes it.
+var rot := PackedByteArray()
+var rot_width := 0
 
 
 static func create(seed_value: int) -> WorldData:
@@ -421,6 +425,7 @@ func to_dict() -> Dictionary:
 		"artifacts": artifacts.values().map(func(artifact): return artifact.to_dict()),
 		"legend": legend.duplicate(),
 		"ichor": ichor, "ichor_banked": ichor_banked, "boons": boons.duplicate(), "kept_graft": kept_graft.duplicate(), "known_events": known_events.duplicate(), "key_places": key_places.duplicate(), "explored": explored.duplicate(true), "places_seen": places_seen.duplicate(),
+		"rot": rot.duplicate(), "rot_width": rot_width,
 	}
 
 
@@ -457,6 +462,8 @@ static func from_dict(d: Dictionary) -> WorldData:
 	data.key_places = d.get("key_places", {}).duplicate()
 	data.explored = d.get("explored", {}).duplicate(true)
 	data.places_seen = d.get("places_seen", {}).duplicate()
+	data.rot = PackedByteArray(d.get("rot", PackedByteArray()))
+	data.rot_width = int(d.get("rot_width", 0))
 	data._fit_inventory()
 	return data
 
