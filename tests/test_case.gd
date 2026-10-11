@@ -53,6 +53,8 @@ func start_scene(path: String, world_seed := 0) -> void:
 		game.new_world_seed = world_seed
 	if game.has_node("CombatFeel"):
 		game.get_node("CombatFeel").hitstop_enabled = false  # Frame-counting tests.
+	# The body's moods (D-033) come at random: no surprise spasms in tests.
+	load("res://src/world/body_moods.gd").enabled = false
 	root.add_child(game)
 	for i in 5:
 		await physics_frame

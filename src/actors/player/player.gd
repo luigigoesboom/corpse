@@ -355,10 +355,10 @@ func noise_radius() -> float:
 	if _dead:
 		return 0.0
 	if _loud > 0.0:
-		return LOUD_NOISE
+		return LOUD_NOISE * BodyMoods.noise_scale
 	if is_sneaking() or not is_on_floor() or absf(velocity.x) < 30.0:
 		return 0.0
-	return STEP_NOISE
+	return STEP_NOISE * BodyMoods.noise_scale  # A hush (D-033) muffles steps.
 
 
 ## How easy the host is to see: dim when sneaking, bright in a watch light.
@@ -468,7 +468,7 @@ func _apply_run(input_dir: float, delta: float) -> void:
 		rate = ground_decel if input_dir == 0.0 or turning else ground_accel
 	else:
 		rate = air_decel if input_dir == 0.0 else air_accel
-	var top := run_speed * (SNEAK_SPEED_SCALE if is_sneaking() else 1.0)
+	var top := run_speed * (SNEAK_SPEED_SCALE if is_sneaking() else 1.0) * BodyMoods.speed_scale  # A fever (D-033)
 	velocity.x = move_toward(velocity.x, input_dir * top + wind().x * WIND_DRIFT, rate * delta)
 
 

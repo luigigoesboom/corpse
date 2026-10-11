@@ -24,6 +24,12 @@ const LOOKS := {
 		"vignette": Color(0.02, 0.02, 0.05), "fog": Color(0.55, 0.6, 0.72), "fog_density": 0.46,
 		"mist": Color(0.75, 0.78, 0.86), "motes": [Color8(214, 220, 232), Color8(140, 255, 204), Color8(246, 200, 208)],
 	},
+	# A fever (BodyMoods, D-033): the air burns.
+	&"fever": {
+		"lift": Color(0.08, 0.0, 0.0), "gain": Color(1.12, 0.92, 0.82), "saturation": 1.05,
+		"vignette": Color(0.12, 0.0, 0.0), "fog": Color(0.6, 0.18, 0.12), "fog_density": 0.55,
+		"mist": Color(0.75, 0.3, 0.25), "motes": [Color8(255, 140, 90), Color8(255, 200, 120), Color8(220, 80, 60)],
+	},
 	# Heavy rot (D-033), mixed in by how rotten the air is where the camera is.
 	&"rot": {
 		"lift": Color(0.03, 0.04, 0.0), "gain": Color(1.0, 1.02, 0.82), "saturation": 0.7,
@@ -86,6 +92,8 @@ func _process(delta: float) -> void:
 	var rot := smoothstep(0.3, 0.8, Rot.at_point(WorldState.data, at)) if WorldState.data else 0.0
 	if rot > 0.0:
 		target = _mix(target, LOOKS[&"rot"], rot)
+	if BodyMoods.mood == &"fever":
+		target = _mix(target, LOOKS[&"fever"], 0.75)
 	for key in _look:
 		if _look[key] is Color:
 			_look[key] = (_look[key] as Color).lerp(target[key], clampf(delta * EASE, 0.0, 1.0))

@@ -26,6 +26,8 @@ const EXHALE := 8.0
 static var time := 0.0
 ## Zones, by the WindZones that join and leave (no tree lookups per call).
 static var zones: Array = []
+## The body holds its breath (BodyMoods hush, D-033): the clock stops.
+static var held := false
 
 var _last_phase: StringName = &""
 
@@ -39,6 +41,8 @@ func _exit_tree() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if held:
+		return
 	time += delta
 	var now := phase()
 	if now != _last_phase:

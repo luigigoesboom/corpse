@@ -50,6 +50,10 @@ func _ready() -> void:
 	breath.name = "Breath"
 	add_child(breath)
 	breath.phase_changed.connect(_on_breath)
+	var moods := BodyMoods.new()  # The body's moods while you live (D-033).
+	moods.name = "BodyMoods"
+	moods.player = _player
+	add_child(moods)
 	var ambience := Ambience.new()  # The Gut's background sound (week 40).
 	ambience.name = "Ambience"
 	add_child(ambience)
@@ -283,7 +287,7 @@ func _on_entity_killed(entity: Node) -> void:
 		var kind := CombatRules.kind_of(entity)
 		WorldState.data.record_kill(kind)
 		Quests.on_kill(WorldState.data, kind)  # D-033
-		var ichor := Ichor.for_kill(kind, entity.global_position)
+		var ichor := roundi(Ichor.for_kill(kind, entity.global_position) * BodyMoods.ichor_scale)  # A surge (D-033)
 		if ichor > 0:
 			WorldState.data.add_ichor(ichor)
 			EventBus.ichor_gained.emit(ichor, entity.global_position)
