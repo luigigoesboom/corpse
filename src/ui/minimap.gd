@@ -16,10 +16,6 @@ const VIEW := Vector2i(120, 68)  # Tiles shown.
 const REFRESH := 0.25
 const UNSEEN := Color(0.05, 0.02, 0.03, 0.8)
 const AIR := Color(0.27, 0.11, 0.12, 0.85)
-const WALL := {
-	&"flesh": Color8(180, 72, 76), &"bile": Color8(150, 168, 52), &"bruise": Color8(138, 96, 164),
-	&"bone": Color8(184, 172, 146), &"rot": Color8(164, 114, 62),
-}
 ## How far around the host counts as seen (tiles): about the screen.
 const SIGHT := Vector2i(11, 7)
 
@@ -75,7 +71,7 @@ func _redraw_image(data: WorldData) -> void:
 					# Only the rock next to open space is drawn: the walls.
 					var edge := not map.is_solid(t + Vector2i.UP) or not map.is_solid(t + Vector2i.DOWN) \
 						or not map.is_solid(t + Vector2i.LEFT) or not map.is_solid(t + Vector2i.RIGHT)
-					c = WALL[ChunkData.KINDS[map.kind_at(t)]] if edge else UNSEEN
+					c = RockKinds.map_color(ChunkData.KINDS[map.kind_at(t)]) if edge else UNSEEN
 				else:
 					c = AIR
 			_image.set_pixel(x, y, c)

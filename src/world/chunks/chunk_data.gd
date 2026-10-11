@@ -12,15 +12,16 @@ const SIZE_PX := SIZE * TILE_PX
 ## A cell is EMPTY or rock. Rock stores which tile it is and what kind of
 ## rock (art program, D-028): cell = 1 + tile + TILES * kind, where tile is
 ## its open-sides mask (0..15), NEAR (16: 2 tiles from air) or DEEP (17: 3+),
-## and kind indexes KINDS (flesh, bile, bruise, bone, rot). One byte holds
+## and kind indexes KINDS (RockKinds: flesh, bile, bruise...). One byte holds
 ## both; tile_of() and kind_of() take it apart.
 const EMPTY := 0
 const NEAR := 16
 const DEEP := 17
 ## Tiles per kind (16 masks + NEAR + DEEP).
 const TILES := 18
-## Kinds of rock, in atlas order (each kind is 5 more rows of the atlas).
-const KINDS := [&"flesh", &"bile", &"bruise", &"bone", &"rot"]
+## Kinds of rock, in atlas order (each kind is 5 more rows of the atlas):
+## the table is RockKinds.
+const KINDS := RockKinds.IDS
 ## Open-sides mask bits: which neighbors are open space.
 const OPEN_UP := 1
 const OPEN_RIGHT := 2

@@ -193,6 +193,12 @@ func log_event(type: StringName, actors: Array, details: Dictionary) -> EventRec
 	return event
 
 
+## Puts the log back in order (year, then the order things were logged)
+## after events were added out of order (an older past added to a world).
+func sort_events() -> void:
+	events.sort_custom(func(a, b): return a.year < b.year or (a.year == b.year and a.id < b.id))
+
+
 ## How a faction feels about the current host, -100..100: this body's own
 ## standing (week 31) plus what the faction knows of the fragment inside it,
 ## as much as it can sense the fragment (week 32, VISION.md):

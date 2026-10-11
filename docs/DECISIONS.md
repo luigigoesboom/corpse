@@ -147,6 +147,11 @@ Format: ID, date, decision, why, what it rules out.
 - Why: more content first; teaching and playtesting one region would have to be redone once there are two.
 - Consequences: the Gut is not formally signed off as a vertical slice. Onboarding should be built once the Wound / Gut / Lungs start is settled.
 
+**D-030 Regions are data, each with a past of its own** (2026-10-11, week 46)
+- What: a region (the Gut, the Lungs, later the others) is a row in `Regions` (src/sim): name, paint color, how many people it can feed, whether its past is simulated, where newcomers come from, what is traded. Where it lies is painted in data/maps/regions.png (unpainted = the Gut). Every FactionData and SiteData has a `region`. HistorySim runs each region's past with its own seeded generator, year by year side by side; peoples only meet peoples of their own region until cross-region history (week 70).
+- Why: the Lungs need their own peoples and destined faction without rewriting the Gut's story: the Gut keeps the generator it always had, so every old seed keeps its past word for word (checked for five seeds and between lives).
+- Also: the rock kinds moved into one table (`RockKinds`, src/world) instead of eight copies; old saves are now tested: tests/fixtures holds a save of every format since 22 (tests/make_fixture.gd writes the current one), and tests/test_old_saves.gd loads them all. Save version 23.
+
 ---
 
 ## Open questions

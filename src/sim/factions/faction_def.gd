@@ -15,6 +15,8 @@ extends Resource
 @export var color := Color.WHITE
 ## Belief tags the history sim and dialogue react to (deeds they like or hate).
 @export var values: Array[StringName] = []
+## The region they live in (a Regions id); their history happens there.
+@export var region: StringName = &"gut"
 
 @export_group("Temperament", "")
 ## 0..1, how readily they fight over land and slights.

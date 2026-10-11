@@ -6,6 +6,8 @@ extends RefCounted
 ## the slot's chunk) that is not in a slot yet. If that faction has none
 ## left, a new one is founded now. A slot nobody can fill gets an empty site.
 ## Slots that already have a site keep it: from then on it is history's.
+## Everything stays inside a slot's region (D-030): a ruin slot in the Lungs
+## only takes a ruin of the Lungs' past.
 
 
 static func fill_slots(data: WorldData, settlements: Array) -> void:
@@ -26,6 +28,7 @@ static func fill_slots(data: WorldData, settlements: Array) -> void:
 			site.id = "site_%d" % data.new_id()
 			site.name = Names.place_name(data.world_seed, key)
 			site.founded_year = data.year
+			site.region = WorldMap.region_of(slot.position)
 			if owner != &"":
 				site.faction = owner
 				site.population = SiteData.PEOPLE_PER_RESIDENT * 3
@@ -40,17 +43,18 @@ static func fill_ruin_slots(data: WorldData, ruins: Array) -> void:
 		var key := EntityLayer.key_of(slot)
 		if data.site_in_slot(key):
 			continue
+		var region := WorldMap.region_of(slot.position)
 		var best: SiteData = null
 		var best_score := -1
 		for candidate: SiteData in data.sites.values():
-			if candidate.kind != &"ruin" or candidate.slot != "":
+			if candidate.kind != &"ruin" or candidate.slot != "" or candidate.region != region:
 				continue
 			var score := ArtifactForge.events_at(data, candidate.id).size()
 			if score > best_score:
 				best = candidate
 				best_score = score
 		if best == null:
-			best = _older_ruin(data, key)  # History left too few ruins: one older than it.
+			best = _older_ruin(data, key, region)  # History left too few ruins: one older than it.
 		best.slot = key
 		var artifact := ArtifactForge.forge_for_site(data, best)
 		if artifact:
@@ -62,9 +66,11 @@ static func fill_ruin_slots(data: WorldData, ruins: Array) -> void:
 ## A ruin from before the history began (about 1 world in 20 ends with fewer
 ## ruins than there are ruin slots). Some people founded it early and left
 ## it; the log says so, so its mural and tablet have something to tell.
-static func _older_ruin(data: WorldData, key: String) -> SiteData:
+static func _older_ruin(data: WorldData, key: String, region: StringName) -> SiteData:
 	var rng := SeededRng.make([data.world_seed, "older_ruin", key])
-	var peoples: Array = data.factions.values()
+	var peoples: Array = data.factions.values().filter(func(f): return f.region == region)
+	if peoples.is_empty():
+		peoples = data.factions.values()  # A region whose past is not simulated yet.
 	peoples.sort_custom(func(a, b): return a.founded_year < b.founded_year)
 	var people: FactionData = peoples[rng.randi() % mini(3, peoples.size())]
 	var now := data.year
@@ -76,5 +82,5 @@ static func _older_ruin(data: WorldData, key: String) -> SiteData:
 	HistorySim._end_site(data, site)
 	data.log_event(&"site_abandoned", [people.id], {"site": site.id, "dead": gone})
 	data.year = now
-	data.events.sort_custom(func(a, b): return a.year < b.year)
+	data.sort_events()
 	return site

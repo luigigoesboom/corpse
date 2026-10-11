@@ -1,15 +1,9 @@
 extends CanvasLayer
 ## Feeds the backdrop shader every frame: where the camera is, how big the
 ## view is, and a tint for the kind of rock around the camera (D-028), eased
-## so walking from flesh into bile slowly turns the back wall green.
+## so walking from flesh into bile slowly turns the back wall green. The
+## tints are in RockKinds.
 
-const TINTS := {
-	&"flesh": Color(1.0, 1.0, 1.0),
-	&"bile": Color(0.72, 1.0, 0.5),
-	&"bruise": Color(0.72, 0.58, 1.15),
-	&"bone": Color(0.9, 0.86, 0.82),
-	&"rot": Color(1.0, 0.78, 0.5),
-}
 ## How fast the tint follows the camera (per second).
 const EASE := 1.2
 
@@ -39,5 +33,5 @@ func _target_tint(at: Vector2) -> Color:
 	var weights := WorldMap.kind_weights(_kinds, at)
 	var sum := Color(0, 0, 0)
 	for k in weights.size():
-		sum += TINTS[ChunkData.KINDS[k]] * weights[k]
+		sum += RockKinds.tint(ChunkData.KINDS[k]) * weights[k]
 	return sum

@@ -13,10 +13,10 @@ extends Node
 
 const PACK_DIR := "res://assets/audio/ambience/"
 const OWN_DIR := "res://assets/audio/generated/"
-## layer: [loudest dB, pitch for the pack's copy]
+## layer: [loudest dB, pitch for the pack's copy]. Each kind of rock has a
+## layer too, from RockKinds.
 const LAYERS := {
 	&"body": [-8.0, 1.0],
-	&"flesh": [-12.0, 0.9], &"bile": [-14.0, 0.5], &"bruise": [-12.0, 0.8], &"bone": [-14.0, 0.75], &"rot": [-12.0, 1.0],
 	&"settlement": [-16.0, 1.0],
 	&"boss": [-10.0, 1.0],
 }
@@ -26,6 +26,7 @@ const FADE := 0.8
 const SETTLEMENT_RANGE := 600.0
 const SETTLEMENT_NEAR := 200.0
 
+var _layers := {}  # LAYERS and the rock kinds' layers
 var _players := {}  # layer -> AudioStreamPlayer
 var _levels := {}  # layer -> current loudness 0..1
 var _kinds: Image
@@ -38,14 +39,17 @@ func _ready() -> void:
 	if FileAccess.file_exists(WorldMap.KINDS_PATH) or ResourceLoader.exists(WorldMap.KINDS_PATH):
 		_kinds = WorldMap.read_image(WorldMap.KINDS_PATH)
 		_world_height = _kinds.get_height() * ChunkData.TILE_PX
-	for layer in LAYERS:
+	_layers = LAYERS.duplicate()
+	for kind in RockKinds.IDS:
+		_layers[kind] = RockKinds.sound(kind)
+	for layer in _layers:
 		var player := AudioStreamPlayer.new()
 		player.bus = &"Ambience"
 		var pack := PACK_DIR + "amb_%s.wav" % layer
 		var own := OWN_DIR + "amb_%s.wav" % layer
 		if ResourceLoader.exists(pack):
 			player.stream = _looping(load(pack))
-			player.pitch_scale = LAYERS[layer][1]
+			player.pitch_scale = _layers[layer][1]
 		elif ResourceLoader.exists(own):
 			player.stream = _looping(load(own))
 		else:
@@ -69,7 +73,7 @@ func _process(delta: float) -> void:
 	for layer in _players:
 		_levels[layer] = move_toward(_levels[layer], targets.get(layer, 0.0), delta * FADE)
 		var player: AudioStreamPlayer = _players[layer]
-		player.volume_db = LAYERS[layer][0] + linear_to_db(maxf(_levels[layer], 0.0001))
+		player.volume_db = _layers[layer][0] + linear_to_db(maxf(_levels[layer], 0.0001))
 
 
 ## How loud each layer should be (0..1) with the camera at `at`.

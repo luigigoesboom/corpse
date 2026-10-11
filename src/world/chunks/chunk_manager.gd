@@ -49,6 +49,7 @@ func reset() -> void:
 ## Reads the PNG again and rebuilds. For painting: save in Krita, press F4.
 func reload_map() -> void:
 	map = WorldMap.load_from()
+	WorldMap.forget_regions()
 	reset()
 
 

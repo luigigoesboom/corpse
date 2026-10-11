@@ -23,6 +23,8 @@ var founded_year := 0
 var ended_year := -1
 ## The hand-made slot it occupies in the built world, or "" (elsewhere).
 var slot := ""
+## The region it is in (Regions, week 46): its founders' region.
+var region: StringName = Regions.GUT
 
 
 func is_lived_in() -> bool:
@@ -38,7 +40,7 @@ func residents_shown(capacity: int) -> int:
 
 func to_dict() -> Dictionary:
 	return {"id": id, "kind": kind, "faction": faction, "name": name, "population": population,
-		"founded_year": founded_year, "ended_year": ended_year, "slot": slot}
+		"founded_year": founded_year, "ended_year": ended_year, "slot": slot, "region": region}
 
 
 static func from_dict(d: Dictionary) -> SiteData:
@@ -51,4 +53,5 @@ static func from_dict(d: Dictionary) -> SiteData:
 	site.founded_year = int(d.get("founded_year", 0))
 	site.ended_year = int(d.get("ended_year", -1))
 	site.slot = d.get("slot", site.id)  # Before week 28 a site's id was its slot.
+	site.region = d.get("region", Regions.GUT)
 	return site

@@ -102,9 +102,11 @@ func _process(delta: float) -> void:
 
 func _on_world_loaded() -> void:
 	var data := WorldState.data
-	if data.factions.is_empty():
-		# A new world, or a save from before week 26: give it a past (D-025).
-		HistorySim.run(data)
+	var without_past := HistorySim.regions_without_past(data)
+	if not without_past.is_empty():
+		# A new world, a save from before week 26, or one from before a
+		# region's past was simulated: give it a past (D-025, D-030).
+		HistorySim.run_regions(data, without_past)
 		FactionTerritory.apply_territory(data)
 	SiteSeeder.fill_slots(data, _entities.templates().filter(func(t): return t is Settlement and not t is GuardPost))
 	SiteSeeder.fill_ruin_slots(data, _entities.templates().filter(func(t): return t is RuinSite))

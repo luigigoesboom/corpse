@@ -13,14 +13,15 @@ extends RefCounted
 
 const DEFAULT_PATH := "res://data/maps/world.png"
 ## Kinds of rock (D-028): a second painting the same size as world.png.
-## Transparent = flesh; otherwise the nearest of KIND_PAINT picks the kind.
+## Transparent = flesh; otherwise the nearest paint color in RockKinds.
 const KINDS_PATH := "res://data/maps/tiles.png"
-const KIND_PAINT := {
-	&"bile": Color8(150, 180, 40),
-	&"bruise": Color8(110, 60, 170),
-	&"bone": Color8(210, 200, 170),
-	&"rot": Color8(140, 85, 40),
-}
+## Regions (week 46, D-030): a third painting the same size, each region in
+## its Regions paint color; unpainted, or outside it, is the Gut.
+const REGIONS_PATH := "res://data/maps/regions.png"
+
+## The regions painting, read once (forget_regions() reads it again).
+static var _regions: Image
+static var _regions_read := false
 
 var size: Vector2i
 ## The painted image as loaded. Also used by the debug map.
@@ -34,6 +35,26 @@ static func load_from(path: String = DEFAULT_PATH) -> WorldMap:
 	if path == DEFAULT_PATH and (ResourceLoader.exists(KINDS_PATH) or FileAccess.file_exists(KINDS_PATH)):
 		map.kinds = read_image(KINDS_PATH)
 	return map
+
+
+## Which region a tile is in (a Regions id).
+static func region_at(tile: Vector2i) -> StringName:
+	if not _regions_read:
+		_regions_read = true
+		_regions = read_image(REGIONS_PATH) if FileAccess.file_exists(REGIONS_PATH) or ResourceLoader.exists(REGIONS_PATH) else null
+	if _regions == null or tile.x < 0 or tile.y < 0 or tile.x >= _regions.get_width() or tile.y >= _regions.get_height():
+		return Regions.GUT
+	return Regions.of_paint(_regions.get_pixelv(tile))
+
+
+## Which region a point in the world (px) is in.
+static func region_of(point: Vector2) -> StringName:
+	return region_at(Vector2i((point / ChunkData.TILE_PX).floor()))
+
+
+## Makes region_at() read the painting again (F4 reloads the map).
+static func forget_regions() -> void:
+	_regions_read = false
 
 
 ## Which kind of rock a tile is (index into ChunkData.KINDS).
@@ -69,20 +90,9 @@ static func kind_weights(kinds_image: Image, at: Vector2) -> Array:
 	return out
 
 
-## The kind a painted color means (index into ChunkData.KINDS): transparent
-## is flesh, otherwise the nearest of KIND_PAINT.
+## The kind a painted color means (index into ChunkData.KINDS).
 static func kind_of_color(c: Color) -> int:
-	if c.a < 0.5:
-		return 0
-	var best := 0
-	var best_d := INF
-	for name in KIND_PAINT:
-		var p: Color = KIND_PAINT[name]
-		var d := Vector3(c.r - p.r, c.g - p.g, c.b - p.b).length_squared()
-		if d < best_d:
-			best_d = d
-			best = ChunkData.KINDS.find(name)
-	return best
+	return RockKinds.of_paint(c)
 
 
 ## Loads the map PNG. Shared with the editor preview.

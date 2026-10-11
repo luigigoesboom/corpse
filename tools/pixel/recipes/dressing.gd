@@ -19,7 +19,7 @@ const Sheet := preload("res://tools/pixel/sheet.gd")
 
 const S := 32
 const PER := 6
-const KINDS := [&"flesh", &"bile", &"bruise", &"bone", &"rot"]
+const KINDS := RockKinds.IDS
 const ROWS := 5
 const BIG := 64
 const BIG_PER := 4
@@ -321,7 +321,7 @@ class Things:
 
 	# --- inlays: things buried in the rock ----------------------------------------
 	static func inlay(c, pal, kind: StringName, v: int, rng) -> void:
-		var rock: StringName = {&"flesh": &"flesh", &"bile": &"rock_bile", &"bruise": &"rock_bruise", &"bone": &"rock_bone", &"rot": &"rock_rot"}[kind]
+		var rock: StringName = RockKinds.ramp(kind)
 		var dark := {"lo": 0, "hi": 1, "line": false}
 		match v:
 			0, 1:  # A vein running through.
@@ -351,7 +351,7 @@ class Things:
 ## from the top.
 class Big:
 	static func draw(c, pal, kind: StringName, floor: bool, v: int, rng) -> void:
-		var rock: StringName = {&"flesh": &"flesh", &"bile": &"rock_bile", &"bruise": &"rock_bruise", &"bone": &"rock_bone", &"rot": &"rock_rot"}[kind]
+		var rock: StringName = RockKinds.ramp(kind)
 		if floor:
 			match [kind, v]:
 				[&"bone", 0], [&"bone", 1]:  # A rib arch.

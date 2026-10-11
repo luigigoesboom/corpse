@@ -17,7 +17,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 22
+const SAVE_VERSION := 23
 const SLOTS := [1, 2, 3]
 
 
@@ -213,4 +213,11 @@ func _migrate(save: Dictionary) -> Dictionary:
 		# v22 (after week 41): what the fragment has seen, for the minimap.
 		# Nothing to convert: an old world starts unseen.
 		save.save_version = 22
+	if save.save_version == 22:
+		# v23 (week 46, D-030): regions. Everything older lived in the Gut.
+		for faction in save.world.get("factions", []):
+			faction["region"] = faction.get("region", Regions.GUT)
+		for site in save.world.get("sites", []):
+			site["region"] = site.get("region", Regions.GUT)
+		save.save_version = 23
 	return save

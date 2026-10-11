@@ -1,16 +1,21 @@
 class_name HistorySim
 extends RefCounted
-## The Gut's past, simulated year by year when a world is created (D-025,
+## The body's past, simulated year by year when a world is created (D-025,
 ## week 28). Plain data in, plain data out: factions (WorldData.factions),
 ## sites (WorldData.sites) and the event log (WorldData.events). Text is made
 ## from the events when shown (EventText), never stored.
 ##
 ## Peoples arrive, found settlements, grow, trade, go to war, split in
-## schisms, suffer floods and plagues, and die out. The hand-made factions
-## are destined: the Flesh-Tenders are among the early peoples, the Choir of
-## Waking is born as a prophet's schism mid-history, and neither can vanish
-## before the present. Everything comes from one seeded generator, so the
-## same world seed always gives the same history.
+## schisms, suffer floods and plagues, and die out. Each region (Regions,
+## D-030) has a past of its own: its peoples only meet each other, and its
+## own seeded generator drives it, so the same world seed always gives the
+## same history and adding a region never changes another's story. The
+## years of all regions run side by side, so the log stays in order.
+##
+## The hand-made factions are destined (DESTINED): in the Gut the
+## Flesh-Tenders are among the early peoples and the Choir of Waking is born
+## as a prophet's schism mid-history; none of them can vanish before the
+## present.
 
 const YEARS := 2000
 ## Between lives (week 37): hand-made places (sites in a slot) cannot be
@@ -19,6 +24,19 @@ const YEARS := 2000
 static var protect_slots := false
 const TENDERS := &"flesh_tenders"
 const CHOIR := &"choir_of_waking"
+## The hand-made factions of each region and how they come to be:
+##   early   founded in years `from`..`to` of the past, like any people
+##   schism  born in years `from`..`to` as a prophet's split (`cause`) from
+##           the most devout people of the day, or from pilgrims
+const DESTINED := {
+	&"gut": [
+		{"id": TENDERS, "how": "early", "from": 5, "to": 220},
+		{"id": CHOIR, "how": "schism", "from": 700, "to": 1500, "cause": "over whether the god only sleeps"},
+	],
+}
+## The region being simulated: _alive(), _living_sites() and new peoples
+## and sites belong to it.
+static var region: StringName = Regions.GUT
 ## A settlement this big gets crowded and sends settlers off.
 const SITE_CAPACITY := 360
 const MAX_SITES_PER_FACTION := 6
@@ -27,54 +45,87 @@ const MAX_LIVING_FACTIONS := 7
 const DESTINED_FLOOR := 20
 ## A destined faction this small in the present gets pilgrims (an event).
 const DESTINED_PRESENT_MIN := 80
-## How many people the Gut can feed. The fuller it gets, the slower everyone
-## grows and the more readily neighbours turn on each other.
-const GUT_CAPACITY := 2600
-
-const FROM := ["the Wound", "the upper veins", "the lung-dark", "a burst artery", "the scar tissue"]
+## How many people a region can feed is its Regions "capacity" (the Gut:
+## 2600). The fuller it gets, the slower everyone grows and the more readily
+## neighbours turn on each other. Where newcomers come from and what is
+## traded are per region too.
 const WAR_CAUSES := ["the bile cisterns of %s", "an old insult", "the warm wall near %s", "a stolen relic",
 	"grazing rights on the lining", "who may bury their dead at %s", "a prophecy about %s", "a murdered envoy"]
 const SCHISM_CAUSES := ["over whether the god only sleeps", "over the right way to bury the dead",
 	"over a vision seen in a spasm", "over who should lead after the flood", "over eating the god's flesh"]
-const GOODS := ["bile and salt", "dried gut-meat", "bone tools", "lamp oil", "spores", "relics", "cartilage"]
 const DISASTERS := [&"bile_flood", &"rot_plague", &"spasm", &"famine"]
 
 
-## Runs YEARS (or `years`) of history ending at data.year. Expects a world
-## without factions; afterwards data.year is unchanged.
+## Runs YEARS (or `years`) of history ending at data.year, in every region
+## whose past is simulated (Regions INFO "history"). Expects a world without
+## peoples in those regions; afterwards data.year is unchanged.
 static func run(data: WorldData, years := YEARS) -> void:
-	var rng := SeededRng.make([data.world_seed, "history"])
+	run_regions(data, Regions.IDS.filter(func(r): return Regions.info(r).history), years)
+
+
+## Regions whose past is simulated but that have no peoples in this world
+## yet: all of them for a new world, a new region for an old save.
+static func regions_without_past(data: WorldData) -> Array:
+	return Regions.IDS.filter(func(r): return Regions.info(r).history \
+		and not data.factions.values().any(func(f): return f.region == r))
+
+
+## Runs the past of some regions only (also for an old world that gains a
+## region it did not have: its events are then sorted in among the others).
+static func run_regions(data: WorldData, regions: Array, years := YEARS) -> void:
+	var had_events := not data.events.is_empty()
 	var now := data.year
 	var start := now - years
-	var tenders_year := start + rng.randi_range(5, 220)
-	var choir_year := start + rng.randi_range(700, 1500)
+	var plans := {}  # region -> {rng, founding: {year: [DESTINED entries]}}
+	for r in regions:
+		# The Gut's generator is the one history always had, so old seeds
+		# keep their past word for word.
+		var rng := SeededRng.make([data.world_seed, "history"] if r == Regions.GUT else [data.world_seed, "history", r])
+		var founding := {}
+		for entry in DESTINED.get(r, []):
+			founding.get_or_add(start + rng.randi_range(entry.from, entry.to), []).append(entry)
+		plans[r] = {"rng": rng, "founding": founding}
 	data.year = start
 	for year in years:
 		data.year += 1
-		if year == 0:
-			for i in rng.randi_range(2, 3):
-				_arrive(data, rng)
-		if data.year == tenders_year:
-			_found_tenders(data, rng)
-		if data.year == choir_year:
-			_found_choir(data, rng)
-		tick(data, rng)
+		for r in plans:
+			region = r
+			var rng: RandomNumberGenerator = plans[r].rng
+			if year == 0:
+				for i in rng.randi_range(2, 3):
+					_arrive(data, rng)
+			for entry in plans[r].founding.get(data.year, []):
+				_found_destined(data, rng, entry)
+			tick(data, rng)
 	data.year = now
-	_into_the_present(data, rng)
+	for r in plans:
+		region = r
+		_into_the_present(data, plans[r].rng)
+	region = Regions.GUT
+	if had_events:
+		data.sort_events()
 
 
 ## History between two lives (week 37): `years` more years of the same
-## yearly simulation, ending at data.year, with hand-made places protected.
-## Returns the events it logged.
+## yearly simulation in every region with people, ending at data.year, with
+## hand-made places protected. The Gut uses `rng`, other regions their own
+## generator for this gap. Returns the events it logged.
 static func between_lives(data: WorldData, years: int, rng: RandomNumberGenerator) -> Array:
 	var first := data.events.size()
 	var now := data.year
+	var rngs := {}
+	for r in Regions.IDS:
+		if Regions.info(r).history and data.factions.values().any(func(f): return f.region == r):
+			rngs[r] = rng if r == Regions.GUT else SeededRng.make([data.world_seed, "between", r, now, data.lives.size()])
 	data.year = now - years
 	protect_slots = true
 	for i in years:
 		data.year += 1
-		tick(data, rng)
+		for r in rngs:
+			region = r
+			tick(data, rngs[r])
 	protect_slots = false
+	region = Regions.GUT
 	data.year = now
 	return data.events.slice(first)
 
@@ -99,17 +150,27 @@ static func tick(data: WorldData, rng: RandomNumberGenerator) -> void:
 static func _arrive(data: WorldData, rng: RandomNumberGenerator) -> FactionData:
 	var faction := FactionData.new()
 	faction.id = StringName("people_%d" % data.new_id())
+	faction.region = region
 	HistoryNames.make_people(faction, HistoryNames.random_archetype(rng), rng)
 	faction.founded_year = data.year
 	data.factions[faction.id] = faction
 	var site := _new_site(data, faction, rng.randi_range(40, 90), rng)
-	data.log_event(&"people_arrived", [faction.id], {"site": site.id, "from": FROM[rng.randi() % FROM.size()]})
+	var from: Array = Regions.info(region).from
+	data.log_event(&"people_arrived", [faction.id], {"site": site.id, "from": from[rng.randi() % from.size()]})
 	_update_strength(data, faction)
 	return faction
 
 
-static func _found_tenders(data: WorldData, rng: RandomNumberGenerator) -> void:
-	var faction := FactionData.from_def(FactionDb.get_def(TENDERS), data.year)
+## A destined faction comes to be (a DESTINED entry).
+static func _found_destined(data: WorldData, rng: RandomNumberGenerator, entry: Dictionary) -> void:
+	if entry.how == "schism":
+		_found_by_schism(data, rng, entry.id, entry.cause)
+	else:
+		_found_early(data, rng, entry.id)
+
+
+static func _found_early(data: WorldData, rng: RandomNumberGenerator, id: StringName) -> void:
+	var faction := FactionData.from_def(FactionDb.get_def(id), data.year)
 	faction.relations.clear()
 	data.factions[faction.id] = faction
 	var site := _new_site(data, faction, rng.randi_range(50, 80), rng)
@@ -117,26 +178,26 @@ static func _found_tenders(data: WorldData, rng: RandomNumberGenerator) -> void:
 	_update_strength(data, faction)
 
 
-## The Choir is born from the most devout people of the day, or, if there
-## is nobody devout enough, from pilgrims who heard the heart.
-static func _found_choir(data: WorldData, rng: RandomNumberGenerator) -> void:
+## Born from the most devout people of the day, or, if there is nobody
+## devout enough, from pilgrims who heard the heart (the Choir).
+static func _found_by_schism(data: WorldData, rng: RandomNumberGenerator, id: StringName, cause: String) -> void:
 	var parent: FactionData = null
 	for faction in _alive(data):
 		if not _sites_of(data, faction.id).is_empty() and (parent == null or faction.piety * faction.strength > parent.piety * parent.strength):
 			parent = faction
-	var choir := FactionData.from_def(FactionDb.get_def(CHOIR), data.year)
-	choir.relations.clear()
-	data.factions[choir.id] = choir
+	var born := FactionData.from_def(FactionDb.get_def(id), data.year)
+	born.relations.clear()
+	data.factions[born.id] = born
 	var prophet := HistoryNames.person(rng)
 	if parent == null:
-		var site := _new_site(data, choir, rng.randi_range(40, 70), rng)
-		data.log_event(&"faction_founded", [choir.id], {"site": site.id, "founder": prophet, "pilgrims": true})
+		var site := _new_site(data, born, rng.randi_range(40, 70), rng)
+		data.log_event(&"faction_founded", [born.id], {"site": site.id, "founder": prophet, "pilgrims": true})
 	else:
-		choir.parent = parent.id
-		var site := _split_off(data, parent, choir, rng)
-		data.set_relation(parent.id, choir.id, -60)
-		data.log_event(&"schism", [choir.id, parent.id], {"site": site.id, "prophet": prophet, "cause": "over whether the god only sleeps"})
-	_update_strength(data, choir)
+		born.parent = parent.id
+		var site := _split_off(data, parent, born, rng)
+		data.set_relation(parent.id, born.id, -60)
+		data.log_event(&"schism", [born.id, parent.id], {"site": site.id, "prophet": prophet, "cause": cause})
+	_update_strength(data, born)
 
 
 # --- Each year ---------------------------------------------------------------
@@ -170,6 +231,7 @@ static func _act(data: WorldData, faction: FactionData, rng: RandomNumberGenerat
 		splinter.id = StringName("people_%d" % data.new_id())
 		HistoryNames.make_splinter(splinter, faction, rng)
 		splinter.parent = faction.id
+		splinter.region = faction.region
 		splinter.founded_year = data.year
 		data.factions[splinter.id] = splinter
 		var site := _split_off(data, faction, splinter, rng)
@@ -220,7 +282,8 @@ static func _relations(data: WorldData, rng: RandomNumberGenerator, pressure: fl
 				a.trade_partners.append(b.id)
 				b.trade_partners.append(a.id)
 				data.set_relation(a.id, b.id, current + 20)
-				data.log_event(&"trade_pact", [a.id, b.id], {"goods": GOODS[rng.randi() % GOODS.size()]})
+				var goods: Array = Regions.info(region).goods
+				data.log_event(&"trade_pact", [a.id, b.id], {"goods": goods[rng.randi() % goods.size()]})
 
 
 static func _battles(data: WorldData, rng: RandomNumberGenerator) -> void:
@@ -289,7 +352,7 @@ static func _disasters(data: WorldData, rng: RandomNumberGenerator) -> void:
 
 static func _falls(data: WorldData) -> void:
 	for faction: FactionData in data.factions.values():
-		if faction.fell_year >= 0:
+		if faction.fell_year >= 0 or faction.region != region:
 			continue
 		_update_strength(data, faction)
 		if faction.strength >= 12 and not _sites_of(data, faction.id).is_empty():
@@ -313,12 +376,10 @@ static func _falls(data: WorldData) -> void:
 ## The present: destined factions alive with a home, nobody left at war
 ## with the dead.
 static func _into_the_present(data: WorldData, rng: RandomNumberGenerator) -> void:
-	for id in [TENDERS, CHOIR]:
+	for entry in DESTINED.get(region, []):
+		var id: StringName = entry.id
 		if not data.factions.has(id):
-			if id == TENDERS:
-				_found_tenders(data, rng)
-			else:
-				_found_choir(data, rng)
+			_found_destined(data, rng, entry)
 		var faction: FactionData = data.factions[id]
 		if _sites_of(data, id).is_empty():
 			var site := _new_site(data, faction, 40, rng)
@@ -355,33 +416,34 @@ static func _war_appetite(data: WorldData, a: FactionData, b: FactionData) -> fl
 	return 1.0
 
 
-## Living factions, oldest first. Dictionaries keep insertion order, and
-## history inserts in a repeatable order, so this repeats too.
+## Living factions of the region, oldest first. Dictionaries keep insertion
+## order, and history inserts in a repeatable order, so this repeats too.
 static func _alive(data: WorldData) -> Array:
-	return data.factions.values().filter(func(faction): return faction.is_alive())
+	return data.factions.values().filter(func(faction): return faction.is_alive() and faction.region == region)
 
 
-## 0 (empty Gut) .. 1 (every mouth it can feed).
+## 0 (an empty region) .. 1 (every mouth it can feed).
 static func _pressure(data: WorldData) -> float:
 	var total := 0
 	for site in _living_sites(data):
 		total += site.population
-	return clampf(total / float(GUT_CAPACITY), 0.0, 1.2)
+	return clampf(total / float(Regions.info(region).capacity), 0.0, 1.2)
 
 
 static func _sites_of(data: WorldData, faction_id: StringName) -> Array:
 	return _living_sites(data).filter(func(site): return site.faction == faction_id)
 
 
-## Lived-in sites, oldest first (insertion order, see _alive).
+## Lived-in sites of the region, oldest first (insertion order, see _alive).
 static func _living_sites(data: WorldData) -> Array:
-	return data.sites.values().filter(func(site): return site.is_lived_in())
+	return data.sites.values().filter(func(site): return site.is_lived_in() and site.region == region)
 
 
 static func _new_site(data: WorldData, faction: FactionData, population: int, rng: RandomNumberGenerator) -> SiteData:
 	var site := SiteData.new()
 	site.id = "site_%d" % data.new_id()
 	site.faction = faction.id
+	site.region = faction.region
 	site.population = maxi(1, population)
 	site.founded_year = data.year
 	var used := data.sites.values().map(func(s): return s.name)

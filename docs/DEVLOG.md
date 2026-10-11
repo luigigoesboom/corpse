@@ -5,6 +5,11 @@ Three lines a week minimum. Newest at the top.
 Template:
 
 ```
+## Week 46 (2026-10-11)
+Done: D-030, regions as data: `Regions` (src/sim), regions.png read by `WorldMap.region_at()`, `region` on factions and sites (save version 23 with its migration), the history sim runs each region with its own generator side by side (the Gut's past is word for word the same for five seeds, between lives too), site slots stay inside their region. `RockKinds` replaces eight copies of the kinds list (tiles and dressing come out byte-identical). Old saves are tested: tests/fixtures (versions 22 and 23), tests/make_fixture.gd, tests/test_old_saves.gd; tests/test_regions.gd.
+Not done: The Lungs have no past yet (history off until their people exist, week 50) and no map (week 47).
+Next: Week 47, the Lungs' map: huge chambers, membranes, new kinds of rock.
+
 ## Week 45 (2026-10-11)
 Done: D-029: on to the Lungs (weeks 45-52) before onboarding and playtests. Creature kit: `tools/pixel/kit.gd` (sacs, chains, waves, IK legs, wings, cilia, eyes, mouths, a placeholder body, `write()`), the Gut creatures' recipe uses it with byte-identical output. `tools/creature/new_creature.gd` makes a working creature (recipe, AI script, scene) as a walker, flyer, floater or rooted thing; `Creature` base class. First one made with it: the Puffsac, a drifting lung lobe that swells and bursts (hurts everything near it; pop it from afar or roll away from the fuse), with sounds and a spore cloud. Devlog clips: F12 records a GIF (`GifRecorder`, `GifWriter`), and `run.gd --gif` writes every animation as a GIF. A v22 save fixture (tests/fixtures) for week 46's migration check.
 Not done: The Puffsac has nowhere to live yet (the Lungs are week 47); it is only in the tests.

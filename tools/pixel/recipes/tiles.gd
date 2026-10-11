@@ -1,6 +1,6 @@
 extends RefCounted
 ## The rock tiles (D-022/D-023 look, D-028 colors): one 4 x 5 block of 32 px
-## tiles per kind of rock (ChunkData.KINDS: flesh, bile, bruise, bone, rot),
+## tiles per kind of rock (RockKinds: flesh, bile, bruise, bone, rot...),
 ## stacked downward in assets/art/tiles/gut_tiles.png. Each block: the 16
 ## open-sides masks (rims on open sides, a 12 px paved face on top when the
 ## tile has air above), then NEAR and DEEP fill. Every kind is the same
@@ -14,8 +14,7 @@ const T := 32
 const FACE := 12  # Top face rows 0..11; row 11 is the lip.
 const R := 7.0  # Rounding of lower corners.
 const FACE_R := 4.0
-const RAMPS := {&"flesh": &"flesh", &"bile": &"rock_bile", &"bruise": &"rock_bruise", &"bone": &"rock_bone", &"rot": &"rock_rot"}
-const KINDS := [&"flesh", &"bile", &"bruise", &"bone", &"rot"]  # Same order as ChunkData.KINDS.
+const KINDS := RockKinds.IDS  # Each kind's ramp is in RockKinds.
 const BAYER := [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
 const ATLAS := "res://assets/art/tiles/gut_tiles.png"
 const TILESET := "res://assets/art/tiles/gut_tileset.tres"
@@ -25,7 +24,7 @@ static func make(pal, out: Array) -> void:
 	var cells := _voronoi_points()
 	var atlas := Image.create(T * 4, T * 5 * KINDS.size(), false, Image.FORMAT_RGBA8)
 	for k in KINDS.size():
-		var ramp: Array = pal.ramp(RAMPS[KINDS[k]])
+		var ramp: Array = pal.ramp(RockKinds.ramp(KINDS[k]))
 		var block := Image.create(T * 4, T * 5, false, Image.FORMAT_RGBA8)
 		for mask in 16:
 			_tile(block, Vector2i(mask % 4, mask / 4) * T, mask, ramp, cells)

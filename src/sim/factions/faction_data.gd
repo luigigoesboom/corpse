@@ -36,6 +36,8 @@ var founded_year := 0
 var fell_year := -1
 ## Faction it split from (schism), or &"".
 var parent: StringName = &""
+## The region it lives in (Regions, week 46).
+var region: StringName = Regions.GUT
 
 
 func is_alive() -> bool:
@@ -63,6 +65,7 @@ func copy_identity(def: FactionDef) -> void:
 	member_name = def.member_name
 	color = def.color
 	values = def.values.duplicate()
+	region = def.region
 	aggression = def.aggression
 	expansion = def.expansion
 	piety = def.piety
@@ -77,7 +80,7 @@ func to_dict() -> Dictionary:
 		"aggression": aggression, "expansion": expansion, "piety": piety, "trade": trade,
 		"senses_fragment": senses_fragment, "strength": strength,
 		"territory": territory.duplicate(), "relations": relations.duplicate(), "wars": wars.duplicate(), "trade_partners": trade_partners.duplicate(),
-		"founded_year": founded_year, "fell_year": fell_year, "parent": parent,
+		"founded_year": founded_year, "fell_year": fell_year, "parent": parent, "region": region,
 	}
 
 
@@ -94,6 +97,7 @@ static func from_dict(d: Dictionary) -> FactionData:
 	faction.fell_year = int(d.get("fell_year", -1))
 	faction.parent = d.get("parent", &"")
 	faction.archetype = d.get("archetype", &"")
+	faction.region = d.get("region", Regions.GUT)
 	var def := FactionDb.get_def(faction.id)
 	if not d.has("display_name") and def:
 		faction.copy_identity(def)  # Saved before week 28: identity lived only in the def.
