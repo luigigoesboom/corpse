@@ -9,7 +9,9 @@ var data
 
 func run() -> void:
 	state = autoload("WorldState")
-	await start_scene("res://game.tscn")
+	# A fixed world: in about 1 world in 70 every death rolls a short gap
+	# (days, months) and no history happens between lives at all.
+	await start_scene("res://game.tscn", 33)
 	data = state.data
 	var start_year: int = data.year
 	var chapel_site = data.site_in_slot("ChoirChapel")

@@ -17,6 +17,12 @@
 [ext_resource type="Script" path="res://src/world/guard_post.gd" id="16_post"]
 [ext_resource type="PackedScene" path="res://src/actors/bosses/gullet_matron.tscn" id="17_matron"]
 [ext_resource type="Script" path="res://src/world/key_cache.gd" id="18_cache"]
+[ext_resource type="Script" path="res://src/world/landmark.gd" id="19_landmark"]
+[ext_resource type="PackedScene" path="res://src/props/lungs/cartilage_gate.tscn" id="20_gate"]
+[ext_resource type="PackedScene" path="res://src/props/lungs/hive_lantern.tscn" id="21_lantern"]
+[ext_resource type="PackedScene" path="res://src/props/lungs/pleura_curtain.tscn" id="22_curtain"]
+[ext_resource type="PackedScene" path="res://src/props/lungs/aerie_nest.tscn" id="23_nest"]
+[ext_resource type="PackedScene" path="res://src/props/lungs/wind_bones.tscn" id="24_bones"]
 
 [node name="World" type="Node2D"]
 
@@ -52,6 +58,50 @@ position = Vector2(3500, 2314)
 script = ExtResource("11_spawn")
 place_name = "the chamber heights"
 host_types = Array[StringName]([&"antibody", &"pilgrim"])
+
+[node name="Landmarks" type="Node2D" parent="."]
+
+[node name="GreatBronchus" type="Node2D" parent="Landmarks"]
+position = Vector2(8800, 2240)
+script = ExtResource("19_landmark")
+title = "The Great Bronchus"
+line = "An airway as wide as a street, ringed with cartilage. Air still moves in it."
+extents = Vector2(896, 192)
+
+[node name="Bellows" type="Node2D" parent="Landmarks"]
+position = Vector2(10720, 1856)
+script = ExtResource("19_landmark")
+title = "The Bellows"
+line = "A hollow the size of a town, where the god breathed. Sheets of lung hang across it."
+extents = Vector2(1056, 1504)
+
+[node name="AlveolarHives" type="Node2D" parent="Landmarks"]
+position = Vector2(12992, 1216)
+script = ExtResource("19_landmark")
+title = "The Alveolar Hives"
+line = "Cells of air in their thousands, each one a room."
+extents = Vector2(1120, 800)
+
+[node name="LowerLobe" type="Node2D" parent="Landmarks"]
+position = Vector2(13952, 3136)
+script = ExtResource("19_landmark")
+title = "The Lower Lobe"
+line = "The low hall of the lung, where the heavy air settles."
+extents = Vector2(2080, 320)
+
+[node name="Trachea" type="Node2D" parent="Landmarks"]
+position = Vector2(15296, 1600)
+script = ExtResource("19_landmark")
+title = "The Trachea"
+line = "The windpipe climbs toward the god's throat."
+extents = Vector2(160, 1216)
+
+[node name="HighAerie" type="Node2D" parent="Landmarks"]
+position = Vector2(15104, 256)
+script = ExtResource("19_landmark")
+title = "The High Aerie"
+line = "Something nests up here, where the air is thinnest."
+extents = Vector2(672, 192)
 
 [node name="Entities" type="Node2D" parent="."]
 script = ExtResource("2_entities")
@@ -235,3 +285,55 @@ amount = 28
 [node name="ClotAlcove" parent="Entities" instance=ExtResource("15_clot")]
 position = Vector2(5136, 2150)
 amount = 14
+
+[node name="CartilageGate" parent="Entities" instance=ExtResource("20_gate")]
+position = Vector2(8976, 2406)
+
+[node name="HiveLanternHigh" parent="Entities" instance=ExtResource("21_lantern")]
+position = Vector2(12688, 710)
+
+[node name="HiveLanternMid" parent="Entities" instance=ExtResource("21_lantern")]
+position = Vector2(13360, 1286)
+
+[node name="HiveLanternLow" parent="Entities" instance=ExtResource("21_lantern")]
+position = Vector2(12880, 1926)
+
+[node name="HiveLanternLobe" parent="Entities" instance=ExtResource("21_lantern")]
+position = Vector2(14128, 3398)
+
+[node name="PleuraCurtain" parent="Entities" instance=ExtResource("22_curtain")]
+position = Vector2(10768, 352)
+
+[node name="PleuraCurtainLobe" parent="Entities" instance=ExtResource("22_curtain")]
+position = Vector2(13456, 2848)
+
+[node name="AerieNest" parent="Entities" instance=ExtResource("23_nest")]
+position = Vector2(15056, 422)
+
+[node name="WindBonesBellows" parent="Entities" instance=ExtResource("24_bones")]
+position = Vector2(11152, 480)
+
+[node name="WindBonesLobe" parent="Entities" instance=ExtResource("24_bones")]
+position = Vector2(12176, 2848)
+
+[node name="WindBonesLobeEast" parent="Entities" instance=ExtResource("24_bones")]
+position = Vector2(11920, 2944)
+
+[node name="WildRootLungs" parent="Entities" instance=ExtResource("14_root")]
+position = Vector2(15664, 3398)
+
+[node name="ClotHives" parent="Entities" instance=ExtResource("15_clot")]
+position = Vector2(13744, 1286)
+amount = 18
+
+[node name="ClotHivesLow" parent="Entities" instance=ExtResource("15_clot")]
+position = Vector2(13936, 1926)
+amount = 14
+
+[node name="ClotAerie" parent="Entities" instance=ExtResource("15_clot")]
+position = Vector2(14928, 422)
+amount = 30
+
+[node name="ClotBellows" parent="Entities" instance=ExtResource("15_clot")]
+position = Vector2(11632, 3366)
+amount = 12

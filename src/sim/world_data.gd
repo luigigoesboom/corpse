@@ -70,6 +70,9 @@ var key_places: Dictionary = {}
 ## What the fragment has seen (the minimap, after week 41): chunk ->
 ## PackedByteArray bitset, one bit per tile of the chunk (64 x 64 / 8 bytes).
 var explored: Dictionary = {}
+## Named places the fragment has found (week 48): Landmark name (or
+## "region:<id>") -> the year it was first seen.
+var places_seen: Dictionary = {}
 
 
 static func create(seed_value: int) -> WorldData:
@@ -299,6 +302,14 @@ func is_explored(tile: Vector2i) -> bool:
 	return bits[i >> 3] & (1 << (i & 7)) != 0
 
 
+## Notes that the fragment is at a named place. True the first time.
+func see_place(key: String) -> bool:
+	if places_seen.has(key):
+		return false
+	places_seen[key] = year
+	return true
+
+
 ## Marks events as read (week 35). Returns how many were new.
 func learn(ids: Array) -> int:
 	var fresh := 0
@@ -409,7 +420,7 @@ func to_dict() -> Dictionary:
 		"sites": sites.values().map(func(site): return site.to_dict()),
 		"artifacts": artifacts.values().map(func(artifact): return artifact.to_dict()),
 		"legend": legend.duplicate(),
-		"ichor": ichor, "ichor_banked": ichor_banked, "boons": boons.duplicate(), "kept_graft": kept_graft.duplicate(), "known_events": known_events.duplicate(), "key_places": key_places.duplicate(), "explored": explored.duplicate(true),
+		"ichor": ichor, "ichor_banked": ichor_banked, "boons": boons.duplicate(), "kept_graft": kept_graft.duplicate(), "known_events": known_events.duplicate(), "key_places": key_places.duplicate(), "explored": explored.duplicate(true), "places_seen": places_seen.duplicate(),
 	}
 
 
@@ -445,6 +456,7 @@ static func from_dict(d: Dictionary) -> WorldData:
 	data.known_events = d.get("known_events", {}).duplicate()
 	data.key_places = d.get("key_places", {}).duplicate()
 	data.explored = d.get("explored", {}).duplicate(true)
+	data.places_seen = d.get("places_seen", {}).duplicate()
 	data._fit_inventory()
 	return data
 

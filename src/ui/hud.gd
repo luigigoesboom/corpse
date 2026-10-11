@@ -15,6 +15,8 @@ const HEART_PIXEL := 3.0
 const HEART_GAP := 6.0
 
 var _message_tween: Tween
+var _place: VBoxContainer
+var _place_tween: Tween
 var _health: Health
 var minimap: Minimap
 var _ichor: Label
@@ -28,6 +30,7 @@ func _ready() -> void:
 	mouse_filter = MOUSE_FILTER_IGNORE
 	_message.modulate.a = 0.0
 	EventBus.notify.connect(show_message)
+	EventBus.place_entered.connect(show_place)
 	EventBus.mutations_changed.connect(_refresh_mutations)
 	EventBus.world_loaded.connect(_refresh_mutations)
 	_refresh_mutations()
@@ -103,6 +106,50 @@ func _refresh_mutations() -> void:
 			if def:
 				parts.append("%s: %s" % [def.control_hint, def.display_name])
 	_mutations.text = "    ".join(parts)
+
+
+## A place's name across the upper middle of the screen (week 48): a small
+## "Discovered" the first time, the title big, its line under it; fades in,
+## holds, fades out.
+func show_place(title: String, line: String, first: bool) -> void:
+	if _place == null:
+		_place = VBoxContainer.new()
+		_place.name = "Place"
+		_place.alignment = BoxContainer.ALIGNMENT_CENTER
+		_place.mouse_filter = MOUSE_FILTER_IGNORE
+		add_child(_place)
+		_place.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+		_place.offset_left = -260.0
+		_place.offset_right = 260.0
+		_place.offset_top = 64.0
+		for size in [16, 32, 16]:
+			var label := Label.new()
+			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			label.add_theme_font_size_override(&"font_size", size)
+			label.add_theme_color_override(&"font_color", Color(0.92, 0.86, 0.74))
+			label.add_theme_color_override(&"font_outline_color", Color.BLACK)
+			label.add_theme_constant_override(&"outline_size", 4)
+			_place.add_child(label)
+	var labels := _place.get_children()
+	labels[0].text = "Discovered" if first else ""
+	labels[0].visible = first
+	labels[1].text = title
+	labels[2].text = line
+	labels[2].visible = line != ""
+	if first:
+		Sfx.play(&"discover")
+	if _place_tween:
+		_place_tween.kill()
+	_place.modulate.a = 0.0
+	_place_tween = create_tween()
+	_place_tween.tween_property(_place, "modulate:a", 1.0, 0.8)
+	_place_tween.tween_interval(3.5 if first else 2.0)
+	_place_tween.tween_property(_place, "modulate:a", 0.0, 1.2)
+
+
+func place_shown() -> String:
+	return _place.get_child(1).text if _place and _place.modulate.a > 0.05 else ""
 
 
 func show_message(text: String) -> void:

@@ -51,3 +51,5 @@ signal boss_engaged(boss: Node)
 signal boss_defeated(boss: Node)
 ## Something big happened (a slam, a roar): shake the camera, strength ~ px.
 signal shake_requested(strength: float)
+## Walked into a named place (Landmark) or a region; `first` = discovered now.
+signal place_entered(title: String, line: String, first: bool)

@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/props/hive_lantern_body.png" id="art_1"]
+[ext_resource type="Texture2D" path="res://assets/art/props/hive_lantern_glow.png" id="art_2"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="2_unshaded"]
+[ext_resource type="Texture2D" path="res://assets/lights/light_banded.tres" id="3_light"]
+
+[node name="HiveLantern" type="Node2D"]
+
+[node name="Art" type="Sprite2D" parent="."]
+texture = ExtResource("art_1")
+centered = false
+offset = Vector2(-24, -62)
+
+[node name="ArtGlow" type="Sprite2D" parent="."]
+material = ExtResource("2_unshaded")
+texture = ExtResource("art_2")
+centered = false
+offset = Vector2(-24, -62)
+
+[node name="Light" type="PointLight2D" parent="."]
+position = Vector2(0, -38)
+color = Color(0.55, 1, 0.8, 1)
+energy = 1.0
+shadow_enabled = true
+texture = ExtResource("3_light")
+texture_scale = 1.5

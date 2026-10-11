@@ -17,7 +17,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 23
+const SAVE_VERSION := 24
 const SLOTS := [1, 2, 3]
 
 
@@ -220,4 +220,7 @@ func _migrate(save: Dictionary) -> Dictionary:
 		for site in save.world.get("sites", []):
 			site["region"] = site.get("region", Regions.GUT)
 		save.save_version = 23
+	if save.save_version == 23:
+		# v24 (week 48): places found. Nothing to convert: none found yet.
+		save.save_version = 24
 	return save

@@ -11,6 +11,9 @@ extends Node2D
 ## burst Puffsac is a cloud.
 const NO_CARCASS := [&"gullet_matron", &"puffsac"]
 
+## The region the host was last in (_check_region).
+var _region: StringName = &""
+
 @onready var _player: Player = $Player
 @onready var _chunks: ChunkManager = $ChunkManager
 @onready var _world: Node2D = $World
@@ -98,6 +101,22 @@ func _process(delta: float) -> void:
 	var life := WorldState.data.current_life() if WorldState.data else null
 	if life:
 		life.seconds_alive += delta
+		_check_region()
+
+
+## Crossing into another region shows its name (week 48), like a landmark.
+func _check_region() -> void:
+	var region := WorldMap.region_of(_player.global_position)
+	if region == _region:
+		return
+	var was := _region
+	_region = region
+	if was == &"" and region == Regions.GUT:
+		WorldState.data.see_place("region:%s" % region)  # Waking in the Gut is not news.
+		return
+	var title := Regions.display_name(region)
+	var first := WorldState.data.see_place("region:%s" % region)
+	EventBus.place_entered.emit(title[0].to_upper() + title.substr(1), "", first)
 
 
 func _on_world_loaded() -> void:

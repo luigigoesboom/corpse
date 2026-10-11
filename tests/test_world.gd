@@ -43,6 +43,10 @@ func run() -> void:
 	await goto(Vector2(7100, 3800), 10)
 	check(entity("LeechCavern") != null and entity("TenderCamp") == null, "in the cavern: the reverse")
 
+	for i in 120:  # Let every chunk around finish building first.
+		if chunks.pending_count() == 0:
+			break
+		await physics_frame
 	var cells_before := _cell_count(chunks)
 	var open := Image.create(chunks.map.size.x, chunks.map.size.y, false, Image.FORMAT_RGBA8)
 	open.fill(Color.WHITE)

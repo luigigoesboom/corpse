@@ -5,6 +5,11 @@ Three lines a week minimum. Newest at the top.
 Template:
 
 ```
+## Week 48 (2026-10-11)
+Done: Landmarks: `Landmark` areas under World/Landmarks name the Lungs' places when you walk in (the Great Bronchus, the Bellows, the Alveolar Hives, the Lower Lobe, the Trachea, the High Aerie); the first visit is a discovery ("Discovered", a sound) kept in the save (`places_seen`, save version 24, fixture v24); crossing into a region names it too. Set pieces drawn by tools/pixel/recipes/lung_props.gd, made of many uneven shapes rather than clean ones (after the developer found the art too geometric): a great cartilage ring over the bronchus, pleural curtains, hive lanterns that light the Hives, the aerie's bone nest, wind bones. A wild heart-root in the Lower Lobe and four ichor clots. tests/test_landmarks.gd.
+Not done: No creatures or people in the Lungs yet. Wind bones do not move yet (the breath, week 52).
+Next: Week 49, the Lungs' creatures.
+
 ## Week 47 (2026-10-11)
 Done: The Lungs' map. tools/map/paint_lungs.gd paints them into world.png (now 512 x 128): the Great Bronchus from the east cavern's row-75 ledge, the Bellows (a huge chamber with a balcony and a membrane ladder), the Alveolar Hives, the Lower Lobe, the Trachea up to the High Aerie; it checks every place can be reached with the host's jumps before writing. Membranes: magenta in the painting, one-way springy floors (bounce on landing, higher jumps, down + jump drops through; physics layer 7). New kinds of rock: alveolus (honeycomb) and cartilage (rings) with their own dressing, ambience loops and a membrane thump; the backdrop blends to the Lungs' own layers; regions.png; minimap shows membranes; F3 shows region and membrane. tests/test_lungs.gd.
 Not done: The Lungs are empty: no landmarks, creatures or people yet (weeks 48-50). No spawn point there.

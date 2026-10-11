@@ -43,10 +43,14 @@ func autoload(autoload_name: String) -> Node:
 	return root.get_node("/root/" + autoload_name)
 
 
-func start_scene(path: String) -> void:
+## Starts a scene (usually res://game.tscn). `world_seed` makes the new
+## world the same every run (0 = a random one, as in the game).
+func start_scene(path: String, world_seed := 0) -> void:
 	# Autosaves (each new life) must never touch the player's own slots.
 	autoload("WorldState").slot = 97
 	game = load(path).instantiate()
+	if world_seed != 0 and "new_world_seed" in game:
+		game.new_world_seed = world_seed
 	if game.has_node("CombatFeel"):
 		game.get_node("CombatFeel").hitstop_enabled = false  # Frame-counting tests.
 	root.add_child(game)
