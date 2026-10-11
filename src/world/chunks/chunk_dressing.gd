@@ -12,6 +12,11 @@ const BODY := preload("res://assets/art/tiles/dressing.png")
 const GLOW := preload("res://assets/art/tiles/dressing_glow.png")
 const BIG_BODY := preload("res://assets/art/tiles/dressing_big.png")
 const BIG_GLOW := preload("res://assets/art/tiles/dressing_big_glow.png")
+## What hangs under every tile with air below it (tools/pixel/recipes/tiles.gd):
+## per kind a row of 32 x UNDER_H pieces, 0..3 middles, 4 a left end, 5 a
+## right end, 6..7 alone.
+const UNDERSIDES := preload("res://assets/art/tiles/undersides.png")
+const UNDER_H := 24
 const ROWS := 5
 const BIG := 64
 const BIG_PER := 4
@@ -32,6 +37,7 @@ const DENSITY := [0.85, 0.65, 0.4, 0.4]
 const PLACE := [Vector2(0, 9 - S), Vector2(0, S - 3), Vector2(S - 4, 0), Vector2(4 - S, 0)]
 
 var _items: Array = []  # [dest Rect2, source Rect2, texture, tint]
+var _under: Array = []  # [dest Rect2, source Rect2]: undersides, drawn first
 var _glow: GlowLayer
 
 
@@ -50,6 +56,12 @@ func setup(data: ChunkData) -> void:
 				var shift := Vector2((hb / 1000) % 9 - 4, (hb / 9000) % 9 - 4)
 				_items.append([Rect2(Vector2(at * S) + shift, Vector2(S, S)), Rect2(((hb / 81000) % PER) * S, (kind * ROWS + 4) * S, S, S), BODY, INLAY_TINT])
 			continue
+		if tile & ChunkData.OPEN_DOWN:
+			var left := tile & ChunkData.OPEN_LEFT != 0
+			var right := tile & ChunkData.OPEN_RIGHT != 0
+			var hu := hash(Vector3i(origin.x + at.x, origin.y + at.y, 5))
+			var piece := 6 + hu % 2 if left and right else (4 if left else (5 if right else hu % 4))
+			_under.append([Rect2(Vector2(at * S) + Vector2(0, S), Vector2(S, UNDER_H)), Rect2(piece * S, kind * UNDER_H, S, UNDER_H)])
 		var sides := [tile & ChunkData.OPEN_UP, tile & ChunkData.OPEN_DOWN, tile & ChunkData.OPEN_RIGHT, tile & ChunkData.OPEN_LEFT]
 		for row in 4:
 			if sides[row] == 0:
@@ -76,7 +88,9 @@ func setup(data: ChunkData) -> void:
 
 
 func _draw() -> void:
-	# Inlays first (they are in the rock), then everything on it.
+	# Undersides first (they are the rock), inlays (in it), then everything on it.
+	for item in _under:
+		draw_texture_rect_region(UNDERSIDES, item[0], item[1])
 	for item in _items:
 		if item[3] != Color.WHITE:
 			draw_texture_rect_region(item[2], item[0], item[1], item[3])
@@ -87,6 +101,10 @@ func _draw() -> void:
 
 func count() -> int:
 	return _items.size()
+
+
+func underside_count() -> int:
+	return _under.size()
 
 
 ## The glowing bits, unshaded so they shine in the dark.

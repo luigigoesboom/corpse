@@ -157,6 +157,11 @@ Format: ID, date, decision, why, what it rules out.
 - Why: the roadmap's signature system for the Lungs ("winds on a timer change traversal"). A clock is easy to read, to learn and to test; hand-placed zones say exactly where air moves, like the rest of the painted world (D-010), instead of simulating airflow.
 - Consequences: the Trachea is a timed climb (the exhale carries you up, the inhale presses you down); the Bellows' inhale slows falls and lifts gliders. The breath is not saved (it restarts with the scene); nothing depends on its phase across saves.
 
+**D-032 Generated pictures, pixelated into the palette; every place reachable** (2026-10-11, after the Lungs)
+- What: (1) besides the code-drawn art (D-028), static art (props, set pieces, backdrops, icons) may start as a picture from an image model, turned into palette pixel art by `tools/pixel/generate.gd`: cut out of its plain background, shrunk to sprite size, snapped to gut.gpl (optionally to a few ramps), stray pixels cleaned, outlined. What to make is a list (tools/pixel/generated.json: name, description, size, ramps). The model is a local Stable Diffusion WebUI by default, or OpenAI's image API with the developer's own key. (2) Ceilings and ledge undersides hang lumps and drips below the tile (`undersides.png`), instead of ending in a flat line. (3) The map gets a last pass, `tools/map/rooms.gd`: the Gut's three box halls become storeys of smaller rooms, and steps are built until every floor can be reached from the start, and left again, with the host's own jump (`MapReach`).
+- Why: the developer found the code-drawn art too geometric, hanging tiles too square, the halls "flat boxes", and suspected some places could not be reached: they could not (most of the chamber's upper ledges, the upper caves, the east cavern and so all of the Lungs needed more than a jump).
+- Consequences: generated pictures do not animate consistently, so creatures and hosts stay code-drawn (rigs, frames); generated art is for things that do not move. Claude cannot make pictures itself: generating needs the WebUI running or a key. Raw pictures stay local (gitignored), only the pixelated sprites are committed. The halls' old thin ledges are gone where nothing stood on them; tests that stood in mid-air in the chamber moved.
+
 ---
 
 ## Open questions

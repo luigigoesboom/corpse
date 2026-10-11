@@ -25,3 +25,7 @@ Thumbs.db
 
 # Art program preview sheets (tools/pixel/run.gd --preview)
 tools/pixel/preview/
+
+# Pictures from an image model (tools/pixel/generate.gd): big, kept locally only.
+/assets/art/_generated_raw/*
+!/assets/art/_generated_raw/.gdignore

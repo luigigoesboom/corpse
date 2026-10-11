@@ -421,6 +421,10 @@ Original plan:
 - **Motes** (src/world/motes.gd): 80 specks and spores floating around the camera in the region's colours, flickering, carried by `Breath.wind_at()`.
 - **Settings**: Display tab "Atmosphere" (`Settings.atmosphere`, 0..1; 0 = the plain picture, no fog, no motes) and "Film grain". tests/perf_render.gd turns it off while it reads marker pixels.
 
+## Rooms and reachability (D-032)
+
+world.png is made in three steps, all offline tools: shape_world.gd (the Gut's painting into caves), paint_lungs.gd (the Lungs), then rooms.gd, which reads their result (data/maps/_source/world_shaped.png) and breaks the Gut's box halls into storeys of rooms, adds ladders and membrane steps, and writes world.png only if `MapReach` (tools/map/map_reach.gd) finds every thing placed in world.tscn reachable from the spawn with the host's own jump (3 tiles up, 4 across, falls, membranes; no wall jumps or mutations) and every reached floor able to get back. tests/test_terrain.gd checks the same on the committed map, so a repaint that cuts something off fails. Undersides (`ChunkDressing`, undersides.png) are only a view: no collision below a tile's edge.
+
 ## Minimap (after week 41)
 
 `WorldData.explored` keeps which tiles the player has seen: chunk -> a 512-byte bitset (one bit per tile), saved (version 22). `Minimap` (src/ui/minimap.gd, made by the HUD, top right) reveals about a screen around the host four times a second (`reveal(rect)`) and redraws 120 x 68 tiles around it, one pixel per tile: seen air dark red, walls next to air in their rock kind's color, everything else dark. Marks: settlements gold, the guard post orange, anything in group `minimap_marks` in its `minimap_color` meta (ruins grey, heart-roots red), the last body if the host has the sense_bodies boon. The game calls `HUD.bind_map(chunks, player)`.

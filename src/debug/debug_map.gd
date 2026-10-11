@@ -21,6 +21,34 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("debug_map"):
 		visible = not visible
+	elif visible and OS.is_debug_build() and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		# Debug builds: click the map to put the host there (on the floor below).
+		var tile := Vector2i((make_input_local(event).position - _origin()) / _px())
+		var at := floor_below(tile)
+		if at != Vector2.INF and player and player.has_method("teleport"):
+			player.teleport(at)
+			visible = false
+		get_viewport().set_input_as_handled()
+
+
+## Where the host's feet go for a click on `tile`: the first floor at or
+## below it (INF if the tile is rock or there is no floor).
+func floor_below(tile: Vector2i) -> Vector2:
+	var map: WorldMap = chunks.map
+	if tile.x < 0 or tile.y < 0 or tile.x >= map.size.x or tile.y >= map.size.y or map.is_solid(tile):
+		return Vector2.INF
+	while tile.y < map.size.y - 1 and not map.is_solid(tile + Vector2i.DOWN) and not map.is_membrane(tile + Vector2i.DOWN):
+		tile.y += 1
+	return Vector2(tile.x * ChunkData.TILE_PX + 16, (tile.y + 1) * ChunkData.TILE_PX - 22)
+
+
+func _px() -> float:
+	var map_size := Vector2(chunks.map.size)
+	return minf(size.x * 0.9 / map_size.x, size.y * 0.9 / map_size.y)
+
+
+func _origin() -> Vector2:
+	return (size - Vector2(chunks.map.size) * _px()) / 2.0
 
 
 func _process(_delta: float) -> void:

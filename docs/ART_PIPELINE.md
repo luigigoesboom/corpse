@@ -80,6 +80,20 @@ It erodes walls and ceilings with noise, hollows tall ceilings and hangs lumps f
 
 To change the world's shape: paint `_source/world_painted.png` (or world.png directly, if you do not want the shaping) and run the script again. It only rewrites the Gut's columns; the Lungs (below) stay.
 
+## Rooms and reachability (D-032)
+
+The last step, after shape_world.gd and paint_lungs.gd: `tools/map/rooms.gd` reads `data/maps/_source/world_shaped.png` (what those two left) and writes world.png.
+
+```
+Godot --headless --path . --script res://tools/map/rooms.gd [-- --refresh] [--preview] [--show]
+```
+
+It digs a few rects (`DIG`), takes out the thin floating ledges nothing stands on in each hall of `HALLS`, lays storeys across the hall every 9 rows (two rows thick, lumpy underneath, with a 6-wide gap and two little shelves in it to climb through), hangs curtains of rock from ceilings down to 3 rows above the floor, gives every floating ledge a lumpy underside, then builds shelves (an A* search: walk the map as it is for free, a shelf costs a lot) until every floor can be reached from the player's spawn and every reached floor can get back. It refuses to write if anything placed in world.tscn is out of reach. Never touched: a box around everything placed, the air just above floors, `KEEP_CLEAR` (the Matron's arena, the bronchus, the Bellows, the Trachea). After running shape_world.gd or paint_lungs.gd again, run rooms.gd with `--refresh` (it takes world.png as its new source). `--preview` writes user://rooms_preview.png instead, `--show` draws user://rooms_reach.png (green: reached and back, yellow: no way back, red: out of reach). It takes a few minutes.
+
+`tools/map/check_reach.gd` (`-- --png <file>`) checks the map as it is and lists anything placed that cannot be reached. `MapReach` (tools/map/map_reach.gd) is the model both use: steps, jumps 3 tiles up and 4 across, falls, drops through membranes; no wall jumps, no mutations.
+
+In the game (debug builds), M opens the debug map: click anywhere to put the host on the floor under the click.
+
 ## The Lungs (week 47)
 
 The Lungs are painted by code, not in Krita: `tools/map/paint_lungs.gd` is their painting.
@@ -161,6 +175,24 @@ In a debug build, **F12** starts recording the game's own 640 x 360 picture at 1
 **Props and items.** `recipes/props.gd` redraws every prop in the frame its scene already uses (`FRAMES`: size, floor point, which of body / glow / cloth the scene shows), the code-drawn objects at their fixed sizes, the brazier flame strip, and the item icons. The scenes did not change; to give a prop a bigger frame, change its `FRAMES` entry and the matching Sprite2D offsets in its scene.
 
 **Dressing.** The stuff on the rock: `recipes/dressing.gd` draws, per kind, 6 floor things, 6 ceiling things, 6 wall things (and their mirror) and 6 inlays (buried in the rock, drawn dark) in `dressing.png`, plus 4 big floor and 4 big ceiling pieces (64 px) in `dressing_big.png`, each with a glow sheet. `ChunkDressing` (src/world/chunks) places them on every built chunk from a hash of each tile's position, so a place always looks the same: densities and offsets are constants at its top. Only a view, never saved.
+
+**Undersides** (D-032): `recipes/tiles.gd` also draws `undersides.png`: per kind 8 pieces, 32 x 24, of rock hanging below a tile with air under it (0..3 middles, 4 a ledge's left end, 5 its right end, 6..7 alone). The middles are all 4 px deep at their edges, so any two side by side join; lobes and a drip swell between. Tiles with air below no longer draw an outline along their bottom: the underside carries on from them. `ChunkDressing` hangs one under every such tile (a hash picks the middle), before anything else it draws.
+
+## Generated pictures (D-032)
+
+`tools/pixel/generate.gd` turns a picture into a sprite in the palette. List what you want in `tools/pixel/generated.json`:
+
+```
+"fungus_tree": {"prompt": "a tall pale fungus shaped like a tree", "size": 96, "ramps": ["rot", "bone"], "outline": true}
+```
+
+then run `Godot --headless --path . --script res://tools/pixel/generate.gd -- fungus_tree` (or `-- --all`; `--again` asks for a new picture). The picture is kept in `assets/art/_generated_raw/<name>.png` (local only, not in git) and the sprite goes to `assets/art/generated/<name>.png`, with a 4x preview beside the raw picture. Any picture can be dropped into _generated_raw by hand under an entry's name; the tool only pixelates it then.
+
+Where pictures come from (environment variable `CORPSE_IMAGE_BACKEND`):
+- `local` (default): Stable Diffusion WebUI (AUTOMATIC1111 or Forge) on this PC, started with `--api` (http://127.0.0.1:7860, or set `CORPSE_SD_URL`). Free and offline; needs a decent GPU.
+- `openai`: OpenAI's image API, `OPENAI_API_KEY` set. Paid per picture; the description is sent to OpenAI.
+
+Good subjects: props, set pieces, backdrop layers, item icons, big still things. Not creatures or hosts: a model will not draw the same thing twice in matching poses, so animation stays with the rigs. Descriptions work best as one object on a plain background (the tool adds that); `ramps` keeps a sprite inside one region's colors.
 
 ## Props and items (week 39 art pass)
 

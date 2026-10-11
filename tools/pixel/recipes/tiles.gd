@@ -11,6 +11,14 @@ extends RefCounted
 ## After the last kind, one more row: the four membranes (week 47): middle,
 ## left end, right end, alone (ChunkData.membrane_cell()).
 ##
+## Also the undersides (assets/art/tiles/undersides.png, after the Lungs):
+## what hangs below a tile with air under it, so a ceiling or a ledge ends
+## in lumps and drips instead of a flat line. Per kind one row of UNDER_PER
+## pieces, UNDER_H tall: 0..3 middles, 4 the left end of a ledge, 5 the
+## right end, 6..7 alone (both ends). Every middle meets its neighbours at
+## UNDER_EDGE px deep, so any two side by side join. ChunkDressing hangs one
+## under every such tile.
+##
 ## Also writes the tileset's extra rows (gut_tileset.tres): every kind's
 ## tiles get the collision and light occluders of the flesh tiles; membranes
 ## get a thin one-way collision on physics layer 2 (collision layer 7,
@@ -24,6 +32,10 @@ const FACE_R := 4.0
 const KINDS := RockKinds.IDS  # Each kind's ramp is in RockKinds.
 const BAYER := [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
 const ATLAS := "res://assets/art/tiles/gut_tiles.png"
+const UNDERSIDES := "res://assets/art/tiles/undersides.png"
+const UNDER_PER := 8
+const UNDER_H := 24
+const UNDER_EDGE := 4
 const TILESET := "res://assets/art/tiles/gut_tileset.tres"
 ## Physics layer 7 (value 64): membranes.
 const MEMBRANE_LAYER := 64
@@ -54,6 +66,15 @@ static func make(pal, out: Array) -> void:
 	atlas.blit_rect(membranes, Rect2i(0, 0, T * 4, T), Vector2i(0, T * 5 * KINDS.size()))
 	out.append({"name": "membranes", "body": membranes})
 	Sheet.save(atlas, ATLAS)
+	var under := Image.create(T * UNDER_PER, UNDER_H * KINDS.size(), false, Image.FORMAT_RGBA8)
+	for k in KINDS.size():
+		_texture = RockKinds.texture(KINDS[k])
+		var ramp: Array = pal.ramp(RockKinds.ramp(KINDS[k]))
+		for v in UNDER_PER:
+			_underside(under, Vector2i(v * T, k * UNDER_H), v, k, ramp, cells)
+	_texture = "cobble"
+	Sheet.save(under, UNDERSIDES)
+	out.append({"name": "undersides", "body": under})
 	_write_tileset()
 
 
@@ -206,6 +227,10 @@ static func _side(x: int, y: int, buried: bool, right: bool, down: bool, left: b
 	var base := _cobble(x, y, cells)
 	if buried:
 		return base - 0.4
+	# The bottom edge has an underside hanging from it (undersides.png):
+	# no outline there, the rock just turns into shadow.
+	if down and absf(d - (T - p.y)) < 0.01 and corners.is_empty() or down and absf(d - (T - p.y)) < 0.01 and p.x >= R and p.x <= T - R:
+		return base - 1.0 - maxf(0.0, 4.0 - d) * 0.15 if d < 4.0 else (base - 1.2 if d < 5.0 else base)
 	if d < 1.5:
 		return 0.0
 	if d < 3.0:
@@ -240,6 +265,56 @@ static func _face(x: int, y: int, left: bool, right: bool) -> float:
 		if x > j:
 			stone += 1
 	return [4.6, 5.0, 5.3][(stone + band) % 3] - (y - top_row) * 0.12
+
+
+# --- Undersides ------------------------------------------------------------------
+
+## How far a piece hangs below its tile at column x (px): the middles swell
+## between their edges in one or two lobes with a drip; the ends round off
+## toward the tile's rounded corner.
+static func _under_depth(x: int, v: int, k: int) -> float:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 900 + v * 31 + k * 7
+	var t := (x + 0.5) / T
+	var d := float(UNDER_EDGE)
+	var alone := v >= 6
+	var lobes := 1 if alone else rng.randi_range(1, 2)
+	for i in lobes:
+		var c := rng.randf_range(0.25, 0.75) if lobes == 1 else (0.28 if i == 0 else 0.7) + rng.randf_range(-0.06, 0.06)
+		if alone:
+			c = 0.5 + rng.randf_range(-0.05, 0.05)
+		var w := rng.randf_range(0.18, 0.3) if not alone else 0.42
+		var h := rng.randf_range(8.0, 15.0)
+		d += h * maxf(0.0, cos(clampf((t - c) / w, -1.0, 1.0) * PI * 0.5)) ** 1.5
+	# A drip: a thin point under the deepest lobe.
+	var drip_x := int(rng.randf_range(0.3, 0.7) * T)
+	if absi(x - drip_x) <= 0:
+		d += rng.randf_range(3.0, 6.0)
+	elif absi(x - drip_x) == 1:
+		d += 2.0
+	var left_end := v == 4 or v >= 6
+	var right_end := v == 5 or v >= 6
+	# Ends: nothing beyond the tile's rounded corner, then a quick swell.
+	if left_end:
+		d = minf(d, maxf(0.0, (x - R + 1.0) * 1.6))
+	if right_end:
+		d = minf(d, maxf(0.0, (T - R - x) * 1.6))
+	return minf(d, UNDER_H - 1.0)
+
+
+## One underside piece: rock texture continuing down from the tile, in
+## shadow (it faces down), darker toward its edge, a dark outline last.
+static func _underside(img: Image, at: Vector2i, v: int, k: int, ramp: Array, cells: Array) -> void:
+	for x in T:
+		var depth := _under_depth(x, v, k)
+		var bottom := int(floor(depth))
+		for y in range(0, bottom):
+			var tone := _cobble(x, T + y, cells) - 0.6 - float(y) / maxf(1.0, depth) * 1.1
+			if y >= bottom - 1:
+				tone = 0.0  # The outline along its bottom.
+			elif x > 0 and _under_depth(x - 1, v, k) <= y or x < T - 1 and _under_depth(x + 1, v, k) <= y:
+				tone = 0.3  # And along its sides.
+			_px(img, at, x, y, maxf(tone, 0.0), ramp)
 
 
 # --- Membranes -------------------------------------------------------------------

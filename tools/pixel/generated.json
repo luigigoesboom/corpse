@@ -1,0 +1,6 @@
+{
+	"fungus_tree": {"prompt": "a tall pale fungus growing like a crooked tree, drooping caps, fleshy stalk", "size": 96, "ramps": ["rock_rot", "bone"], "outline": true},
+	"rib_arch": {"prompt": "a broken arch made of two huge curved ribs meeting at the top, cracked bone", "size": 128, "ramps": ["bone"], "outline": true},
+	"gut_polyp_cluster": {"prompt": "a cluster of swollen glistening polyps and small tumours on a lump of flesh", "size": 48, "ramps": ["flesh", "blood"], "outline": true},
+	"bile_vat": {"prompt": "a crude vat carved from a bone socket, full of bubbling green bile", "size": 64, "ramps": ["bone", "bile"], "outline": true}
+}
