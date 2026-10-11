@@ -39,6 +39,17 @@ if hostile
 			{{npc}}: {{trade_done_text}}
 		- Not now.
 	=> menu
+- Is there work? [if has_work /]
+	{{npc}}: {{work_text}}
+	- I will do it. [if not work_taken /]
+		do accept_work()
+		{{npc}}: {{accept_text}}
+	- Not now.
+	=> menu
+- About the task. [if can_turn_in /]
+	do turn_in()
+	{{npc}}: {{turn_in_text}}
+	=> menu
 - The heart-key. [if key_here /]
 	=> key
 - Farewell.

@@ -10,6 +10,8 @@ extends RefCounted
 
 ## Emitted after a barter changed the pockets.
 signal traded
+## A task was taken or handed in (D-033): pockets and ichor changed.
+signal quest_changed
 
 ## Speaker's name, shown as the speaking character.
 var npc := ""
@@ -133,6 +135,72 @@ func _init(data: WorldData, speaker_name: String, faction_id: StringName, rng_se
 	key_here = _key != &""
 	key_price = ValveKeys.price_of(_key)
 	key_line = KEY_LINES.get(_key, "")
+	_set_up_work()
+
+
+# --- Work (D-033) ---------------------------------------------------------------
+
+## A task they would give, or the one you carry for them.
+var has_work := false
+var work_text := ""
+var accept_text := ""
+## Something to hand in here: their task done, or a gift you carry for them.
+var can_turn_in := false
+var turn_in_text := ""
+## Whether the task they would give is already yours.
+var work_taken := false
+var _offer: QuestData
+var _turn_in: QuestData
+
+
+func _set_up_work() -> void:
+	has_work = false
+	can_turn_in = false
+	work_taken = false
+	if _faction == &"" or _def == null or hostile:
+		return
+	var open := Quests.open_from(_data, _faction)
+	_turn_in = Quests.delivery_for(_data, _faction)
+	if _turn_in == null and open and Quests.ready(_data, open):
+		_turn_in = open
+	can_turn_in = _turn_in != null
+	_offer = Quests.offer(_data, _faction, _rng.randi())
+	work_taken = _offer != null and _data.quests.has(_offer.id)
+	has_work = _offer != null and not (work_taken and _turn_in == _offer)
+	if _offer == null:
+		work_text = ""
+	elif work_taken:
+		var summary := Quests.summary(_data, _offer)
+		work_text = "You still have our task. " + summary
+	else:
+		work_text = Quests.ask_text(_data, _offer)
+
+
+## Takes the task offered.
+func accept_work() -> void:
+	if _offer == null or _data.quests.has(_offer.id):
+		accept_text = "Then go and do it."
+		return
+	if not Quests.accept(_data, _offer):
+		accept_text = "You have no room to carry it. Come back with empty hands."
+		return
+	accept_text = _pick(["Good. Do not make us wait long.", "Go well. Come back to us.", "We will remember who helped."], "Good.")
+	quest_changed.emit()
+	_set_up_work()
+
+
+## Hands in what is ready here.
+func turn_in() -> void:
+	if _turn_in == null:
+		return
+	var paid := Quests.turn_in(_data, _turn_in)
+	if _turn_in.kind == &"deliver" and _turn_in.target == String(_faction):
+		turn_in_text = "From %s? ...We understand. Tell them we accept. Take this for your trouble: %d ichor." % [EventText._faction(_data, _turn_in.giver), paid]
+	else:
+		turn_in_text = _pick(["It is done, then. Here: %d ichor, and our thanks." % paid, "You did what you said. %d ichor, as promised." % paid], "Thank you.")
+	standing = _data.standing(_faction)
+	quest_changed.emit()
+	_set_up_work()
 
 
 ## Sets up a bribe for the place this speaker guards (Conversation calls it).

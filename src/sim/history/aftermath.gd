@@ -50,6 +50,7 @@ static func apply(data: WorldData, tier_index: int, rng: RandomNumberGenerator, 
 		Rot.ensure(data, body)
 		happened.append_array(Rot.run(data, body, years, SeededRng.make([data.world_seed, "rot", data.lives.size()])))
 		happened.append_array(Beasts.between_lives(data, body.get("lairs", []), years, SeededRng.make([data.world_seed, "beasts", data.lives.size()])))
+	Quests.check(data)  # Tasks nobody can finish any more fail (D-033).
 	_hint_history(data, happened, report)
 	CorpseFate.apply(data, strength, rng, places, report)  # Factions first (week 33).
 	_scavenge_bodies(data, strength, rng, report)

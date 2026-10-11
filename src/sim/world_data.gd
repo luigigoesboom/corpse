@@ -83,6 +83,8 @@ var beasts: Dictionary = {}
 var beasts_seeded := false
 ## Notable people (D-033, Figures): id -> FigureData, living and dead.
 var figures: Dictionary = {}
+## Tasks peoples gave the fragment (D-033, Quests): id -> QuestData.
+var quests: Dictionary = {}
 
 
 static func create(seed_value: int) -> WorldData:
@@ -435,6 +437,7 @@ func to_dict() -> Dictionary:
 		"rot": rot.duplicate(), "rot_width": rot_width,
 		"beasts": beasts.values().map(func(b): return b.to_dict()), "beasts_seeded": beasts_seeded,
 		"figures": figures.values().map(func(f): return f.to_dict()),
+		"quests": quests.values().map(func(q): return q.to_dict()),
 	}
 
 
@@ -480,6 +483,9 @@ static func from_dict(d: Dictionary) -> WorldData:
 	for figure_dict in d.get("figures", []):
 		var figure := FigureData.from_dict(figure_dict)
 		data.figures[figure.id] = figure
+	for quest_dict in d.get("quests", []):
+		var quest := QuestData.from_dict(quest_dict)
+		data.quests[quest.id] = quest
 	data._fit_inventory()
 	return data
 

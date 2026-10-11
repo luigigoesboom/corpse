@@ -27,6 +27,8 @@ static func describe(event: EventRecord, data: WorldData) -> String:
 			return EventText._one(pick, ["Rot sickness took %d in %s." % [d.get("dead", 0), site], "%s coughed grey for a season; %d died." % [site, d.get("dead", 0)]])
 		&"beast_arose", &"beast_raided", &"beast_slain", &"beast_slain_by_host", &"beast_died", &"beast_escaped":
 			return _beast(event, data, a, site, pick)
+		&"quest_done":
+			return "%s, a host, did what %s asked of them." % [event.actors[1] if event.actors.size() > 1 else "Someone", a]
 		&"leader_rose", &"leader_died", &"leader_overthrown", &"leader_deed", &"leader_killed":
 			return _leader(event, data, a, site, pick)
 	return ""

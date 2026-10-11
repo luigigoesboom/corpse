@@ -20,6 +20,11 @@ static func set_generated(defs: Dictionary) -> void:
 	_generated = defs
 
 
+## Every generated item of a world: artifacts and trophies, quest gifts (D-033).
+static func refresh_generated(data: WorldData) -> void:
+	set_generated(ArtifactText.item_defs(data).merged(Quests.item_defs(data)))
+
+
 static func display_name(id: StringName) -> String:
 	var def := get_def(id)
 	return def.display_name if def else String(id)

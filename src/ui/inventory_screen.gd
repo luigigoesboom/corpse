@@ -1,5 +1,5 @@
 extends Control
-## The inventory (week 25 rework): three tabs.
+## The inventory (week 25 rework): five tabs (Tasks: D-033).
 ##   Pockets: the 8 pockets and what the selected item does. Enter eats, X drops.
 ##   Body:    this host and the part in each body slot, with its key.
 ##   Lives:   every host so far, where its body lies and what is still on it.
@@ -8,7 +8,7 @@ extends Control
 ## Keyboard and gamepad move the selection; the mouse selects by hovering and
 ## uses the buttons. Built in code: the .tscn is just this script on a Control.
 
-const TABS := ["Pockets", "Body", "Lives", "History"]
+const TABS := ["Pockets", "Body", "Lives", "History", "Tasks"]
 const BODY_SLOTS := ["head", "mouth", "back", "arm", "belly"]
 const SLOT_SIZE := Vector2(52, 52)
 const CREATURE_NAMES: Dictionary = preload("res://src/ui/death_screen.gd").CREATURE_NAMES
@@ -34,6 +34,8 @@ var _body_list: GridContainer
 var _lives_list: VBoxContainer
 var _history_scroll: ScrollContainer
 var _history_list: VBoxContainer
+var _tasks_scroll: ScrollContainer
+var _tasks_list: VBoxContainer
 var _lives_scroll: ScrollContainer
 var _hints: Label
 
@@ -66,7 +68,7 @@ func show_tab(index: int) -> void:
 		1:
 			_tab_buttons[tab].grab_focus()
 			_hints.text = "Q / E: tabs    Tab: close"
-		2, 3:
+		2, 3, 4:
 			_tab_buttons[tab].grab_focus()
 			_scroll_of(tab).scroll_vertical = 0
 			_hints.text = "Up / Down: scroll    Q / E: tabs    Tab: close"
@@ -103,6 +105,7 @@ func _refresh() -> void:
 	_refresh_body()
 	_refresh_lives()
 	_refresh_history()
+	_refresh_tasks()
 
 
 # --- Pockets ---------------------------------------------------------------
@@ -295,7 +298,7 @@ func _build() -> void:
 	pages.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	pages.custom_minimum_size = Vector2(0, 220)
 	root.add_child(pages)
-	_pages = [_build_pockets(), _build_body(), _build_lives(), _build_history()]
+	_pages = [_build_pockets(), _build_body(), _build_lives(), _build_history(), _build_tasks()]
 	for page in _pages:
 		page.set_anchors_preset(Control.PRESET_FULL_RECT)
 		pages.add_child(page)
@@ -402,7 +405,40 @@ func _build_history() -> Control:
 
 
 func _scroll_of(index: int) -> ScrollContainer:
-	return _lives_scroll if index == 2 else _history_scroll
+	return [_lives_scroll, _history_scroll, _tasks_scroll][clampi(index - 2, 0, 2)]
+
+
+func _build_tasks() -> Control:
+	_tasks_scroll = ScrollContainer.new()
+	_tasks_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_tasks_list = VBoxContainer.new()
+	_tasks_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_tasks_list.add_theme_constant_override("separation", 3)
+	_tasks_scroll.add_child(_tasks_list)
+	return _tasks_scroll
+
+
+## What peoples asked of the fragment (D-033): open tasks first, then the
+## last few finished or failed.
+func _refresh_tasks() -> void:
+	var data := WorldState.data
+	for child in _tasks_list.get_children():
+		child.queue_free()
+	var open := data.quests.values().filter(func(q): return q.is_open())
+	var closed := data.quests.values().filter(func(q): return not q.is_open())
+	if open.is_empty() and closed.is_empty():
+		var empty := _label("Nobody has asked anything of you. Ask the people you meet if there is work.", 16, DIM_TEXT)
+		empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_tasks_list.add_child(empty)
+		return
+	for q in open:
+		var line := _label(("Done: go back. " if q.state == &"done" else "") + Quests.summary(data, q), 16)
+		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_tasks_list.add_child(line)
+	for q in closed.slice(maxi(0, closed.size() - 6)):
+		var line := _label(("Done. " if q.state == &"rewarded" else "Failed. ") + Quests.summary(data, q), 16, DIM_TEXT)
+		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_tasks_list.add_child(line)
 
 
 # --- History ----------------------------------------------------------------

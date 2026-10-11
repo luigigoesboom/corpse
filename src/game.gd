@@ -146,7 +146,7 @@ func _on_world_loaded() -> void:
 		FactionTerritory.apply_territory(data)
 	SiteSeeder.fill_slots(data, _entities.templates().filter(func(t): return t is Settlement and not t is GuardPost))
 	SiteSeeder.fill_ruin_slots(data, _entities.templates().filter(func(t): return t is RuinSite))
-	ItemDb.set_generated(ArtifactText.item_defs(data))  # Artifacts work like items.
+	ItemDb.refresh_generated(data)  # Artifacts, trophies and quest gifts work like items.
 	ValveKeys.place_at_start(data)  # Week 38: history decides who holds the Gut's key.
 	if Rot.ensure(data, body()):  # D-033: a new world (or an old save) rots in.
 		Rot.settle(data, body(), SeededRng.make([data.world_seed, "rot"]))
@@ -282,6 +282,7 @@ func _on_entity_killed(entity: Node) -> void:
 	if health and health.last_hit_source == &"player":
 		var kind := CombatRules.kind_of(entity)
 		WorldState.data.record_kill(kind)
+		Quests.on_kill(WorldState.data, kind)  # D-033
 		var ichor := Ichor.for_kill(kind, entity.global_position)
 		if ichor > 0:
 			WorldState.data.add_ichor(ichor)

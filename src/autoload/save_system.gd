@@ -17,7 +17,7 @@ extends Node
 ## - When the format changes, bump SAVE_VERSION and add a step to _migrate().
 
 const SAVE_DIR := "user://saves"
-const SAVE_VERSION := 27
+const SAVE_VERSION := 28
 const SLOTS := [1, 2, 3]
 
 
@@ -235,4 +235,7 @@ func _migrate(save: Dictionary) -> Dictionary:
 		# v27 (D-033): leaders. Nothing to convert: an old world's peoples
 		# get leaders when it loads.
 		save.save_version = 27
+	if save.save_version == 27:
+		# v28 (D-033): quests. Nothing to convert: none taken yet.
+		save.save_version = 28
 	return save

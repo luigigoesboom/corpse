@@ -19,6 +19,11 @@ static func start(speaker: Node, speaker_name: String, faction_id: StringName, r
 		EventBus.inventory_changed.emit()
 		EventBus.ichor_changed.emit()
 		Sfx.play(&"pickup"))
+	talk.quest_changed.connect(func():
+		ItemDb.refresh_generated(WorldState.data)
+		EventBus.inventory_changed.emit()
+		EventBus.ichor_changed.emit()
+		Sfx.play(&"pickup"))
 	talk.bribed.connect(func():
 		EventBus.ichor_changed.emit()
 		Sfx.play(&"pickup"))
