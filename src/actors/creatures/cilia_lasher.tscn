@@ -1,0 +1,82 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/actors/creatures/cilia_lasher.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/actors/components/health.gd" id="2_health"]
+[ext_resource type="Script" path="res://src/actors/components/hurtbox.gd" id="3_hurtbox"]
+[ext_resource type="Script" path="res://src/actors/components/hitbox.gd" id="4_hitbox"]
+[ext_resource type="Script" path="res://src/actors/components/layered_sprite.gd" id="5_sprite"]
+[ext_resource type="Script" path="res://src/actors/components/ground_shadow.gd" id="6_shadow"]
+
+[sub_resource type="RectangleShape2D" id="body"]
+size = Vector2(38, 28)
+
+[sub_resource type="RectangleShape2D" id="hurt"]
+size = Vector2(44, 35)
+
+[sub_resource type="RectangleShape2D" id="contact"]
+size = Vector2(32, 19)
+
+[sub_resource type="RectangleShape2D" id="attack"]
+size = Vector2(76, 18)
+
+[node name="CiliaLasher" type="CharacterBody2D"]
+collision_layer = 8
+collision_mask = 1
+script = ExtResource("1_script")
+
+[node name="Shadow" type="Node2D" parent="."]
+script = ExtResource("6_shadow")
+width = 38.4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -14)
+shape = SubResource("body")
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="Sprite" type="Node2D" parent="Visual"]
+script = ExtResource("5_sprite")
+body_frames_dir = "res://assets/art/creatures/cilia_lasher"
+glow_frames_dir = "res://assets/art/creatures/cilia_lasher/glow"
+frame_offset = Vector2(0, -32)
+
+[node name="Attack" type="Area2D" parent="Visual"]
+position = Vector2(46, -12)
+collision_layer = 32
+collision_mask = 0
+script = ExtResource("4_hitbox")
+knockback = 300.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Visual/Attack"]
+shape = SubResource("attack")
+
+[node name="Sight" type="RayCast2D" parent="."]
+position = Vector2(0, -14)
+enabled = false
+target_position = Vector2(100, 0)
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("2_health")
+max_health = 3
+invulnerable_time = 0.05
+
+[node name="Hurtbox" type="Area2D" parent="." node_paths=PackedStringArray("health")]
+collision_layer = 0
+collision_mask = 16
+script = ExtResource("3_hurtbox")
+health = NodePath("../Health")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, -14)
+shape = SubResource("hurt")
+
+[node name="ContactHitbox" type="Area2D" parent="."]
+collision_layer = 32
+collision_mask = 0
+script = ExtResource("4_hitbox")
+knockback = 240.0
+once_per_activation = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ContactHitbox"]
+position = Vector2(0, -14)
+shape = SubResource("contact")

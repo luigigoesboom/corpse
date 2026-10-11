@@ -5,6 +5,11 @@ Three lines a week minimum. Newest at the top.
 Template:
 
 ```
+## Week 49 (2026-10-11)
+Done: The Lungs' creatures, each started with tools/creature/new_creature.gd: the Puffsac (week 45) now lives in the Bellows, the Hives and the Lobe; the Cilia Lasher (rooted: draws its lash back, whips the floor ahead) on floors; the Bellows Ray (flyer: perches high, swoops down to your height and pulls up; drops a breath sac, the Lung Sac you can eat) in the high spaces. Their own sounds, ichor values. tests/test_lung_creatures.gd. The test helper goto() now holds the player until far chunks are built (it fell through floors that were not there yet).
+Not done: The breath does not move them yet (week 52).
+Next: Week 50, the Lungs' people: the Bellows-Kin.
+
 ## Week 48 (2026-10-11)
 Done: Landmarks: `Landmark` areas under World/Landmarks name the Lungs' places when you walk in (the Great Bronchus, the Bellows, the Alveolar Hives, the Lower Lobe, the Trachea, the High Aerie); the first visit is a discovery ("Discovered", a sound) kept in the save (`places_seen`, save version 24, fixture v24); crossing into a region names it too. Set pieces drawn by tools/pixel/recipes/lung_props.gd, made of many uneven shapes rather than clean ones (after the developer found the art too geometric): a great cartilage ring over the bronchus, pleural curtains, hive lanterns that light the Hives, the aerie's bone nest, wind bones. A wild heart-root in the Lower Lobe and four ichor clots. tests/test_landmarks.gd.
 Not done: No creatures or people in the Lungs yet. Wind bones do not move yet (the breath, week 52).

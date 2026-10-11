@@ -13,6 +13,8 @@ const CREATURE_VALUES := {
 	&"bile_spitter": 4,
 	&"gullet_matron": 60,
 	&"puffsac": 3,
+	&"cilia_lasher": 4,
+	&"bellows_ray": 5,
 }
 ## Each chunk row further down the body gives this much more (1.0 = +100%).
 const DEPTH_BONUS := 0.25

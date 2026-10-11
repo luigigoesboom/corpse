@@ -291,6 +291,12 @@ New creatures extend `Creature` (src/actors/creatures/creature.gd): the script f
 
 **Puffsac** (the Lungs): a floater that drifts toward the host, swells (0.8 s, the tell) and bursts: its Attack ring (62 px, 2 damage) hurts everything, other creatures too; a `SporeCloud` shows the reach. One hit pops it, but then it bursts after `fuse_time` (0.35 s); a pop by the host counts as the host's kill.
 
+**Cilia Lasher** (the Lungs, rooted): a mound of lung with one thick cilium; whatever comes within `reach` (84 px, 70 up or down) gets whipped: it draws the lash back (0.5 s), then a long low Attack box sweeps the floor ahead (76 x 18 px). It cannot move; jump or roll through the lash and hit it while it coils back (0.9 s).
+
+**Bellows Ray** (the Lungs, flyer): circles over what moves, glides to a perch high to one side, tips over (0.55 s) and swoops: straight at the host, then, once down at the height the host was (`_floor_y`), it bends back up and away (`pull_up`). Drops a breath sac (the Lung Sac mutation).
+
+Creatures in the Lungs: Puffsacs in the open chambers, Lashers on the floors, Rays in the high spaces (world.tscn Entities). Their ichor: Puffsac 3, Lasher 4, Ray 5.
+
 ## Bosses (D-026)
 
 `GulletMatron` (src/actors/bosses) is a CharacterBody2D with one state machine: DORMANT -> INTRO -> STALK <-> WINDUP -> ACTIVE -> RECOVER, plus STAGGER, PHASE_SHIFT (once, at half health: faster windups and rests, brood unlocked, bigger volleys) and DEAD. Attacks are a data table (`ATTACKS`: windup / active / recover seconds, distance band, phase, weight); she picks by distance and weight, never the same attack three times running, and reacts faster to a player hugging her (favouring the tail sweep). Spawned hazards (bile_glob -> bile_puddle, shockwave) live beside her and exclude her Hurtbox; with friendly fire on they hurt her brood. `telegraph_left()` exposes the windup for bots and tests. EventBus: `boss_engaged` (shows `BossBar` in the HUD), `boss_defeated`, `shake_requested` (GameCamera shakes). On death she drops loot through `item_drop_requested`, logs `boss_slain`, and emits `entity_killed`. Tests may opt into fixed frames with a `## run-with: --fixed-fps 60` line (tests/run_tests.sh), so long fights run faster than real time.

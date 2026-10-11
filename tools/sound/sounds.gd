@@ -116,6 +116,19 @@ func _one_shots() -> void:
 	s.tone(0.0, 0.35, 95, 60, 0.8, "sine", 0.002, 2.5)  # A drum of skin.
 	s.squelch(0.0, 0.2, 0.35, 1.3)
 	_done(s, "membrane", false, 0.75)
+	s = Synth.new(0.6, 43)
+	s.noise(0.0, 0.55, 0.4, 2200.0, 0.4, 0.5)  # Hairs bristling, drawing back.
+	s.tone(0.0, 0.55, 300, 520, 0.12, "saw", 0.4, 0.6)
+	_done(s, "lasher_draw", false, 0.55)
+	s = Synth.new(0.35, 44)
+	s.noise(0.0, 0.12, 0.9, 5000.0, 0.002, 3.0)  # A crack of the lash.
+	s.squelch(0.03, 0.2, 0.4, 1.6)
+	_done(s, "lasher_lash", false, 0.85)
+	s = Synth.new(1.0, 45)
+	s.tone(0.0, 0.9, 700, 420, 0.3, "sine", 0.05, 1.2)  # A long breathy cry.
+	s.tone(0.0, 0.9, 1050, 640, 0.12, "tri", 0.05, 1.2)
+	s.noise(0.0, 0.9, 0.3, 1800.0, 0.1, 1.0)
+	_done(s, "ray_cry", false, 0.6)
 
 func _ui() -> void:
 	var s

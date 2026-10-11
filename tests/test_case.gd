@@ -64,9 +64,21 @@ func wait_frames(n: int) -> void:
 		await physics_frame
 
 
+## Puts the player at `pos` and waits. Far away, the chunks there are not
+## built yet: the player is held in place until they are (or it would fall
+## through a floor that is not there yet).
 func goto(pos: Vector2, frames := 15) -> void:
 	player.global_position = pos
 	player.velocity = Vector2.ZERO
+	var chunks: Node = game.get_node_or_null("ChunkManager")
+	if chunks:
+		var target := Vector2i(floori(pos.x / 2048.0), floori(pos.y / 2048.0))  # ChunkData.SIZE_PX
+		for i in 180:
+			await physics_frame
+			player.global_position = pos
+			player.velocity = Vector2.ZERO
+			if i > 2 and chunks.is_loaded(target) and chunks.pending_count() == 0:
+				break
 	await wait_frames(frames)
 
 

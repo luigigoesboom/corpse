@@ -23,6 +23,9 @@
 [ext_resource type="PackedScene" path="res://src/props/lungs/pleura_curtain.tscn" id="22_curtain"]
 [ext_resource type="PackedScene" path="res://src/props/lungs/aerie_nest.tscn" id="23_nest"]
 [ext_resource type="PackedScene" path="res://src/props/lungs/wind_bones.tscn" id="24_bones"]
+[ext_resource type="PackedScene" path="res://src/actors/creatures/puffsac.tscn" id="25_puffsac"]
+[ext_resource type="PackedScene" path="res://src/actors/creatures/cilia_lasher.tscn" id="26_lasher"]
+[ext_resource type="PackedScene" path="res://src/actors/creatures/bellows_ray.tscn" id="27_ray"]
 
 [node name="World" type="Node2D"]
 
@@ -337,3 +340,39 @@ amount = 30
 [node name="ClotBellows" parent="Entities" instance=ExtResource("15_clot")]
 position = Vector2(11632, 3366)
 amount = 12
+
+[node name="PuffsacBellows" parent="Entities" instance=ExtResource("25_puffsac")]
+position = Vector2(10576, 2736)
+
+[node name="PuffsacBellowsHigh" parent="Entities" instance=ExtResource("25_puffsac")]
+position = Vector2(11056, 1296)
+
+[node name="PuffsacHives" parent="Entities" instance=ExtResource("25_puffsac")]
+position = Vector2(12880, 1232)
+
+[node name="PuffsacLobe" parent="Entities" instance=ExtResource("25_puffsac")]
+position = Vector2(14576, 3088)
+
+[node name="LasherBronchus" parent="Entities" instance=ExtResource("26_lasher")]
+position = Vector2(9296, 2406)
+
+[node name="LasherBellows" parent="Entities" instance=ExtResource("26_lasher")]
+position = Vector2(11216, 3366)
+
+[node name="LasherLobe" parent="Entities" instance=ExtResource("26_lasher")]
+position = Vector2(12816, 3398)
+
+[node name="LasherLobeEast" parent="Entities" instance=ExtResource("26_lasher")]
+position = Vector2(14896, 3398)
+
+[node name="LasherHives" parent="Entities" instance=ExtResource("26_lasher")]
+position = Vector2(13552, 998)
+
+[node name="RayBellows" parent="Entities" instance=ExtResource("27_ray")]
+position = Vector2(10736, 1616)
+
+[node name="RayBellowsHigh" parent="Entities" instance=ExtResource("27_ray")]
+position = Vector2(10256, 976)
+
+[node name="RayLobe" parent="Entities" instance=ExtResource("27_ray")]
+position = Vector2(13776, 3056)
