@@ -1,6 +1,6 @@
 class_name DebugOverlay
 extends CanvasLayer
-## F3 overlay: FPS, position, velocity, chunk coord, chunk loading.
+## F3 overlay: FPS, position, velocity, chunk coord, region, chunk loading.
 ##
 ## A CanvasLayer draws on top of the game, ignoring the camera, which is
 ## what you want for UI and debug text.
@@ -38,8 +38,8 @@ func _process(_delta: float) -> void:
 		"FPS %d" % Engine.get_frames_per_second(),
 		"pos %.0f, %.0f   tile %d, %d" % [pos.x, pos.y, floori(pos.x / ChunkData.TILE_PX), floori(pos.y / ChunkData.TILE_PX)],
 		"vel %.0f, %.0f" % [player.velocity.x, player.velocity.y],
-		"chunk %s" % ChunkData.world_to_chunk(pos),
-		"floor %s  wall %s  cling %s" % [player.is_on_floor(), player.is_on_wall(), player.is_clinging()],
+		"chunk %s  region %s" % [ChunkData.world_to_chunk(pos), WorldMap.region_of(pos)],
+		"floor %s  wall %s  cling %s  membrane %s" % [player.is_on_floor(), player.is_on_wall(), player.is_clinging(), player.is_on_membrane()],
 	])
 	if WorldState.data:
 		lines.append("seed %d  year %d" % [WorldState.data.world_seed, WorldState.data.year])

@@ -5,12 +5,18 @@
 [ext_resource type="Texture2D" path="res://assets/art/backdrop/backdrop_far.png" id="3_far"]
 [ext_resource type="Texture2D" path="res://assets/art/backdrop/backdrop_mid.png" id="4_mid"]
 [ext_resource type="Texture2D" path="res://assets/art/backdrop/backdrop_near.png" id="5_near"]
+[ext_resource type="Texture2D" path="res://assets/art/backdrop/lungs_far.png" id="6_lfar"]
+[ext_resource type="Texture2D" path="res://assets/art/backdrop/lungs_mid.png" id="7_lmid"]
+[ext_resource type="Texture2D" path="res://assets/art/backdrop/lungs_near.png" id="8_lnear"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_wall"]
 shader = ExtResource("2_shader")
 shader_parameter/far_texture = ExtResource("3_far")
 shader_parameter/mid_texture = ExtResource("4_mid")
 shader_parameter/near_texture = ExtResource("5_near")
+shader_parameter/lungs_far_texture = ExtResource("6_lfar")
+shader_parameter/lungs_mid_texture = ExtResource("7_lmid")
+shader_parameter/lungs_near_texture = ExtResource("8_lnear")
 
 [node name="Backdrop" type="CanvasLayer"]
 layer = -10

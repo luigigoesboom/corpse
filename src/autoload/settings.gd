@@ -11,7 +11,7 @@ const BUSES := [&"Master", &"Music", &"Ambience", &"SFX", &"UI"]
 ## Actions a player may rebind, in the order the Controls tab shows them,
 ## with the name it shows.
 const REBINDABLE := {
-	&"move_left": "Move left", &"move_right": "Move right", &"jump": "Jump", &"attack": "Attack",
+	&"move_left": "Move left", &"move_right": "Move right", &"move_down": "Down (drop through)", &"jump": "Jump", &"attack": "Attack",
 	&"dodge": "Dodge roll", &"sneak": "Sneak", &"interact": "Talk / take / use",
 	&"ability_mouth": "Mouth mutation", &"ability_arm": "Arm mutation", &"inventory": "Inventory",
 	&"quick_save": "Quick save", &"quick_load": "Quick load",

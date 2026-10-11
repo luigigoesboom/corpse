@@ -6,6 +6,10 @@ extends RefCounted
 ##   near: a few big tendrils and vessels close behind the playfield
 ## Writes assets/art/backdrop/backdrop_far.png, _mid.png, _near.png. Each
 ## tiles both ways (shapes near an edge are drawn again across it).
+## The Lungs (week 47) have their own three: lungs_far.png (a wall of packed
+## alveoli), lungs_mid.png (bronchial trees and the arches of cartilage
+## rings), lungs_near.png (bronchioles hanging close); the shader blends
+## to them in the Lungs.
 ## scenes/backdrop.tscn scrolls them (assets/shaders/backdrop.gdshader) and
 ## tints them by the kind of rock around the camera (src/world/backdrop.gd).
 
@@ -21,6 +25,15 @@ static func make(pal, out: Array) -> void:
 	Sheet.save(far, DIR + "backdrop_far.png")
 	Sheet.save(mid, DIR + "backdrop_mid.png")
 	Sheet.save(near, DIR + "backdrop_near.png")
+	var lungs := [_lungs_far(pal), _lungs_mid(pal), _lungs_near(pal)]
+	Sheet.save(lungs[0], DIR + "lungs_far.png")
+	Sheet.save(lungs[1], DIR + "lungs_mid.png")
+	Sheet.save(lungs[2], DIR + "lungs_near.png")
+	var lung_stack: Image = lungs[0].duplicate()
+	for layer in [lungs[1], lungs[2]]:
+		lung_stack.blend_rect(layer.get_region(Rect2i(0, 0, lung_stack.get_width(), lung_stack.get_height())), Rect2i(0, 0, lung_stack.get_width(), lung_stack.get_height()), Vector2i.ZERO)
+	lung_stack.resize(lung_stack.get_width() / 2, lung_stack.get_height() / 2, Image.INTERPOLATE_NEAREST)
+	out.append({"name": "lungs_stacked", "body": lung_stack})
 	for item in [["far", far], ["mid", mid], ["near", near]]:
 		var small: Image = item[1].duplicate()
 		small.resize(small.get_width() / 3, small.get_height() / 3, Image.INTERPOLATE_NEAREST)
@@ -144,4 +157,82 @@ static func _near(pal) -> Image:
 	# A great vessel crossing.
 	w.strand(Vector2(0, H * 0.6), Vector2(1, -0.08), W * 0.55, 16, 14, &"flesh", rng, black.merged({"z": 20}), 10)
 	w.strand(Vector2(W * 0.55, H * 0.6 - W * 0.04), Vector2(1, 0.08), W * 0.47, 14, 16, &"flesh", rng, black.merged({"z": 21}), 10)
+	return c.render().body
+
+
+# --- The Lungs (week 47) ------------------------------------------------------------
+
+## A wall of alveoli: round hollow sacs packed tight, each a dim dome with a
+## dark mouth, veins of blood between them.
+static func _lungs_far(pal) -> Image:
+	var W = 512
+	var H = 384
+	var c = Canvas.new(W, H, pal)
+	c.outlines = false
+	var w = Wrap.new(c, W, H)
+	var rng = RandomNumberGenerator.new()
+	rng.seed = 47
+	c.rect(Rect2(0, 0, W, H), &"rock_alveolus", {"flat": true, "lo": 0, "hi": 0, "z": -10})
+	for row in 17:
+		for col in 22:
+			var p = Vector2(col * 24 + (12 if row % 2 else 0) + rng.randf_range(-3, 3), row * 23 + rng.randf_range(-3, 3))
+			var r = rng.randf_range(9, 12)
+			w.ellipse(p, r, r * 0.9, &"rock_alveolus", {"lo": 0, "hi": 2, "dither": true, "tone": -0.35, "z": row * 0.01})
+			w.ellipse(p + Vector2(1, 2), r * 0.42, r * 0.38, &"outline", {"flat": true, "z": 1.0 + row * 0.01})
+	for i in 12:
+		w.strand(Vector2(rng.randf_range(0, W), rng.randf_range(0, H)), Vector2.from_angle(rng.randf_range(0, TAU)), rng.randf_range(60, 140), 1.4, 0.7, &"blood", rng, {"lo": 0, "hi": 0, "z": 3.0 + i * 0.01}, 7)
+	return c.render().body
+
+
+## Bronchial trees branching up from far below, and the pale arches of
+## cartilage rings, seen from inside the airway.
+static func _lungs_mid(pal) -> Image:
+	var W = 1024
+	var H = 512
+	var c = Canvas.new(W, H, pal)
+	c.outlines = false
+	var w = Wrap.new(c, W, H)
+	var rng = RandomNumberGenerator.new()
+	rng.seed = 53
+	var dim = {"lo": 0, "hi": 1, "dither": true, "tone": -0.3}
+	# Ring arches.
+	for k in 3:
+		var centre = Vector2(150 + k * 360 + rng.randf_range(-40, 40), H * 0.62)
+		var r = rng.randf_range(150, 210)
+		for i in 26:
+			var a = PI + i * PI / 25.0
+			w.ellipse(centre + Vector2(cos(a) * r, sin(a) * r * 0.85), 9, 7, &"rock_cartilage", dim.merged({"z": k + i * 0.001}))
+	# Trees: a trunk splitting in two, then two again, ending in clumps.
+	for k in 4:
+		var base = Vector2(rng.randf_range(0, W), H + 10)
+		_branch(w, base, Vector2(rng.randf_range(-0.2, 0.2), -1).normalized(), 150.0, 14.0, 4, rng, dim.merged({"z": 10 + k}))
+	return c.render().body
+
+
+static func _branch(w, from: Vector2, dir: Vector2, length: float, r: float, depth: int, rng: RandomNumberGenerator, opts: Dictionary) -> void:
+	var to = from + dir * length
+	w.capsule(from, to, r, r * 0.72, &"rock_alveolus", opts)
+	if depth == 0:
+		for i in 4:
+			w.ellipse(to + Vector2(rng.randf_range(-14, 14), rng.randf_range(-12, 6)), rng.randf_range(6, 10), rng.randf_range(5, 9), &"rock_alveolus", opts.merged({"z": opts.z + 0.5, "lo": 1, "hi": 3}))
+		return
+	for side in [-1.0, 1.0]:
+		_branch(w, to, dir.rotated(side * rng.randf_range(0.35, 0.6)), length * 0.68, r * 0.7, depth - 1, rng, opts.merged({"z": opts.z + 0.01}))
+
+
+## Bronchioles hanging close: dark tubes with sacs at their ends.
+static func _lungs_near(pal) -> Image:
+	var W = 1024
+	var H = 512
+	var c = Canvas.new(W, H, pal)
+	c.outlines = false
+	var w = Wrap.new(c, W, H)
+	var rng = RandomNumberGenerator.new()
+	rng.seed = 59
+	var black = {"lo": 0, "hi": 0, "flat": true}
+	for k in 7:
+		var top = Vector2(rng.randf_range(0, W), -10)
+		var length = rng.randf_range(120, 260)
+		w.strand(top, Vector2(rng.randf_range(-0.15, 0.15), 1), length, rng.randf_range(5, 9), 2.0, &"rock_alveolus", rng, black.merged({"z": k}), 8)
+		w.ellipse(top + Vector2(0, length), rng.randf_range(12, 20), rng.randf_range(10, 16), &"rock_alveolus", black.merged({"z": k + 0.5}))
 	return c.render().body

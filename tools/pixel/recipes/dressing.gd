@@ -319,6 +319,89 @@ class Things:
 			4: vein(c, pal, &"rock_rot", Vector2(0, 4), Vector2(9, 28), rng)
 			5: tuft(c, &"rock_rot", 4, 0, 0, rng)
 
+	# --- alveolus (the Lungs, week 47) ---------------------------------------------
+	static func alveolus_floor(c, pal, v: int, rng) -> void:
+		match v:
+			0, 1:  # Cilia, swaying all one way (the breath).
+				for i in 6 + v * 2:
+					var base = Vector2(4 + i * 3.2, 31.5)
+					c.stroke(base, base + Vector2(3 + rng.randf_range(0, 2), -6 - rng.randf_range(0, 6)), pal.step(&"rock_alveolus", 5))
+			2: cluster(c, &"lung", Vector2(16, 28), 6, 3.0, rng, {"dither": true})  # Little air sacs.
+			3:  # A bubble of mucus, catching the light.
+				c.ellipse(Vector2(16, 28), 7, 4, &"rock_alveolus", {"lo": 4, "alpha": 0.8})
+				c.circle(Vector2(13, 26), 1.2, &"wing", {"glow": true})
+			4: tuft(c, &"rock_alveolus", 16, 5, 7, rng, {"lo": 3})
+			5:  # A pinched-off lobe.
+				c.ellipse(Vector2(16, 27), 6, 5, &"lung", {"dither": true})
+				c.stroke(Vector2(16, 22), Vector2(16, 31), pal.step(&"blood", 1))
+
+	static func alveolus_ceiling(c, pal, v: int, rng) -> void:
+		match v:
+			0, 1:  # Bronchioles: thin branching tubes ending in sacs.
+				var end = hang(c, &"rock_alveolus", 12 + v * 6, 12 + v * 5, 1.2, rng, {"lo": 3})
+				c.circle(end + Vector2(0, 2), 2.8, &"lung", {"dither": true})
+			2: cluster(c, &"lung", Vector2(16, 4), 5, 3.2, rng, {"dither": true})
+			3:  # Mucus strings.
+				for i in 3:
+					var end = hang(c, &"rock_alveolus", 8 + i * 8, rng.randf_range(8, 20), 0.7, rng, {"lo": 5})
+					c.circle(end, 1.4, &"rock_alveolus", {"lo": 5, "alpha": 0.85})
+			4:  # Glowing spores caught in the lining.
+				cluster(c, &"rock_alveolus", Vector2(16, 3), 3, 2.5, rng, {"lo": 3})
+				for i in 3:
+					c.circle(Vector2(10 + i * 6, 6 + (i % 2) * 2), 1.0, &"glow_fungus", {"glow": true})
+			5:
+				for i in 5:
+					c.stroke(Vector2(5 + i * 5, 0), Vector2(7 + i * 5, 5 + rng.randf_range(0, 5)), pal.step(&"rock_alveolus", 5))
+
+	static func alveolus_wall(c, pal, v: int, rng) -> void:
+		match v:
+			0, 1:  # Cilia along the wall.
+				for i in 6:
+					var base = Vector2(0, 5 + i * 4)
+					c.stroke(base, base + Vector2(5 + rng.randf_range(0, 3), -2 + v * 2), pal.step(&"rock_alveolus", 5))
+			2: cluster(c, &"lung", Vector2(4, 16), 4, 3.2, rng, {"dither": true})
+			3: vein(c, pal, &"blood", Vector2(0, 6), Vector2(10, 26), rng)
+			4:
+				c.ellipse(Vector2(3, 16), 4, 6, &"rock_alveolus", {"lo": 4, "alpha": 0.8})
+			5: tuft(c, &"rock_alveolus", 4, 0, 0, rng)
+
+	# --- cartilage (the Lungs' airways, week 47) ----------------------------------
+	static func cartilage_floor(c, pal, v: int, rng) -> void:
+		match v:
+			0, 1:  # Ring stubs: the ends of cartilage rings.
+				for i in 2 + v:
+					var x = 8.0 + i * 8.0
+					c.ellipse(Vector2(x, 29), 3, 2.4, &"rock_cartilage", {"lo": 3})
+			2: tuft(c, &"rock_cartilage", 16, 6, 6, rng, {"lo": 4})  # Pale cilia.
+			3:  # A cast-off shell of mucus, dried hard.
+				c.polygon(PackedVector2Array([Vector2(8, 31), Vector2(14, 24), Vector2(22, 25), Vector2(25, 31)]), &"rock_cartilage", {"lo": 4})
+			4: cluster(c, &"rock_cartilage", Vector2(16, 29), 4, 2.4, rng, {"lo": 3})
+			5:
+				c.ellipse(Vector2(16, 30), 10, 2, &"rock_cartilage", {"lo": 2})
+
+	static func cartilage_ceiling(c, pal, v: int, rng) -> void:
+		match v:
+			0, 1:  # A rim of a ring, overhanging.
+				c.ellipse(Vector2(16, 2), 13 - v * 3, 3, &"rock_cartilage", {"lo": 3})
+				c.ellipse(Vector2(16, 4), 11 - v * 3, 1.5, &"rock_cartilage", {"lo": 1, "z": -1})
+			2:
+				for i in 3:
+					hang(c, &"rock_cartilage", 9 + i * 7, rng.randf_range(4, 10), 1.0, rng, {"lo": 3})
+			3: cluster(c, &"rock_cartilage", Vector2(16, 3), 4, 2.6, rng, {"lo": 3})
+			4:  # A drip of clear fluid.
+				c.capsule(Vector2(16, 0), Vector2(16, 8), 1.2, 0.8, &"wing", {"lo": 0})
+				c.circle(Vector2(16, 10), 1.3, &"wing", {"glow": true})
+			5: tuft(c, &"rock_cartilage", 16, 0, 0, rng)
+
+	static func cartilage_wall(c, pal, v: int, rng) -> void:
+		match v:
+			0, 1, 2:  # Ring ends sticking out of the wall.
+				for i in 2:
+					c.ellipse(Vector2(2, 9 + i * 12 + v), 4, 2, &"rock_cartilage", {"lo": 3, "z": i})
+			3: cluster(c, &"rock_cartilage", Vector2(3, 16), 3, 2.6, rng, {"lo": 3})
+			4: vein(c, pal, &"rock_cartilage", Vector2(0, 4), Vector2(8, 28), rng)
+			5: tuft(c, &"rock_cartilage", 4, 0, 0, rng)
+
 	# --- inlays: things buried in the rock ----------------------------------------
 	static func inlay(c, pal, kind: StringName, v: int, rng) -> void:
 		var rock: StringName = RockKinds.ramp(kind)
@@ -366,6 +449,18 @@ class Big:
 					c.ellipse(Vector2(31 + v * 3, 28), 15, 6, rock, {"lo": 2, "dither": true, "z": 1})
 					for i in 5:
 						c.circle(Vector2(20 + i * 6 + v * 3, 30), 1.4, &"glow_fungus", {"glow": true})
+				[&"alveolus", 0], [&"alveolus", 1]:  # A bronchiole tree: branches ending in clusters of sacs.
+					var trunk = Vector2(32, 63)
+					var top = Vector2(30 + v * 4, 34)
+					c.capsule(trunk, top, 4.0, 2.6, &"rock_alveolus", {"lo": 2})
+					for i in 4:
+						var tip = top + Vector2(-16 + i * 11, -8 - rng.randf_range(0, 14))
+						c.capsule(top, tip, 2.2, 1.2, &"rock_alveolus", {"lo": 2, "z": 0.5 + i * 0.01})
+						Things.cluster(c, &"lung", tip, 4, 3.0, rng, {"dither": true, "z": 2 + i * 0.01})
+				[&"cartilage", 0], [&"cartilage", 1]:  # A half ring standing out of the floor.
+					for i in 14:
+						var a = PI + i * PI / 13.0
+						c.circle(Vector2(32, 64) + Vector2(cos(a) * 24, sin(a) * 26), 3.6, &"rock_cartilage", {"lo": 2, "z": i * 0.01})
 				[&"bile", 0], [&"bile", 1]:  # Bile spires.
 					for i in 3:
 						var x = 18.0 + i * 13.0

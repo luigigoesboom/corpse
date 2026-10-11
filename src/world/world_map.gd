@@ -4,6 +4,8 @@ extends RefCounted
 ##
 ## Palette (see docs/ART_PIPELINE.md, "Painting the world"):
 ##   dark (darker than mid-grey)            -> rock
+##   magenta (255, 0, 255)                  -> a membrane (open space with a
+##                                             springy one-way floor, week 47)
 ##   light, or transparent                  -> open space
 ## Colors are matched loosely, so soft brush edges still read correctly.
 ## Everything outside the image counts as rock.
@@ -130,6 +132,18 @@ func is_solid(tile: Vector2i) -> bool:
 	return is_rock_color(image.get_pixelv(tile))
 
 
+## Membranes (week 47) are painted magenta. They are not solid: rock sees
+## them as open space, and things fall through them; only the host lands.
+static func is_membrane_color(c: Color) -> bool:
+	return c.a >= 0.5 and c.r > 0.7 and c.b > 0.7 and c.g < 0.35
+
+
+func is_membrane(tile: Vector2i) -> bool:
+	if tile.x < 0 or tile.y < 0 or tile.x >= size.x or tile.y >= size.y:
+		return false
+	return is_membrane_color(image.get_pixelv(tile))
+
+
 ## Size of the world in chunks, rounding up. A partial chunk at the edge is
 ## padded with rock.
 func size_in_chunks() -> Vector2i:
@@ -166,7 +180,13 @@ func make_chunk(chunk_coord: Vector2i) -> ChunkData:
 			var i := (y + B) * w + (x + B)
 			var cell := ChunkData.EMPTY
 			var kind := kind_at(origin + Vector2i(x, y)) if solid[i] else 0
-			if deep2[i]:
+			if not solid[i]:
+				var here := origin + Vector2i(x, y)
+				if is_membrane(here):
+					# Which ends are free: pinned to rock or joined to more membrane.
+					var variant := (0 if is_membrane(here + Vector2i.LEFT) else 1) + (0 if is_membrane(here + Vector2i.RIGHT) else 2)
+					cell = ChunkData.membrane_cell(variant)
+			elif deep2[i]:
 				cell = ChunkData.cell_of(ChunkData.DEEP, kind)
 			elif deep1[i]:
 				cell = ChunkData.cell_of(ChunkData.NEAR, kind)

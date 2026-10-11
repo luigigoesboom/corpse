@@ -8,6 +8,11 @@ shader_type canvas_item;
 uniform sampler2D far_texture : repeat_enable, filter_nearest;
 uniform sampler2D mid_texture : repeat_enable, filter_nearest;
 uniform sampler2D near_texture : repeat_enable, filter_nearest;
+// The Lungs' set (week 47), blended in by `lungs` (0 = the Gut, 1 = the Lungs).
+uniform sampler2D lungs_far_texture : repeat_enable, filter_nearest;
+uniform sampler2D lungs_mid_texture : repeat_enable, filter_nearest;
+uniform sampler2D lungs_near_texture : repeat_enable, filter_nearest;
+uniform float lungs = 0.0;
 uniform vec2 camera_position;  // Screen centre in world pixels, set by backdrop.gd.
 uniform vec2 screen_size = vec2(640.0, 360.0);  // Viewport size in game pixels.
 uniform float far_scroll = 0.12;
@@ -21,11 +26,18 @@ vec4 layer(sampler2D tex, float scroll, vec2 uv) {
 	return texture(tex, floor(world) / vec2(textureSize(tex, 0)));
 }
 
-void fragment() {
-	vec3 col = layer(far_texture, far_scroll, UV).rgb;
-	vec4 mid = layer(mid_texture, mid_scroll, UV);
+vec3 stack(sampler2D far_t, sampler2D mid_t, sampler2D near_t, vec2 uv) {
+	vec3 col = layer(far_t, far_scroll, uv).rgb;
+	vec4 mid = layer(mid_t, mid_scroll, uv);
 	col = mix(col, mid.rgb, mid.a);
-	vec4 near = layer(near_texture, near_scroll, UV);
-	col = mix(col, near.rgb, near.a);
+	vec4 near = layer(near_t, near_scroll, uv);
+	return mix(col, near.rgb, near.a);
+}
+
+void fragment() {
+	vec3 col = lungs < 0.999 ? stack(far_texture, mid_texture, near_texture, UV) : vec3(0.0);
+	if (lungs > 0.001) {
+		col = mix(col, stack(lungs_far_texture, lungs_mid_texture, lungs_near_texture, UV), lungs);
+	}
 	COLOR = vec4(col * tint * brightness, 1.0);
 }

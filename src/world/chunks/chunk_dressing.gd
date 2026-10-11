@@ -39,7 +39,7 @@ func setup(data: ChunkData) -> void:
 	var origin := data.coord * ChunkData.SIZE
 	for i in data.cells.size():
 		var cell := data.cells[i]
-		if cell == ChunkData.EMPTY:
+		if cell == ChunkData.EMPTY or ChunkData.is_membrane(cell):
 			continue
 		var tile := ChunkData.tile_of(cell)
 		var kind := ChunkData.kind_of(cell)

@@ -112,6 +112,10 @@ func _one_shots() -> void:
 	s.tone(0.0, 0.15, 180, 60, 0.7, "sine", 0.001, 3.0)
 	s.noise(0.05, 0.9, 0.45, 2600.0, 0.02, 1.4)  # Spores hissing out.
 	_done(s, "puffsac_burst", false, 0.9)
+	s = Synth.new(0.4, 42)
+	s.tone(0.0, 0.35, 95, 60, 0.8, "sine", 0.002, 2.5)  # A drum of skin.
+	s.squelch(0.0, 0.2, 0.35, 1.3)
+	_done(s, "membrane", false, 0.75)
 
 func _ui() -> void:
 	var s
@@ -195,3 +199,23 @@ func _loops() -> void:
 	s.soften(1500.0)
 	s.make_loop(1.0)
 	_done(s, "amb_boss", true, 0.7)
+	# Alveolus (the Lungs, week 47): slow breaths through sponge, crackling.
+	s = Synth.new(LOOP + 1.0, 48)
+	for k in 3:
+		var a: float = k * (LOOP / 3.0)
+		s.noise(a, a + 2.0, 0.55, 700.0, 1.6, 0.4)  # In...
+		s.noise(a + 2.0, a + 4.0, 0.4, 450.0, 0.3, 1.4)  # ...and out.
+	for i in 50:
+		s.bubble(s.rng.randf_range(0.0, LOOP), s.rng.randf_range(0.2, 0.5), s.rng.randf_range(0.03, 0.08))
+	s.make_loop(1.0)
+	_done(s, "amb_alveolus", true, 0.55)
+	# Cartilage: wind whistling down ringed pipes.
+	s = Synth.new(LOOP + 1.0, 49)
+	s.noise(0.0, LOOP + 1.0, 0.2, 1500.0, 0.0, 0.0)
+	for k in 4:
+		var a: float = k * (LOOP / 4.0)
+		var f: float = [330.0, 392.0, 294.0, 349.0][k]
+		s.tone(a, a + 3.5, f, f * 0.97, 0.08, "sine", 1.2, 1.2)
+		s.tone(a, a + 3.5, f * 2.01, f * 1.95, 0.03, "sine", 1.2, 1.2)
+	s.make_loop(1.0)
+	_done(s, "amb_cartilage", true, 0.5)

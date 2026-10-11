@@ -142,6 +142,22 @@ Columns: 8
 124  82  44	Rot rock mid
 164 114  62	Rot rock light
 204 152  94	Rot rock highlight
+# ramp rock_alveolus
+ 36  14  22	Alveolus deepest
+ 64  26  40	Alveolus deep
+ 96  42  60	Alveolus dark
+128  62  82	Alveolus
+164  90 108	Alveolus mid
+200 128 142	Alveolus light
+232 176 184	Alveolus highlight
+# ramp rock_cartilage
+ 22  24  34	Cartilage deepest
+ 40  44  60	Cartilage deep
+ 64  70  90	Cartilage dark
+ 92 100 122	Cartilage
+128 136 156	Cartilage mid
+170 178 196	Cartilage light
+214 220 232	Cartilage highlight
 # ramp tint
 120 120 120	Tint dark (cloth, tinted in game)
 170 170 170	Tint

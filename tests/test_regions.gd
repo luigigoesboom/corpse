@@ -42,7 +42,7 @@ func run() -> void:
 	check(ChunkData.KINDS == RockKinds.IDS, "the chunk cells use the kinds table")
 	var complete := true
 	for kind in RockKinds.IDS:
-		for key in ["ramp", "paint", "tint", "map", "sound"]:
+		for key in ["ramp", "paint", "tint", "map", "sound", "texture"]:
 			complete = complete and RockKinds.INFO[kind].has(key)
 	check(complete, "every kind has a ramp, paint, tint, map color and sound")
 	for i in RockKinds.count():

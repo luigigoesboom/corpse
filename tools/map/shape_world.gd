@@ -74,7 +74,11 @@ func _initialize() -> void:
 		print("NOT WRITTEN: %d open tiles would become unreachable" % lost)
 		quit(1)
 		return
-	var out := Image.create(w, h, false, Image.FORMAT_RGBA8)
+	# The world may be wider than the Gut's painting (the Lungs, painted by
+	# tools/map/paint_lungs.gd): those columns are kept as they are.
+	var old := Image.load_from_file(ProjectSettings.globalize_path(TARGET))
+	var out := Image.create(maxi(w, old.get_width()), maxi(h, old.get_height()), false, Image.FORMAT_RGBA8)
+	out.blit_rect(old, Rect2i(Vector2i.ZERO, old.get_size()), Vector2i.ZERO)
 	for y in h:
 		for x in w:
 			out.set_pixel(x, y, Color.BLACK if rock[y * w + x] else Color(1, 1, 1, 0))

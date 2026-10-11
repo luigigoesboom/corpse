@@ -5,6 +5,11 @@ Three lines a week minimum. Newest at the top.
 Template:
 
 ```
+## Week 47 (2026-10-11)
+Done: The Lungs' map. tools/map/paint_lungs.gd paints them into world.png (now 512 x 128): the Great Bronchus from the east cavern's row-75 ledge, the Bellows (a huge chamber with a balcony and a membrane ladder), the Alveolar Hives, the Lower Lobe, the Trachea up to the High Aerie; it checks every place can be reached with the host's jumps before writing. Membranes: magenta in the painting, one-way springy floors (bounce on landing, higher jumps, down + jump drops through; physics layer 7). New kinds of rock: alveolus (honeycomb) and cartilage (rings) with their own dressing, ambience loops and a membrane thump; the backdrop blends to the Lungs' own layers; regions.png; minimap shows membranes; F3 shows region and membrane. tests/test_lungs.gd.
+Not done: The Lungs are empty: no landmarks, creatures or people yet (weeks 48-50). No spawn point there.
+Next: Week 48, set pieces and landmarks. Developer question: the art looks too geometric; idea of generated images pixelated into the palette (an import tool after the Lungs).
+
 ## Week 46 (2026-10-11)
 Done: D-030, regions as data: `Regions` (src/sim), regions.png read by `WorldMap.region_at()`, `region` on factions and sites (save version 23 with its migration), the history sim runs each region with its own generator side by side (the Gut's past is word for word the same for five seeds, between lives too), site slots stay inside their region. `RockKinds` replaces eight copies of the kinds list (tiles and dressing come out byte-identical). Old saves are tested: tests/fixtures (versions 22 and 23), tests/make_fixture.gd, tests/test_old_saves.gd; tests/test_regions.gd.
 Not done: The Lungs have no past yet (history off until their people exist, week 50) and no map (week 47).

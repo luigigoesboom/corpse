@@ -3,11 +3,18 @@ extends RefCounted
 ## tiles per kind of rock (RockKinds: flesh, bile, bruise, bone, rot...),
 ## stacked downward in assets/art/tiles/gut_tiles.png. Each block: the 16
 ## open-sides masks (rims on open sides, a 12 px paved face on top when the
-## tile has air above), then NEAR and DEEP fill. Every kind is the same
-## drawing in its own 7-step ramp, with dither between steps.
+## tile has air above), then NEAR and DEEP fill. Every kind is drawn in its
+## own 7-step ramp, with dither between steps, in its RockKinds texture:
+## cobble (lumps with dark gaps), honeycomb (round hollow cells: alveoli),
+## rings (stacked bands: cartilage).
+##
+## After the last kind, one more row: the four membranes (week 47): middle,
+## left end, right end, alone (ChunkData.membrane_cell()).
 ##
 ## Also writes the tileset's extra rows (gut_tileset.tres): every kind's
-## tiles get the collision and light occluders of the flesh tiles.
+## tiles get the collision and light occluders of the flesh tiles; membranes
+## get a thin one-way collision on physics layer 2 (collision layer 7,
+## MEMBRANE_LAYER), which the host can drop through.
 
 const Sheet := preload("res://tools/pixel/sheet.gd")
 const T := 32
@@ -18,12 +25,22 @@ const KINDS := RockKinds.IDS  # Each kind's ramp is in RockKinds.
 const BAYER := [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
 const ATLAS := "res://assets/art/tiles/gut_tiles.png"
 const TILESET := "res://assets/art/tiles/gut_tileset.tres"
+## Physics layer 7 (value 64): membranes.
+const MEMBRANE_LAYER := 64
+## Where a membrane's one-way collision lies in its tile (centred coords):
+## its top 6 px under the tile's top, like a floor (D-023 FLOOR_SINK).
+const MEMBRANE_TOP := -10.0
+const MEMBRANE_BOTTOM := -5.0
+
+## The texture of the kind being drawn (RockKinds.texture()).
+static var _texture := "cobble"
 
 
 static func make(pal, out: Array) -> void:
 	var cells := _voronoi_points()
-	var atlas := Image.create(T * 4, T * 5 * KINDS.size(), false, Image.FORMAT_RGBA8)
+	var atlas := Image.create(T * 4, T * 5 * KINDS.size() + T, false, Image.FORMAT_RGBA8)
 	for k in KINDS.size():
+		_texture = RockKinds.texture(KINDS[k])
 		var ramp: Array = pal.ramp(RockKinds.ramp(KINDS[k]))
 		var block := Image.create(T * 4, T * 5, false, Image.FORMAT_RGBA8)
 		for mask in 16:
@@ -32,6 +49,10 @@ static func make(pal, out: Array) -> void:
 		_fill(block, Vector2i(1, 4) * T, -1.7, ramp, cells)  # DEEP
 		atlas.blit_rect(block, Rect2i(0, 0, T * 4, T * 5), Vector2i(0, T * 5 * k))
 		out.append({"name": "tiles_%s" % KINDS[k], "body": block})
+	_texture = "cobble"
+	var membranes := _membranes(pal)
+	atlas.blit_rect(membranes, Rect2i(0, 0, T * 4, T), Vector2i(0, T * 5 * KINDS.size()))
+	out.append({"name": "membranes", "body": membranes})
 	Sheet.save(atlas, ATLAS)
 	_write_tileset()
 
@@ -73,8 +94,18 @@ static func _voronoi(x: int, y: int, cells: Array) -> Dictionary:
 	return {"gap": d2 - d1 < 1.1, "tone": cells[best].tone}
 
 
-## Cobbled flesh (or bile, or bone...): lumps with dark gaps, lit from above.
+## The rock's surface tone at a pixel, in the current kind's texture.
 static func _cobble(x: int, y: int, cells: Array) -> float:
+	match _texture:
+		"honeycomb":
+			return _honeycomb(x, y)
+		"rings":
+			return _rings(x, y, cells)
+	return _lumps(x, y, cells)
+
+
+## Cobbled flesh (or bile, or bone...): lumps with dark gaps, lit from above.
+static func _lumps(x: int, y: int, cells: Array) -> float:
 	var v := _voronoi(x, y, cells)
 	if v.gap:
 		return 0.4
@@ -83,6 +114,45 @@ static func _cobble(x: int, y: int, cells: Array) -> float:
 	if _voronoi(x, y + 1, cells).gap or _voronoi(x + 1, y, cells).gap:
 		return 1.0
 	return v.tone
+
+
+## Lung: round hollow cells (alveoli) packed on a grid that tiles every
+## 32 px: each a dome lit from the top left around a dark hole, dark between.
+static func _honeycomb(x: int, y: int) -> float:
+	var p := Vector2(posmod(x, T) + 0.5, posmod(y, T) + 0.5)
+	var best := INF
+	var centre := Vector2.ZERO
+	for row in range(-1, 5):
+		for col in range(-1, 5):
+			var c := Vector2(col * 8.0 + (4.0 if row % 2 != 0 else 0.0) + 4.0, row * 8.0 + 4.0)
+			var d := p.distance_to(c)
+			if d < best:
+				best = d
+				centre = c
+	var r := best / 4.6
+	if r > 1.0:
+		return 0.5  # The walls between cells.
+	if r < 0.38:
+		return 0.9 + r  # The hollow.
+	var lit := (centre - p).normalized().dot(Vector2(0.6, 0.8))  # Lit rim at the bottom right of the hollow.
+	return 3.0 + lit * 1.2 - (r - 0.6) * 1.5
+
+
+## Cartilage: stacked rings, each a band lit along its top with a dark
+## groove under it, and a faint grain across.
+static func _rings(x: int, y: int, cells: Array) -> float:
+	var band := posmod(y, 8)
+	var grain := 0.25 if _voronoi(x, y * 3, cells).gap else 0.0
+	match band:
+		0:
+			return 0.4
+		1:
+			return 4.4 - grain
+		2, 3:
+			return 3.4 - grain
+		4, 5:
+			return 2.8 - grain
+	return 2.0 - grain
 
 
 static func _fill(img: Image, at: Vector2i, shift: float, ramp: Array, cells: Array) -> void:
@@ -172,6 +242,42 @@ static func _face(x: int, y: int, left: bool, right: bool) -> float:
 	return [4.6, 5.0, 5.3][(stone + band) % 3] - (y - top_row) * 0.12
 
 
+# --- Membranes -------------------------------------------------------------------
+
+## Four 32 px membrane tiles side by side: middle, left end, right end,
+## alone. A thin sagging sheet of lung across the top of the tile, its top
+## where the collision is; ends are pinned to the rock beside them.
+static func _membranes(pal) -> Image:
+	var img := Image.create(T * 4, T, false, Image.FORMAT_RGBA8)
+	var lung: Array = pal.ramp(&"lung")
+	var vein: Color = pal.step(&"blood", 1)
+	for v in 4:
+		var left_end := v == 1 or v == 3
+		var right_end := v == 2 or v == 3
+		for x in T:
+			# Sag: a gentle curve over every tile, tighter at pinned ends.
+			var sag := sin((x + 0.5) / T * PI) * 1.5
+			if left_end and x < 6:
+				sag -= (6 - x) * 0.4
+			if right_end and x > T - 7:
+				sag -= (x - (T - 7)) * 0.4
+			var top := int(round(16 + MEMBRANE_TOP + sag))
+			for y in range(top, top + 5):
+				var tone := 2.0 if y == top else (1.0 if y == top + 4 else 1.5)
+				var bayer: int = BAYER[(y % 4) * 4 + (x % 4)]
+				var c: Color = lung[clampi(int(tone + (0.5 if bayer > 8 else 0.0)), 0, lung.size() - 1)]
+				c.a = 0.85 if y == top else 0.7
+				img.set_pixel(v * T + x, y, c)
+			if (x + v * 7) % 11 == 0:
+				img.set_pixel(v * T + x, top + 2, vein)  # A vein through it.
+		# Pins: a knot of lung where an end meets the rock.
+		for end in [[left_end, 1], [right_end, T - 2]]:
+			if end[0]:
+				for dy in range(-1, 3):
+					img.set_pixel(v * T + end[1], int(16 + MEMBRANE_TOP) + dy, lung[0])
+	return img
+
+
 # --- Tileset ---------------------------------------------------------------------
 
 ## Copies the flesh tiles' lines (rows 0..4: collision, occluders) to every
@@ -198,9 +304,19 @@ static func _write_tileset() -> void:
 			var m := re.search(line)
 			var row := int(m.get_string(2)) + 5 * k
 			extra.append("%s:%d/0%s" % [m.get_string(1), row, line.substr(m.get_end())])
+	# Membranes: the row after the last kind, one-way, on physics layer 2.
+	var row := 5 * KINDS.size()
+	var points := "PackedVector2Array(-16, %d, 16, %d, 16, %d, -16, %d)" % [MEMBRANE_TOP, MEMBRANE_TOP, MEMBRANE_BOTTOM, MEMBRANE_BOTTOM]
+	for v in 4:
+		extra.append("%d:%d/0 = 0" % [v, row])
+		extra.append("%d:%d/0/physics_layer_1/polygon_0/points = %s" % [v, row, points])
+		extra.append("%d:%d/0/physics_layer_1/polygon_0/one_way = true" % [v, row])
 	var out := keep.slice(0, last_tile_line + 1)
 	out.append_array(extra)
 	out.append_array(keep.slice(last_tile_line + 1))
+	var layer_line := "physics_layer_1/collision_layer = %d" % MEMBRANE_LAYER
+	if not layer_line in out:
+		out.insert(out.find("physics_layer_0/collision_layer = 1") + 1, layer_line)
 	var file := FileAccess.open(TILESET, FileAccess.WRITE)
 	file.store_string("\n".join(out))
 	file.close()

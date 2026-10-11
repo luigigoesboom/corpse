@@ -116,6 +116,21 @@ var body_hidden := false
 
 
 ## Stealth (week 36).
+## Membranes (week 47): springy one-way sheets of lung on physics layer 7
+## (MEMBRANE_LAYER). Landing on one faster than MEMBRANE_MIN_BOUNCE throws
+## you back up with MEMBRANE_BOUNCE of the speed (more if jump is held);
+## jumping off one goes MEMBRANE_JUMP times as high; down + jump drops
+## through it.
+const MEMBRANE_LAYER := 64
+const MEMBRANE_MIN_BOUNCE := 300.0
+const MEMBRANE_BOUNCE := 0.6
+const MEMBRANE_BOUNCE_HELD := 0.85
+const MEMBRANE_JUMP := 1.25
+const DROP_TIME := 0.25
+
+var _on_membrane := false
+var _drop_timer := 0.0
+
 const SNEAK_SPEED_SCALE := 0.4
 const SNEAK_VISIBILITY := 0.3
 const WATCH_LIGHT_BOOST := 2.5
@@ -156,11 +171,18 @@ func _physics_process(delta: float) -> void:
 	else:
 		_apply_run(input_dir, delta)
 		if has_control:
+			_try_drop()
 			_apply_jump()
 	_mutations.physics_tick(delta)
 
 	var fall_speed := velocity.y
 	move_and_slide()
+	_on_membrane = is_on_floor() and _floor_is_membrane()
+	if _on_membrane and not _was_on_floor and fall_speed > MEMBRANE_MIN_BOUNCE and not _dead:
+		var keep := MEMBRANE_BOUNCE_HELD if Input.is_action_pressed("jump") else MEMBRANE_BOUNCE
+		velocity.y = -fall_speed * keep
+		_on_membrane = false
+		Sfx.play(&"membrane", global_position)
 
 	if not is_zero_approx(velocity.x) and not _clinging and has_control:
 		_facing = signf(velocity.x)
@@ -381,6 +403,10 @@ func _tick_timers(delta: float) -> void:
 	_hurt_timer -= delta
 	_dodge_timer -= delta
 	_dodge_cooldown_timer -= delta
+	if _drop_timer > 0.0:
+		_drop_timer -= delta
+		if _drop_timer <= 0.0:
+			set_collision_mask_value(7, true)  # Membranes hold again.
 	if Input.is_action_just_pressed("jump"):
 		_jump_buffer_timer = jump_buffer_time
 
@@ -442,10 +468,35 @@ func _apply_run(input_dir: float, delta: float) -> void:
 	velocity.x = move_toward(velocity.x, input_dir * top, rate * delta)
 
 
+## Down + jump on a membrane: through it.
+func _try_drop() -> void:
+	if not _on_membrane or _jump_buffer_timer <= 0.0 or not Input.is_action_pressed("move_down"):
+		return
+	set_collision_mask_value(7, false)
+	_drop_timer = DROP_TIME
+	velocity.y = 80.0
+	_on_membrane = false
+	_consume_jump()
+
+
+## Whether what the host stands on is a membrane (its body is on the
+## membrane physics layer). A test move down, as standing still slides
+## into nothing.
+func _floor_is_membrane() -> bool:
+	var hit := KinematicCollision2D.new()
+	if not test_move(global_transform, Vector2(0, 2), hit):
+		return false
+	return hit.get_normal().y < -0.7 and PhysicsServer2D.body_get_collision_layer(hit.get_collider_rid()) & MEMBRANE_LAYER != 0
+
+
+func is_on_membrane() -> bool:
+	return _on_membrane
+
+
 func _apply_jump() -> void:
 	if _jump_buffer_timer > 0.0:
 		if _coyote_timer > 0.0:
-			velocity.y = _jump_velocity
+			velocity.y = _jump_velocity * (MEMBRANE_JUMP if _on_membrane else 1.0)
 			_dust.restart()
 			Sfx.play(&"jump")
 			_loud = 0.3

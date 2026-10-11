@@ -48,6 +48,18 @@ static func cell_of(tile: int, kind: int) -> int:
 	return 1 + tile + TILES * kind
 
 
+## A membrane (week 47): not rock but a springy one-way sheet, stored like
+## one more kind after the real ones, so its tiles are the atlas row after
+## the last kind's block. `variant`: 0 middle, 1 left end, 2 right end,
+## 3 alone.
+static func membrane_cell(variant: int) -> int:
+	return cell_of(variant, KINDS.size())
+
+
+static func is_membrane(cell: int) -> bool:
+	return cell != EMPTY and kind_of(cell) == KINDS.size()
+
+
 static func tile_of(cell: int) -> int:
 	return (cell - 1) % TILES
 

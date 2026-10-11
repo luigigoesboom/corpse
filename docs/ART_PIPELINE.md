@@ -48,6 +48,7 @@ The level is a PNG: `data/maps/world.png`, **one pixel = one tile** (32 x 32 px 
 | Paint | Means |
 |---|---|
 | Black / dark | Rock |
+| Magenta (255, 0, 255) | A membrane: open space with a springy one-way floor (week 47) |
 | White, light, or transparent | Open space |
 
 **Krita setup (once):**
@@ -77,7 +78,21 @@ Godot --headless --path . --script res://tools/map/shape_world.gd
 
 It erodes walls and ceilings with noise, hollows tall ceilings and hangs lumps from them (each lump kept only if it blocks nothing), cleans stray tiles, digs the two extra caves (above the Tender camp up a ledged shaft; the hollow off the tall corridor) and a few alcoves, and writes their floor points to tools/map/alcoves.json (ichor clots sit there in world.tscn). Floors never change: every rock tile with air above, the tile under it and the air above it stay, and so does a box around everything placed in world.tscn. It refuses to write if any open tile that was reachable would be cut off or a new cave cannot be reached. tests/test_map.gd climbs the shaft with the real player physics.
 
-To change the world's shape: paint `_source/world_painted.png` (or world.png directly, if you do not want the shaping) and run the script again.
+To change the world's shape: paint `_source/world_painted.png` (or world.png directly, if you do not want the shaping) and run the script again. It only rewrites the Gut's columns; the Lungs (below) stay.
+
+## The Lungs (week 47)
+
+The Lungs are painted by code, not in Krita: `tools/map/paint_lungs.gd` is their painting.
+
+```
+Godot --headless --path . --script res://tools/map/paint_lungs.gd
+```
+
+It widens world.png to 512 x 128 (the Gut's columns are never touched), carves the Lungs into columns 256 and up (the Great Bronchus from the east cavern's row-75 ledge, the Bellows and its membrane ladder, the Alveolar Hives, the Lower Lobe, the Trachea up to the High Aerie), paints their kinds of rock (alveolus, cartilage around the airways) into tiles.png and their region into regions.png, and writes floor spots of each place to tools/map/lungs.json. Before writing anything it walks the host's moves over the new map (steps, jumps up to 3 tiles high and 4 across, falls, drops through membranes) from the Gut and refuses if any place cannot be reached; `-- --show` prints an ASCII map of what was reached. tests/test_lungs.gd walks in with the real player, bounces on a membrane, drops through one and climbs the Bellows' ladder.
+
+**Membranes**: one-way, springy sheets of lung. Paint them magenta, one tile thick; their ends pin themselves to rock or to more membrane. The host lands on them (they sit at floor height, 6 px under the tile's top), bounces back up when landing fast, jumps 25% higher off them, and drops through with down + jump. Nothing else stands on them: creatures, items and bodies fall through. Climbable ladders are membranes 3 rows apart, overlapping or at most 4 tiles apart sideways.
+
+**Regions**: `data/maps/regions.png`, the same size as world.png, each region in its `Regions` paint color (the Lungs light blue; unpainted = the Gut).
 
 ## Painting faction territory
 
@@ -137,7 +152,7 @@ In a debug build, **F12** starts recording the game's own 640 x 360 picture at 1
 
 **Painting kinds.** `data/maps/tiles.png` is a second painting, the same size as world.png. Where it is transparent the rock is flesh; elsewhere the nearest of these colors picks the kind (`WorldMap.KIND_PAINT`): bile (150, 180, 40), bruise (110, 60, 170), bone (210, 200, 170), rot (140, 85, 40). Only rock pixels matter, so paint broad areas; soft or noisy borders blend kinds tile by tile. F4 reloads it with the map. The starter painting: bruise in the deep, bile in the east cavern, bone in the upper tunnel, rot around the chamber ruin.
 
-**Tiles.** `recipes/tiles.gd` draws the cobble rock and paved floors once per kind, each in its own 7-step ramp (`flesh`, `rock_bile`, `rock_bruise`, `rock_bone`, `rock_rot`), stacked as 4 x 5 blocks in `gut_tiles.png`, and copies the flesh tiles' collision and occluders to every kind's rows in `gut_tileset.tres`. A cell stores tile and kind in one byte (`ChunkData.cell_of()`, `tile_of()`, `kind_of()`).
+**Tiles.** `recipes/tiles.gd` draws the rock and paved floors once per kind (the kinds are `RockKinds`, src/world), each in its own 7-step ramp and texture (cobble lumps; honeycomb for the Lungs' alveolus; rings for cartilage), stacked as 4 x 5 blocks in `gut_tiles.png`, then a row of four membranes, and copies the flesh tiles' collision and occluders to every kind's rows in `gut_tileset.tres` (membranes get a thin one-way collision on physics layer 7, "membranes"). A cell stores tile and kind in one byte (`ChunkData.cell_of()`, `tile_of()`, `kind_of()`).
 
 **Backdrop.** `recipes/backdrop.gd` draws three seamless layers (assets/art/backdrop): far muscle-fibre walls, mid rib arches / flesh pillars / membranes, near dark tendrils and a vessel. `assets/shaders/backdrop.gdshader` scrolls them at 0.12 / 0.3 / 0.55 of the camera, dims them (`brightness`) and multiplies a `tint` that `src/world/backdrop.gd` eases toward the kinds of rock painted around the camera.
 
